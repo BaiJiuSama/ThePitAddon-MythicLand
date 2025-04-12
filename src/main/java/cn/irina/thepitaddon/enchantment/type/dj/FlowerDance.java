@@ -1,18 +1,18 @@
 package cn.irina.thepitaddon.enchantment.type.dj;
 
-import cn.charlotte.pit.parm.listener.IAttackEntity;
-import cn.charlotte.pit.parm.listener.IPlayerDamaged;
+import net.mizukilab.pit.parm.listener.IAttackEntity;
+import net.mizukilab.pit.parm.listener.IPlayerDamaged;
 import cn.irina.thepitaddon.ThePitAddon;
-import cn.charlotte.pit.enchantment.AbstractEnchantment;
+import net.mizukilab.pit.enchantment.AbstractEnchantment;
 import cn.irina.thepitaddon.utils.SongUtil;
 
-import cn.charlotte.pit.enchantment.param.item.ArmorOnly;
-import cn.charlotte.pit.enchantment.rarity.EnchantmentRarity;
-import cn.charlotte.pit.parm.listener.ITickTask;
-import cn.charlotte.pit.util.cooldown.Cooldown;
-import cn.charlotte.pit.util.music.NBSDecoder;
-import cn.charlotte.pit.util.music.PositionSongPlayer;
-import cn.charlotte.pit.util.music.Song;
+import net.mizukilab.pit.enchantment.param.item.ArmorOnly;
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity;
+import net.mizukilab.pit.parm.listener.ITickTask;
+import net.mizukilab.pit.util.cooldown.Cooldown;
+import net.mizukilab.pit.util.music.NBSDecoder;
+import net.mizukilab.pit.util.music.PositionSongPlayer;
+import net.mizukilab.pit.util.music.Song;
 import com.google.common.util.concurrent.AtomicDouble;
 import lombok.SneakyThrows;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;

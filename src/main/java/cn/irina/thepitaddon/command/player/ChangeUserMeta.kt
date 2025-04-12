@@ -1,9 +1,10 @@
 package cn.irina.thepitaddon.command.player
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.luckperms.api.LuckPermsProvider
@@ -21,7 +22,7 @@ class ChangeUserMeta {
 
     @Execute
     fun customUserMeta(
-        player: Player,
+        @Context player: Player,
         @Arg type: String,
         @Arg meta: String?
     ) {

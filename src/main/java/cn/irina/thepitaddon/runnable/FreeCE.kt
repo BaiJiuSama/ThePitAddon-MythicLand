@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.runnable
 
 import cn.charlotte.pit.data.PlayerProfile
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player

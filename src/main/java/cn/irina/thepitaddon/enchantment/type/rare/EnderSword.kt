@@ -1,13 +1,13 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
-import cn.charlotte.pit.enchantment.AbstractEnchantment
-import cn.charlotte.pit.enchantment.IActionDisplayEnchant
-import cn.charlotte.pit.enchantment.param.item.WeaponOnly
-import cn.charlotte.pit.enchantment.rarity.EnchantmentRarity
-import cn.charlotte.pit.util.PlayerUtil
-import cn.charlotte.pit.util.chat.RomanUtil
-import cn.charlotte.pit.util.cooldown.Cooldown
+import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.IActionDisplayEnchant
+import net.mizukilab.pit.enchantment.param.item.WeaponOnly
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.util.PlayerUtil
+import net.mizukilab.pit.util.chat.RomanUtil
+import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.entity.EnderPearl
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler

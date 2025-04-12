@@ -1,10 +1,11 @@
 package cn.irina.thepitaddon.command.admin
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.minecraft.server.v1_8_R3.EntityArmorStand
@@ -27,7 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable
 @Permission("pit.admin")
 class AdminCrashClient : Listener {
     @Execute
-    fun freezeClient(sender: CommandSender, @Arg target: Player) {
+    fun freezeClient(@Context sender: CommandSender, @Arg target: Player) {
         Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
             crashPlayer(target)
         }

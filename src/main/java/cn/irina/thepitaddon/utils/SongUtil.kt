@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.utils
 
-import cn.charlotte.pit.util.music.PositionSongPlayer
-import cn.charlotte.pit.util.music.Song
+import net.mizukilab.pit.util.music.PositionSongPlayer
+import net.mizukilab.pit.util.music.Song
 import org.bukkit.Effect
 import org.bukkit.entity.Player
 import java.util.*

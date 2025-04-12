@@ -1,6 +1,6 @@
 package cn.irina.thepitaddon.runnable
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 
 

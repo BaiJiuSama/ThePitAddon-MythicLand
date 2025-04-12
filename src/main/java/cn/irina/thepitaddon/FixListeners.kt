@@ -2,7 +2,7 @@ package cn.irina.thepitaddon
 
 import cn.charlotte.pit.data.PlayerProfile
 import cn.charlotte.pit.event.PitStreakKillChangeEvent
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound

@@ -1,9 +1,10 @@
 package cn.irina.thepitaddon.command.player
 
 import cn.charlotte.pit.data.PlayerProfile
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.item.ItemBuilder
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.item.ItemBuilder
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player
 @Command(name = "getexdiamonditem")
 class GetEXDiamondItem {
     @Execute
-    fun getExDiamondItem(player: Player) {
+    fun getExDiamondItem(@Context player: Player) {
         val profile = PlayerProfile.getRawCache(player.uniqueId) ?: return
 
         if (profile.coins < 1000) {

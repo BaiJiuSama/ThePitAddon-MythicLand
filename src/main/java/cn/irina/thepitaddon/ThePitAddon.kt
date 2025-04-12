@@ -1,52 +1,34 @@
 package cn.irina.thepitaddon
 
-import cn.charlotte.pit.enchantment.rarity.EnchantmentRarity
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.command.util.ClassUtil
-import cn.charlotte.pit.util.music.NBSDecoder
-import cn.charlotte.pit.util.music.Song
-import cn.irina.thepitaddon.command.admin.AdminChangeGameMode
-import cn.irina.thepitaddon.command.admin.AdminCommandEnchant
-import cn.irina.thepitaddon.command.admin.AdminCrashClient
-import cn.irina.thepitaddon.command.admin.AdminHealSelf
-import cn.irina.thepitaddon.command.admin.AdminPlayerAddValue
-import cn.irina.thepitaddon.command.admin.AdminValue
-import cn.irina.thepitaddon.command.admin.GodMode
-import cn.irina.thepitaddon.command.player.ChangeItemEnchant
-import cn.irina.thepitaddon.command.player.ChangeUserMeta
-import cn.irina.thepitaddon.command.player.GetEXDiamondItem
-import cn.irina.thepitaddon.command.player.GetIronHelmet
-import cn.irina.thepitaddon.command.player.PlayerOpenTrash
-import cn.irina.thepitaddon.command.player.PlayerSuicide
-import cn.irina.thepitaddon.command.player.ShowDevelopmentCommand
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.music.NBSDecoder
+import net.mizukilab.pit.util.music.Song
+import cn.irina.thepitaddon.command.admin.*
+import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
 import cn.irina.thepitaddon.perk.PerkManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
-import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getLogger
 import org.bukkit.command.CommandSender
-import org.bukkit.command.defaults.GameModeCommand
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scheduler.BukkitRunnable
 import org.reflections.Reflections
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
-import java.util.Timer
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.timerTask
 
 
 class ThePitAddon : JavaPlugin() {
@@ -218,7 +200,9 @@ class ThePitAddon : JavaPlugin() {
         InvocationTargetException::class
     )
     fun loadListener() {
-        val classes = ClassUtil.getClassesInPackage(this, "cn.irina.thepitaddon")
+        val reflections = Reflections("cn.irina.thepitaddon")
+        val classes = reflections.getSubTypesOf(Any::class.java)
+
         for (clazz in classes) {
             if (!Listener::class.java.isAssignableFrom(clazz)) continue
             Bukkit.getPluginManager().registerEvents(clazz.getDeclaredConstructor().newInstance() as Listener, instance)

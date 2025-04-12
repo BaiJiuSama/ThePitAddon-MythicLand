@@ -1,9 +1,10 @@
 package cn.irina.thepitaddon.command.player
 
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.item.ItemBuilder
-import cn.charlotte.pit.util.item.ItemUtil
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.item.ItemBuilder
+import net.mizukilab.pit.util.item.ItemUtil
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -17,7 +18,7 @@ import java.util.*
 @Command(name = "bin")
 class PlayerOpenTrash : Listener {
     @Execute
-    fun openTrash(player: Player) {
+    fun openTrash(@Context player: Player) {
         createInventory(player)
     }
 

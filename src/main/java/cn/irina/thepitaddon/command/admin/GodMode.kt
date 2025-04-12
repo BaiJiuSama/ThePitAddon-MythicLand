@@ -1,10 +1,11 @@
 package cn.irina.thepitaddon.command.admin
 
-import cn.charlotte.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
+import net.mizukilab.pit.util.chat.CC
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -23,7 +24,7 @@ class GodMode : Listener {
     private val activeMessage = CC.translate("$prefix&c你已开启God模式, 将不被允许 攻击 & 受击!")
 
     @Execute
-    fun onControlGodMode(sender: CommandSender) {
+    fun onControlGodMode(@Context sender: CommandSender) {
         if (sender !is Player) {
             sender.sendMessage(CC.translate("$prefix&c此命令只可由玩家执行!"))
             return

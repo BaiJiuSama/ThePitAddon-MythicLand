@@ -2,7 +2,7 @@ package cn.irina.thepitaddon
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.api.PitInternalHook
-import cn.charlotte.pit.util.item.ItemBuilder
+import net.mizukilab.pit.util.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 

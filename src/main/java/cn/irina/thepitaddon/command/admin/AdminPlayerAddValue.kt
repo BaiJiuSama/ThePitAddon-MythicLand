@@ -1,11 +1,12 @@
 package cn.irina.thepitaddon.command.admin
 
 import cn.charlotte.pit.data.PlayerProfile
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.level.LevelUtil
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.level.LevelUtil
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import org.bukkit.entity.Player
@@ -16,7 +17,7 @@ import java.util.*
 class AdminPlayerAddValue {
     @Execute
     fun addPlayerValue(
-        player: Player,
+        @Context player: Player,
         @Arg target: Player,
         @Arg type: String,
         @Arg amount: Int

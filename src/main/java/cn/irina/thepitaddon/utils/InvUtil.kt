@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.utils
 
-import cn.charlotte.pit.util.item.ItemBuilder
-import cn.charlotte.pit.util.item.ItemUtil
+import net.mizukilab.pit.util.item.ItemBuilder
+import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.entity.Player
 

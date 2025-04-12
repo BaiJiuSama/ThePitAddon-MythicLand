@@ -1,11 +1,9 @@
 package cn.irina.thepitaddon.events
 
-import cn.charlotte.pit.ThePit
-import cn.charlotte.pit.config.PitConfig
 import cn.charlotte.pit.data.PlayerProfile
 import cn.charlotte.pit.event.PitKillEvent
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.chat.ChatComponentBuilder
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import cn.irina.thepitaddon.ThePitAddon
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.HoverEvent

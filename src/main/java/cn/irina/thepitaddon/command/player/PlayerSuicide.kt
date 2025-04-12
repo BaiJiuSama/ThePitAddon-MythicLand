@@ -1,8 +1,9 @@
 package cn.irina.thepitaddon.command.player
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -12,7 +13,7 @@ import java.util.*
 class PlayerSuicide {
 
     @Execute
-    fun killMySelf(player: Player) {
+    fun killMySelf(@Context player: Player) {
         if (checkSuicideNumber.getOrDefault(player.uniqueId, 0) != 1) {
             checkSuicideNumber[player.uniqueId] = 1
             player.sendMessage(CC.translate("&c注意! 你当前正在使用 &e/suicide &c指令自杀!"))

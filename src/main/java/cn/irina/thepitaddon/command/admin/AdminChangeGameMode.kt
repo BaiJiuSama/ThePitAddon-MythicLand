@@ -1,9 +1,10 @@
 package cn.irina.thepitaddon.command.admin
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import org.bukkit.GameMode
@@ -13,7 +14,7 @@ import org.bukkit.entity.Player
 @Permission("pit.admin")
 class AdminChangeGameMode {
     @Execute
-    fun changeMySelfGameMode(player: Player, @Arg gameModeInt: Int) {
+    fun changeMySelfGameMode(@Context player: Player, @Arg gameModeInt: Int) {
         if (switchGameMode(gameModeInt) != null) {
             player.gameMode = switchGameMode(gameModeInt)
             player.sendMessage(CC.translate(PREFIX + " &7已将您的游戏模式设置为 &e" + switchGameModeString(gameModeInt)))

@@ -1,10 +1,11 @@
 package cn.irina.thepitaddon.command.player
 
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.item.ItemUtil
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.item.ItemUtil
 import cn.irina.thepitaddon.utils.NBTUtil.changeEnchantToItem
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import org.bukkit.command.CommandSender
@@ -15,7 +16,7 @@ import org.bukkit.entity.Player
 class ChangeItemEnchant {
     @Execute
     fun changeEnchant(
-        myself: CommandSender,
+        @Context myself: CommandSender,
         @Arg target: Player,
         @Arg needChange: String,
         @Arg toChange: String,

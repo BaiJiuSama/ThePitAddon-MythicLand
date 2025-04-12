@@ -1,14 +1,14 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
-import cn.charlotte.pit.enchantment.AbstractEnchantment
-import cn.charlotte.pit.enchantment.IActionDisplayEnchant
-import cn.charlotte.pit.enchantment.param.item.BowOnly
-import cn.charlotte.pit.enchantment.param.item.WeaponOnly
-import cn.charlotte.pit.enchantment.rarity.EnchantmentRarity
-import cn.charlotte.pit.parm.listener.IAttackEntity
-import cn.charlotte.pit.parm.listener.IPlayerShootEntity
-import cn.charlotte.pit.util.chat.CC
-import cn.charlotte.pit.util.cooldown.Cooldown
+import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.IActionDisplayEnchant
+import net.mizukilab.pit.enchantment.param.item.BowOnly
+import net.mizukilab.pit.enchantment.param.item.WeaponOnly
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.parm.listener.IAttackEntity
+import net.mizukilab.pit.parm.listener.IPlayerShootEntity
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.cooldown.Cooldown
 import cn.irina.thepitaddon.ThePitAddon
 import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.entity.Entity

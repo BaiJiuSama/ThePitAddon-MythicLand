@@ -1,6 +1,6 @@
 package cn.irina.thepitaddon.utils
 
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import cn.irina.thepitaddon.ThePitAddon
 import org.bukkit.Bukkit
 

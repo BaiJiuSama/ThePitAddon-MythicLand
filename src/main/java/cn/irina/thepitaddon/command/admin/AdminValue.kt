@@ -2,9 +2,10 @@ package cn.irina.thepitaddon.command.admin
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
-import cn.charlotte.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.CC
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import org.bukkit.entity.Player
@@ -14,7 +15,7 @@ import org.bukkit.entity.Player
 class AdminValue {
 
     @Execute(name = "setPlayerSpeed")
-    fun setSpeed(sender: Player, @Arg target: Player, @Arg value: Float) {
+    fun setSpeed(@Context sender: Player, @Arg target: Player, @Arg value: Float) {
         val targetProfile = PlayerProfile.getRawCache(target.uniqueId)
         target.walkSpeed = value
         targetProfile.moveSpeed = value
@@ -23,7 +24,7 @@ class AdminValue {
     }
 
     @Execute(name = "getPlayerSpeed")
-    fun getSpeed(sender: Player, @Arg target: Player) {
+    fun getSpeed(@Context sender: Player, @Arg target: Player) {
         val targetProfile = PlayerProfile.getRawCache(target.uniqueId)
         sender.sendMessage(CC.translate(target.name + "'s speed is " + target.walkSpeed))
         sender.sendMessage(CC.translate(target.name + "'s Profile Speed is " + targetProfile.moveSpeed))
@@ -31,7 +32,7 @@ class AdminValue {
 
     @Execute(name = "getEnchant")
     fun getEnchant(
-        sender: Player,
+        @Context sender: Player,
         @Arg enchantNBTName: String,
         @Arg enchantLevel: Int
     ) {
