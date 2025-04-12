@@ -1,0 +1,8 @@
+name: ThePitAddon
+version: '1.0'
+author: Irina, MindsMaster_
+main: cn.irina.thepitaddon.ThePitAddon
+load: STARTUP
+depend:
+  - ThePitUltimate
+  - LuckPerms
