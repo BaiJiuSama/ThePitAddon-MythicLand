@@ -1,9 +1,6 @@
 package cn.irina.thepitaddon
 
-import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.util.chat.CC
-import net.mizukilab.pit.util.music.NBSDecoder
-import net.mizukilab.pit.util.music.Song
+import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
@@ -13,6 +10,10 @@ import cn.irina.thepitaddon.runnable.FreeCE
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.music.NBSDecoder
+import net.mizukilab.pit.util.music.Song
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getLogger
 import org.bukkit.command.CommandSender
@@ -20,10 +21,13 @@ import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitRunnable
 import org.reflections.Reflections
+import org.reflections.scanners.Scanner
+import org.reflections.scanners.SubTypesScanner
+import org.reflections.util.ConfigurationBuilder
 import java.io.File
 import java.io.IOException
-import java.lang.reflect.InvocationTargetException
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.Executors
@@ -40,24 +44,47 @@ class ThePitAddon : JavaPlugin() {
         instance = this
     }
 
+    private val depends = listOf(
+        "LuckPerms",
+        "ThePitUltimate"
+    )
     override fun onEnable() {
         instance = this
 
         loadMusicResources()
         send("&e天坑斗斗终极版扩展 启动中...")
         saveResource("config.yml", false)
-        val thePitPlugin = Bukkit.getPluginManager().getPlugin("ThePitUltimate")
-        val luckPermsPlugin = Bukkit.getPluginManager().getPlugin("LuckPerms")
-
-        if (luckPermsPlugin != null && luckPermsPlugin.isEnabled) {
-            send("&aLuckPerms 已加载!")
-        } else {
-            send("&cLuckPerms 未加载!")
-            Bukkit.getPluginManager().disablePlugin(this)
-        }
 
         Bukkit.getScheduler().runTaskLater(this, {
-            setUp()
+            depends.forEach {
+                val depend = Bukkit.getPluginManager().getPlugin(it)
+                if (depend == null || !depend.isEnabled) {
+                    send("$PREFIX&c前置 &e$it &c未加载或缺失!")
+                    Bukkit.shutdown()
+                    return@runTaskLater
+                }
+            }
+            send("&a无缺失前置, 等待 &fThePit Ultimate &a加载完毕后加载...")
+
+            object : BukkitRunnable() {
+                var index = 0
+                override fun run() {
+                    index++
+                    if (index >= 120) {
+                        send("&fThePit Ultimate &c无法加载, 请检查您的 &f授权码 &c或 &f配置文件")
+                        Bukkit.shutdown()
+                        this.cancel()
+                        return
+                    }
+
+                    if (ThePit.getApi() == null) return
+
+                    send("&fThePit Ultimate &a已加载完毕, 正在加载...")
+                    Bukkit.setWhitelist(false)
+                    this.cancel()
+                    setUp()
+                }
+            }.runTaskTimerAsynchronously(this, 0, 5 * 20L)
         }, 21L)
 
 //        val timer = Timer()
@@ -193,19 +220,15 @@ class ThePitAddon : JavaPlugin() {
         perkManager.registerPerk()
     }
 
-    @Throws(
-        InstantiationException::class,
-        IllegalAccessException::class,
-        NoSuchMethodException::class,
-        InvocationTargetException::class
-    )
     fun loadListener() {
         val reflections = Reflections("cn.irina.thepitaddon")
-        val classes = reflections.getSubTypesOf(Any::class.java)
+        val classes = reflections.getSubTypesOf(Listener::class.java)
 
+        send("&e扫描到的监听类数量: &f${classes.size}")
         for (clazz in classes) {
-            if (!Listener::class.java.isAssignableFrom(clazz)) continue
-            Bukkit.getPluginManager().registerEvents(clazz.getDeclaredConstructor().newInstance() as Listener, instance)
+            send("&a注册: &f${clazz.simpleName}")
+            val listener = clazz.getDeclaredConstructor().newInstance() as Listener
+            Bukkit.getPluginManager().registerEvents(listener, this)
         }
     }
 
@@ -244,10 +267,8 @@ class ThePitAddon : JavaPlugin() {
                 )
 
                 Bukkit.getConsoleSender().sendMessage(CC.translate(PREFIX + messages))
-            } catch (e: NoSuchFieldException) {
-                getLogger().severe("错误! 无法反射并修改 Enchantment Rarity")
-            } catch (e: IllegalAccessException) {
-                getLogger().severe("错误! 无法反射并修改 Enchantment Rarity")
+            } catch (e: Exception) {
+                getLogger().severe("错误! 无法反射并修改 Enchantment Rarity $e")
             }
         }
     }
