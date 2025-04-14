@@ -56,7 +56,7 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
     override fun getUsefulnessLore(enchantLevel: Int): String {
         // "&7攻击时造成的伤害将 &c-${(10 + (enchantLevel * 5))}% /s" +
         return "&7攻击时对目标施加效果 &4凝血 &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)}) &7(${28 - (enchantLevel * 4)}s冷却) /s" +
-                "&7效果 &4凝血 &7: 无法恢复生命值"
+                "&7效果 &4凝血 &7: 无法通过任何附魔恢复生命值"
     }
 
     override fun handleAttackEntity(
@@ -81,7 +81,7 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
 
     val buffCancelRunnableMap: ConcurrentHashMap<UUID, BukkitRunnable> = ConcurrentHashMap()
     private val activeBuffList: MutableList<UUID> = ArrayList()
-    fun stackBuff(player: Player, duration: Int) {
+    private fun stackBuff(player: Player, duration: Int) {
         activeBuffList.add(player.uniqueId)
 
         buffCancelRunnableMap[player.uniqueId] = object : BukkitRunnable() {

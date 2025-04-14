@@ -2,22 +2,15 @@ package cn.irina.thepitaddon.enchantment.type.normal
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
+import cn.irina.thepitaddon.ThePitAddon.Companion.instance
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.cooldown.Cooldown
-import cn.irina.thepitaddon.ThePitAddon.Companion.instance
-import lombok.SneakyThrows
-import net.minecraft.server.v1_8_R3.PacketPlayInFlying
 import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
-
-import spg.lgdev.handler.MovementHandler
-import spg.lgdev.iSpigot
 
 @ArmorOnly
 class Scurry : AbstractEnchantment(), Listener {
