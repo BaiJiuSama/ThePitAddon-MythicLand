@@ -33,6 +33,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 
 class ThePitAddon : JavaPlugin() {
@@ -72,8 +73,11 @@ class ThePitAddon : JavaPlugin() {
                     index++
                     if (index >= 120) {
                         send("&fThePit Ultimate &c无法加载, 请检查您的 &f授权码 &c或 &f配置文件")
-                        Bukkit.shutdown()
+                        send("&c进入线程睡眠模式, 请通过 &f终止任务 &c退出")
                         this.cancel()
+                        while (true) {
+                            Thread.sleep(Long.MAX_VALUE)
+                        }
                         return
                     }
 
@@ -86,25 +90,6 @@ class ThePitAddon : JavaPlugin() {
                 }
             }.runTaskTimerAsynchronously(this, 0, 5 * 20L)
         }, 21L)
-
-//        val timer = Timer()
-//        var index = 0
-//        timer.schedule(timerTask {
-//                if (thePitPlugin == null || !thePitPlugin.isEnabled) {
-//                    index++
-//                    return@timerTask
-//                }
-//
-//                if (index >= 100) {
-//                    send("&c无法检测到 天坑豆豆终极版。")
-//                    test()
-//                    this.cancel()
-//                }
-//
-//                send("&e第 $index 次检查...")
-//
-//                this.cancel()
-//        }, 0L, 500L)
     }
 
     private fun setUp() {
@@ -273,25 +258,25 @@ class ThePitAddon : JavaPlugin() {
         }
     }
 }
-
-fun test() {
-    val currentThread = Thread.currentThread()
-    val threadGroup = currentThread.threadGroup
-
-    val activeCount = threadGroup.activeCount()
-    val threads = arrayOfNulls<Thread>(activeCount)
-    val actualCount = threadGroup.enumerate(threads)
-
-    for (i in 0 until actualCount) {
-        val thread = threads[i]
-
-        // 检查是否是当前线程
-        if (thread != null && thread !== currentThread) {
-            try {
-                thread.stop()
-            } catch (_: Exception) {
-                Runtime.getRuntime().halt(0)
-            }
-        }
-    }
-}
+//
+//fun test() {
+//    val currentThread = Thread.currentThread()
+//    val threadGroup = currentThread.threadGroup
+//
+//    val activeCount = threadGroup.activeCount()
+//    val threads = arrayOfNulls<Thread>(activeCount)
+//    val actualCount = threadGroup.enumerate(threads)
+//
+//    for (i in 0 until actualCount) {
+//        val thread = threads[i]
+//
+//        // 检查是否是当前线程
+//        if (thread != null && thread !== currentThread) {
+//            try {
+//                thread.stop()
+//            } catch (_: Exception) {
+//                Runtime.getRuntime().halt(0)
+//            }
+//        }
+//    }
+//}
