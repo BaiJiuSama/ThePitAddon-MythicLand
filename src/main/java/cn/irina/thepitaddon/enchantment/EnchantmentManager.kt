@@ -3,14 +3,20 @@ package cn.irina.thepitaddon.enchantment
 import cn.charlotte.pit.ThePit
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.utils.ClassUtil
+import io.netty.util.internal.ConcurrentSet
 import lombok.Getter
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity.*
 import net.mizukilab.pit.util.chat.CC.*
 import org.bukkit.Bukkit
 import org.reflections.Reflections
+import java.util.Collections
+import kotlin.reflect.KClass
 
 @Getter
 class EnchantmentManager {
+    private val enchantmentClasses: MutableList<Class<out AbstractEnchantment>> = ArrayList()
+
     private val formatEnchantList: MutableList<String> = ArrayList()
     private val opEnchants: MutableList<String> = ArrayList()
     private val rareEnchants: MutableList<String> = ArrayList()
@@ -21,15 +27,12 @@ class EnchantmentManager {
     private val darkRareEnchants: MutableList<String> = ArrayList()
 
     fun registerEnchantment() {
-        val reflections = Reflections("cn.irina.thepitaddon.enchantment.type")
+        val classes = ClassUtil.getClassesInPackage(ThePitAddon.instance, "cn.irina.thepitaddon.enchantment.type") ?: return
 
-        val enchantmentClasses = reflections.getSubTypesOf(
-            AbstractEnchantment::class.java
-        )
-
-        Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&e扫描到的附魔类数量: ${enchantmentClasses.size}"))
-        for (clazz in enchantmentClasses) {
-            val newInstance = clazz.getDeclaredConstructor().newInstance()
+        Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&e扫描到的附魔类数量: ${classes.size}"))
+        for (clazz in classes) {
+            if (clazz == null || !AbstractEnchantment::class.java.isAssignableFrom(clazz)) continue
+            val newInstance = clazz.getDeclaredConstructor().newInstance() as AbstractEnchantment
             val enchantName = newInstance.enchantName
             when (newInstance.rarity) {
                 OP -> opEnchants.add(translate("&c限定 &f$enchantName"))
@@ -41,6 +44,8 @@ class EnchantmentManager {
                 DARK_RARE -> darkRareEnchants.add(translate("&5暗黑稀有 &f$enchantName"))
                 else -> null
             }
+            @Suppress("UNCHECKED_CAST")
+            enchantmentClasses.add(clazz as Class<out AbstractEnchantment>)
         }
 
         formatEnchantList.addAll(opEnchants)
