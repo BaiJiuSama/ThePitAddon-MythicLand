@@ -4,14 +4,10 @@ import cn.charlotte.pit.ThePit
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import cn.irina.thepitaddon.ThePitAddon
 import cn.irina.thepitaddon.utils.ClassUtil
-import io.netty.util.internal.ConcurrentSet
 import lombok.Getter
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity.*
 import net.mizukilab.pit.util.chat.CC.*
 import org.bukkit.Bukkit
-import org.reflections.Reflections
-import java.util.Collections
-import kotlin.reflect.KClass
 
 @Getter
 class EnchantmentManager {
@@ -27,7 +23,7 @@ class EnchantmentManager {
     private val darkRareEnchants: MutableList<String> = ArrayList()
 
     fun registerEnchantment() {
-        val classes = ClassUtil.getClassesInPackage(ThePitAddon.instance, "cn.irina.thepitaddon.enchantment.type") ?: return
+        val classes = ClassUtil.getClassesInPackage(ThePitAddon.instance, "cn.irina.thepitaddon.enchantment.type")!!
 
         Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&e扫描到的附魔类数量: ${classes.size}"))
         for (clazz in classes) {
