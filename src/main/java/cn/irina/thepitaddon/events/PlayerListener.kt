@@ -30,10 +30,11 @@ class PlayerListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
-        if (player.displayName.equals("Emptyirrn".uppercase())) player.kickPlayer(CC.translate("$PREFIX&c您已被禁止登录于本服天坑乱斗"))
+
         if (player.hasMetadata("NPC")) return
         Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
             event.joinMessage = null
+
             if (!player.hasPermission("pit.admin")) {
                 if (player.hasPermission("pit.support")) {
                     Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &6" + player.displayName))

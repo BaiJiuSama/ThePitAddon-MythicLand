@@ -42,7 +42,7 @@ class EnchantmentManager {
                 RAGE_RARE -> rageRareEnchants.add(translate("&4暴怒稀有 &f$enchantName"))
                 DARK_NORMAL -> darkEnchants.add(translate("&5暗黑 &f$enchantName"))
                 DARK_RARE -> darkRareEnchants.add(translate("&5暗黑稀有 &f$enchantName"))
-                else -> null
+                else -> continue
             }
             @Suppress("UNCHECKED_CAST")
             enchantmentClasses.add(clazz as Class<out AbstractEnchantment>)
