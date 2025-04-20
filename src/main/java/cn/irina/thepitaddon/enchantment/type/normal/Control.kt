@@ -40,7 +40,7 @@ class Control : AbstractEnchantment(),  IPlayerDamaged {
     override fun getUsefulnessLore(enchantLevel: Int): String? {
         return "&7自身受到的伤害 &9-${2 + (enchantLevel * 2)}% /s" +
                 "&7同时, 若攻击者手持武器含有附魔 &d扼杀 &7时 /s" +
-                "&7自身将获得 &6${0.4 + (0.4 * enchantLevel)}❤ 生命吸收 &7效果"
+                "&7自身将获得 &6${String.format("%.2f" , 0.4 + (0.4 * enchantLevel))}❤ 生命吸收 &7效果"
     }
 
     override fun handlePlayerDamaged(
