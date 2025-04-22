@@ -57,7 +57,7 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
         // "&7攻击时造成的伤害将 &c-${(10 + (enchantLevel * 5))}% /s" +
         return "&7攻击时对目标施加以下效果: /s" +
                 "&7   &f▶ &4凝血 &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)})  /s" +
-                "&7   &f▶ &8凋零 &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)}) /s" +
+                "&7   &f▶ &8凋零 II &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)}) /s" +
                 "&7(${28 - (enchantLevel * 4)}s冷却) /s" +
                 "&7效果 &4凝血&7: 无法通过&c任何途径&7恢复生命值 /s" +
                 "&7效果 &8凋零&7: 持续缓慢地损失生命值"
@@ -88,7 +88,7 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
             PotionEffect(
                 PotionEffectType.WITHER,
                 (if (enchantLevel >= 2) 4 else 2) * 20,
-                0,
+                1,
                 false,
                 true
             )

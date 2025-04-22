@@ -6,7 +6,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="E:/ProjectTool/Gradle" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../ProjectTool/Gradle" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -15,11 +15,11 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
-        <option name="externalProjectPath" value="E:/ProjectTool/Gradle" />
-        <option name="gradleHome" value="E:/ProjectTool/Gradle" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/../../ProjectTool/Gradle" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../ProjectTool/Gradle" />
         <option name="modules">
           <set>
-            <option value="E:/ProjectTool/Gradle" />
+            <option value="$PROJECT_DIR$/../../ProjectTool/Gradle" />
           </set>
         </option>
       </GradleProjectSettings>
