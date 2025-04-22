@@ -23,9 +23,6 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.reflections.Reflections
-import org.reflections.scanners.Scanner
-import org.reflections.scanners.SubTypesScanner
-import org.reflections.util.ConfigurationBuilder
 import java.io.File
 import java.io.IOException
 import java.nio.file.*
@@ -33,7 +30,6 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
 
 class ThePitAddon : JavaPlugin() {

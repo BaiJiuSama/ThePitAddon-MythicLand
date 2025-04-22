@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.FixListeners
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
@@ -60,7 +61,9 @@ class Rationalist : AbstractEnchantment(),  IPlayerDamaged {
         if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
         victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
 
-        val nmsVictim = victim as CraftPlayer
-        nmsVictim.handle.absorptionHearts += 1f + (enchantLevel * 1)
+        val craftPlayer = victim as CraftPlayer
+        val absorptionHearts = craftPlayer.handle.absorptionHearts
+        if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
+        craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
     }
 }

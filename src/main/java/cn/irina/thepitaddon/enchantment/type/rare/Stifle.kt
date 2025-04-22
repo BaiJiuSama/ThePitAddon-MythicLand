@@ -17,6 +17,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityRegainHealthEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
@@ -123,6 +124,10 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
 
         healthCheckTaskMap[player.uniqueId]!!.runTaskTimer(ThePitAddon.instance, 0L, 1L)
 
+        cancelBuff(player, duration)
+    }
+
+    private fun cancelBuff(player: Player, duration: Int) {
         buffCancelRunnableMap[player.uniqueId] = object : BukkitRunnable() {
             override fun run() {
                 activeBuffList.remove(player.uniqueId)
@@ -135,6 +140,7 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
         }
 
         buffCancelRunnableMap[player.uniqueId]!!.runTaskLaterAsynchronously(ThePitAddon.instance, duration * 20L)
+
     }
 
     @EventHandler
@@ -149,6 +155,13 @@ class Stifle : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, List
         val player = event.player
         if (!activeBuffList.contains(player.uniqueId)) return
         event.amount = 0.0
+    }
+
+    @EventHandler
+    fun onDeath(event: PlayerDeathEvent) {
+        val player = event.entity.player
+        if (!activeBuffList.contains(player.uniqueId)) return
+        cancelBuff(player, 0)
     }
 
     override fun getText(p0: Int, p1: Player): String {
