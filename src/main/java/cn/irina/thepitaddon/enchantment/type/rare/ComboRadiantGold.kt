@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
 class ComboRadiantGold : AbstractEnchantment(), IAttackEntity, IPlayerDamaged, IActionDisplayEnchant {
-    private val LimitAbsorptionHearts = FixListeners.LimitAbsorptionHearts
+    private val limitAbsorptionHearts = FixListeners.LimitAbsorptionHearts
 
     override fun getEnchantName(): String {
         return "强力击: 耀金"
@@ -67,10 +67,10 @@ class ComboRadiantGold : AbstractEnchantment(), IAttackEntity, IPlayerDamaged, I
             attacker.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 60, 1, true, false))
 
             val nmsPlayer = attacker as CraftPlayer
-            if (nmsPlayer.handle.absorptionHearts + 8 < LimitAbsorptionHearts - 30) {
+            if (nmsPlayer.handle.absorptionHearts + 8 < limitAbsorptionHearts - 30) {
                 nmsPlayer.handle.absorptionHearts += 8f
             } else {
-                nmsPlayer.handle.absorptionHearts = LimitAbsorptionHearts - 30
+                nmsPlayer.handle.absorptionHearts = limitAbsorptionHearts - 30
             }
 
             PlayerUtil.heal(attacker, 2.0)

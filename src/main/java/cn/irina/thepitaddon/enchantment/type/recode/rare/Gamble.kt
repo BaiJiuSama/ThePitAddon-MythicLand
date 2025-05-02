@@ -56,6 +56,6 @@ class Gamble: AbstractEnchantment(), IAttackEntity {
 
         val target = entity as? Player ?: return
         PlayerUtil.damage(target, PlayerUtil.DamageType.TRUE, enchantLevel * 2.0, false)
-        attacker.sendMessage(CC.translate("&4赌徒! &7对目标 &f${target.name}&7造成了伤害!"))
+        attacker.sendMessage(CC.translate("&4赌徒! &7对目标 &f${target.name} &7造成了伤害!"))
     }
 }

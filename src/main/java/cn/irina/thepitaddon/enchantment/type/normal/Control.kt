@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.normal
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.FixListeners
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
@@ -58,6 +59,8 @@ class Control : AbstractEnchantment(),  IPlayerDamaged {
         if (pitAPI.getItemEnchantLevel(attacker.itemInHand, "stifle") <= 0) return
 
         val craftPlayer = player as CraftPlayer
+        val absorptionHearts = craftPlayer.handle.absorptionHearts
+        if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
         craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
     }
 }
