@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 
-
 @WeaponOnly
 @ArmorOnly
 class KillAngels : AbstractEnchantment(),  IPlayerKilledEntity, IActionDisplayEnchant {
