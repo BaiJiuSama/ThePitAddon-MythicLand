@@ -61,7 +61,7 @@ class PlayerOpenTrash : Listener {
             if (slot == 4) {
                 inventory.setItem(
                     slot, ItemBuilder(ItemStack(Material.SKULL_ITEM, 1, 3.toShort()))
-                        .lore(CC.translate("&e将你不要的东西放进下方的格子中"))
+                        .lore(CC.translate("&c丢弃无用的物品"))
                         .name("&r")
                         .setSkullOwner(player.name)
                         .build()
@@ -75,6 +75,6 @@ class PlayerOpenTrash : Listener {
     }
 
     companion object {
-        private const val TRASH_NAME = "垃圾箱"
+        private const val TRASH_NAME = "垃圾桶"
     }
 }

@@ -13,26 +13,26 @@ import org.bukkit.entity.Player
 @Command(name = "enchant")
 @Permission("pit.admin")
 class AdminCommandEnchant {
-    @Execute
-    fun enchant(
-        @Context player: Player,
-        @Arg enchantNBT: String,
-        @Arg enchantLevel: Int
-    ) {
-        val item = addEnchantToItem(player.itemInHand, enchantNBT, enchantLevel)
-        player.inventory.itemInHand = item
-        player.sendMessage(CC.translate("&aSUCCESS!"))
-    }
-
-    @Execute(name = "toTarget")
-    fun enchantToTarget(
-        @Context sender: CommandSender,
-        @Arg target: Player,
-        @Arg enchantNBT: String,
-        @Arg enchantLevel: Int
-    ) {
-        val item = addEnchantToItem(target.itemInHand, enchantNBT, enchantLevel)
-        target.inventory.itemInHand = item
-        sender.sendMessage(CC.translate("&aSUCCESS!"))
-    }
+//    @Execute
+//    fun enchant(
+//        @Context player: Player,
+//        @Arg enchantNBT: String,
+//        @Arg enchantLevel: Int
+//    ) {
+//        val item = addEnchantToItem(player.itemInHand, enchantNBT, enchantLevel)
+//        player.inventory.itemInHand = item
+//        player.sendMessage(CC.translate("&aSUCCESS!"))
+//    }
+//
+//    @Execute(name = "toTarget")
+//    fun enchantToTarget(
+//        @Context sender: CommandSender,
+//        @Arg target: Player,
+//        @Arg enchantNBT: String,
+//        @Arg enchantLevel: Int
+//    ) {
+//        val item = addEnchantToItem(target.itemInHand, enchantNBT, enchantLevel)
+//        target.inventory.itemInHand = item
+//        sender.sendMessage(CC.translate("&aSUCCESS!"))
+//    }
 }

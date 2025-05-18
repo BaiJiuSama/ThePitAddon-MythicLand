@@ -11,6 +11,7 @@ class ShowDevelopmentCommand {
 
     @Execute
     fun development(@Context sender: CommandSender) {
-        sender.sendMessage(CC.translate("&7&lᴘᴏᴡᴇʀᴇᴅ &7&lʙʏ &bɪ&fʀɪɴᴀ"))
+        sender.sendMessage(CC.translate("&bIrina&fThePitAddon"))
+        sender.sendMessage(CC.translate("&aPower By _Ir1na_, ShanguanLinG."))
     }
 }

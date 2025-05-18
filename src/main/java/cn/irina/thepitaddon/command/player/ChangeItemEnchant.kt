@@ -14,20 +14,20 @@ import org.bukkit.entity.Player
 @Command(name = "changeItemEnchant")
 @Permission("pit.changeItemEnchant")
 class ChangeItemEnchant {
-    @Execute
-    fun changeEnchant(
-        @Context myself: CommandSender,
-        @Arg target: Player,
-        @Arg needChange: String,
-        @Arg toChange: String,
-        @Arg changeLevel: Boolean
-    ) {
-        val item = target.itemInHand
-
-        if (ItemUtil.getInternalName(item) == null || item.enchantments.isEmpty()) return
-
-        val returnItem = changeEnchantToItem(item, needChange, toChange, changeLevel)
-        target.itemInHand = returnItem
-        myself.sendMessage(CC.translate("&aDONE"))
-    }
+//    @Execute
+//    fun changeEnchant(
+//        @Context myself: CommandSender,
+//        @Arg target: Player,
+//        @Arg needChange: String,
+//        @Arg toChange: String,
+//        @Arg changeLevel: Boolean
+//    ) {
+//        val item = target.itemInHand
+//
+//        if (ItemUtil.getInternalName(item) == null || item.enchantments.isEmpty()) return
+//
+//        val returnItem = changeEnchantToItem(item, needChange, toChange, changeLevel)
+//        target.itemInHand = returnItem
+//        myself.sendMessage(CC.translate("&aDONE"))
+//    }
 }
