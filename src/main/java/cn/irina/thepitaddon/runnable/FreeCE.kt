@@ -2,7 +2,7 @@ package cn.irina.thepitaddon.runnable
 
 import cn.charlotte.pit.data.PlayerProfile
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
@@ -19,8 +19,8 @@ class FreeCE : Runnable {
     }
 
     companion object {
-        private val message: String = ThePitAddon.instance.config.getString("FreeCoinAndExperience.Message")
-        private val experience = ThePitAddon.instance.config.getInt("FreeCoinAndExperience.Experience")
-        private val coin = ThePitAddon.instance.config.getInt("FreeCoinAndExperience.Coin")
+        private val message: String = Main.instance.config.getString("FreeCoinAndExperience.Message")
+        private val experience = Main.instance.config.getInt("FreeCoinAndExperience.Experience")
+        private val coin = Main.instance.config.getInt("FreeCoinAndExperience.Coin")
     }
 }

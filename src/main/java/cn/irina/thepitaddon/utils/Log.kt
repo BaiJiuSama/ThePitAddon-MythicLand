@@ -1,11 +1,11 @@
 package cn.irina.thepitaddon.utils
 
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import org.bukkit.Bukkit
 
 object Log {
-    private const val PREFIX = ThePitAddon.PREFIX
+    private val PREFIX = Main.instance.PREFIX
 
     @JvmStatic
     fun send(message: String) {

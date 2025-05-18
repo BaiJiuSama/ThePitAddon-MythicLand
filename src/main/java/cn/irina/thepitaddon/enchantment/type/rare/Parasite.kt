@@ -10,14 +10,13 @@ import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
-import cn.irina.thepitaddon.ThePitAddon.Companion.instance
+import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.TimeUtil.formatTotalSeconds
 import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.potion.PotionEffect
@@ -136,7 +135,7 @@ class Parasite : AbstractEnchantment(),  Listener, IPlayerShootEntity, IActionDi
                 applyTrueDamage(target)
                 shooter.sendMessage(CC.translate("&2&l寄生! &f" + target.displayName + " &7当前剩余血量: &c" + (target.health / 2).toInt() + "❤"))
             }
-        }.runTaskTimer(instance, 0L, DAMAGE_INTERVAL.toLong()))
+        }.runTaskTimer(Main.instance, 0L, DAMAGE_INTERVAL.toLong()))
     }
 
     // 辅助方法

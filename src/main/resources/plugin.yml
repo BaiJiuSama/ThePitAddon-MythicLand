@@ -1,7 +1,7 @@
-name: ThePitAddon
+name: IrinaThePitAddon
 version: '1.0'
 author: Irina, MindsMaster_
-main: cn.irina.thepitaddon.ThePitAddon
+main: cn.irina.thepitaddon.Main
 load: STARTUP
 depend:
   - ThePitUltimate

@@ -8,7 +8,7 @@ import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
-import cn.irina.thepitaddon.ThePitAddon.Companion.instance
+import cn.irina.thepitaddon.Main
 import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.Effect
 import org.bukkit.Location
@@ -87,7 +87,7 @@ class DevilChicken : AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEn
                     customExplosion(chicken.location)
                     chicken.remove()
                 }
-            }.runTaskLater(instance, 14L)
+            }.runTaskLater(Main.instance, 14L)
         }
     }
 

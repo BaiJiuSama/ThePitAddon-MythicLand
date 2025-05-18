@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.dj;
 
 import net.mizukilab.pit.enchantment.AbstractEnchantment;
-import cn.irina.thepitaddon.ThePitAddon;
+import cn.irina.thepitaddon.Main;
 import cn.irina.thepitaddon.utils.SongUtil;
 
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly;
@@ -30,7 +30,7 @@ public class FugueInDMinor extends AbstractEnchantment implements  ITickTask, Mo
 
     @SneakyThrows
     public FugueInDMinor() {
-        this.music = NBSDecoder.parse(ThePitAddon.getInstance().getClass().getClassLoader().getResourceAsStream("FugueInDMinor.nbs"));
+        this.music = NBSDecoder.parse(Main.getInstance().getClass().getClassLoader().getResourceAsStream("FugueInDMinor.nbs"));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -48,7 +48,7 @@ public class FugueInDMinor extends AbstractEnchantment implements  ITickTask, Mo
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(ThePitAddon.getInstance(), 20, 20);
+        }.runTaskTimerAsynchronously(Main.getInstance(), 20, 20);
 
         try {
             iSpigot.INSTANCE.addMovementHandler(this);

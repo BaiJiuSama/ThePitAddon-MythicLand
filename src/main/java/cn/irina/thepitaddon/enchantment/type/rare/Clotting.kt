@@ -2,7 +2,7 @@ package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.event.PitRegainHealthEvent
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.TimeUtil
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
@@ -121,7 +121,7 @@ class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Li
             }
         }
 
-        healthCheckTaskMap[player.uniqueId]!!.runTaskTimer(ThePitAddon.instance, 0L, 1L)
+        healthCheckTaskMap[player.uniqueId]!!.runTaskTimer(Main.instance, 0L, 1L)
 
         buffCancelRunnableMap[player.uniqueId] = object : BukkitRunnable() {
             override fun run() {
@@ -134,7 +134,7 @@ class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Li
             }
         }
 
-        buffCancelRunnableMap[player.uniqueId]!!.runTaskLaterAsynchronously(ThePitAddon.instance, duration * 20L)
+        buffCancelRunnableMap[player.uniqueId]!!.runTaskLaterAsynchronously(Main.instance, duration * 20L)
     }
 
     @EventHandler

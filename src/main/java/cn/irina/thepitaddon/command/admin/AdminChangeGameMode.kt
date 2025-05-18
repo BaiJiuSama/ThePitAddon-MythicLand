@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.command.admin
 
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -24,7 +24,7 @@ class AdminChangeGameMode {
     }
 
     companion object {
-        private const val PREFIX = ThePitAddon.PREFIX
+        private val PREFIX = Main.instance.PREFIX
 
         private fun switchGameMode(gameModeInt: Int): GameMode? {
             when (gameModeInt) {

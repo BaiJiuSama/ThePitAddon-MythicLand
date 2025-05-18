@@ -4,15 +4,18 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
-import cn.irina.thepitaddon.perk.PerkManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
+import cn.irina.thepitaddon.utils.DynamicInvoke
+import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
+import lombok.Getter
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
+import net.mizukilab.pit.util.music.NoteBlockPlayerMain.plugin
 import net.mizukilab.pit.util.music.Song
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getLogger
@@ -20,6 +23,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
+import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.reflections.Reflections
@@ -32,24 +36,60 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 
-class ThePitAddon : JavaPlugin() {
-    private val songs: MutableMap<String, Song> = HashMap()
-    private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
+class Main : JavaPlugin() {
 
     init {
-        plugin = this
         instance = this
     }
+
+    private val songs: MutableMap<String, Song> = HashMap()
+    private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
 
     private val depends = listOf(
         "LuckPerms",
         "ThePitUltimate"
     )
+
+    private val file: File = File("plugins/ThePitAddon", "config.yml")
+    private val cfg: FileConfiguration = YamlConfiguration.loadConfiguration(file)
+    private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
+    val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
+
+
+    fun modifyRarityPrefix() {
+        try {
+            val prefixField = EnchantmentRarity::class.java.getDeclaredField("prefix")
+
+            prefixField.isAccessible = true
+
+            prefixField[EnchantmentRarity.RARE] = "&d稀有! "
+            prefixField[EnchantmentRarity.RAGE_RARE] = "&4稀有! "
+            prefixField[EnchantmentRarity.DARK_RARE] = "&5稀有! "
+            prefixField[EnchantmentRarity.AUCTION_LIMITED] = "&6拍卖! "
+            prefixField[EnchantmentRarity.AUCTION_LIMITED_RARE] = "&6拍卖! "
+
+            val messages = listOf(
+                "&fRARE: " + EnchantmentRarity.RARE.prefix,
+                "&fRAGE RARE: " + EnchantmentRarity.RAGE_RARE.prefix,
+                "&fDARK RARE: " + EnchantmentRarity.DARK_RARE.prefix,
+                "&fAUCTION: " + EnchantmentRarity.AUCTION_LIMITED.prefix,
+                "&fAUCTION RARE: " + EnchantmentRarity.AUCTION_LIMITED_RARE.prefix
+                        + "&f"
+            )
+
+            Bukkit.getConsoleSender().sendMessage(CC.translate(PREFIX + messages))
+        } catch (e: Exception) {
+            Bukkit.getLogger().severe("错误! 无法反射并修改 Enchantment Rarity $e")
+        }
+    }
+
+    @HideAccess
+    @DynamicInvoke
     override fun onEnable() {
         instance = this
-
         loadMusicResources()
         send("&e天坑斗斗终极版扩展 启动中...")
+        send("&7作者: &fIrina &7| &fhttps://github.com/BaiJiuSama")
         saveResource("config.yml", false)
 
         Bukkit.getScheduler().runTaskLater(this, {
@@ -90,7 +130,6 @@ class ThePitAddon : JavaPlugin() {
 
     private fun setUp() {
         loadEnchantmentManager()
-        loadPerkManager()
         registerCommands()
         loadListener()
         modifyRarityPrefix()
@@ -107,6 +146,8 @@ class ThePitAddon : JavaPlugin() {
         scheduler.scheduleWithFixedDelay(Announcer(), 0L, 5L, TimeUnit.MINUTES)
     }
 
+    @HideAccess
+    @DynamicInvoke
     override fun onDisable() {
         send("&c天坑斗斗终极版扩展 关闭中!")
         Bukkit.setWhitelist(true)
@@ -151,7 +192,7 @@ class ThePitAddon : JavaPlugin() {
                 GodMode(),
                 ChangeItemEnchant(),
                 ChangeUserMeta(),
-                GetEXDiamondItem(),
+//                GetEXDiamondItem(),
                 GetIronHelmet(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),
@@ -196,11 +237,6 @@ class ThePitAddon : JavaPlugin() {
         enchantmentManager.registerEnchantment()
     }
 
-    private fun loadPerkManager() {
-        val perkManager = PerkManager()
-        perkManager.registerPerk()
-    }
-
     fun loadListener() {
         val reflections = Reflections("cn.irina.thepitaddon")
         val classes = reflections.getSubTypesOf(Listener::class.java)
@@ -213,45 +249,10 @@ class ThePitAddon : JavaPlugin() {
         }
     }
 
-    companion object {
-        var plugin: JavaPlugin? = null
-
+    companion object OverallResourceHolder {
         @JvmStatic
-        lateinit var instance: ThePitAddon
+        lateinit var instance: Main
             private set
-
-        private val file: File = File("plugins/ThePitAddon", "config.yml")
-        private val cfg: FileConfiguration = YamlConfiguration.loadConfiguration(file)
-        private val PlayerDataPath: String = cfg.getString("PlayerDataPath")
-        const val PREFIX: String = "&8[&bI&fRINA&8] &f| "
-
-
-        fun modifyRarityPrefix() {
-            try {
-                val prefixField = EnchantmentRarity::class.java.getDeclaredField("prefix")
-
-                prefixField.isAccessible = true
-
-                prefixField[EnchantmentRarity.RARE] = "&d稀有! "
-                prefixField[EnchantmentRarity.RAGE_RARE] = "&4稀有! "
-                prefixField[EnchantmentRarity.DARK_RARE] = "&5稀有! "
-                prefixField[EnchantmentRarity.AUCTION_LIMITED] = "&6拍卖! "
-                prefixField[EnchantmentRarity.AUCTION_LIMITED_RARE] = "&6拍卖! "
-
-                val messages = listOf(
-                    "&fRARE: " + EnchantmentRarity.RARE.prefix,
-                    "&fRAGE RARE: " + EnchantmentRarity.RAGE_RARE.prefix,
-                    "&fDARK RARE: " + EnchantmentRarity.DARK_RARE.prefix,
-                    "&fAUCTION: " + EnchantmentRarity.AUCTION_LIMITED.prefix,
-                    "&fAUCTION RARE: " + EnchantmentRarity.AUCTION_LIMITED_RARE.prefix
-                            + "&f"
-                )
-
-                Bukkit.getConsoleSender().sendMessage(CC.translate(PREFIX + messages))
-            } catch (e: Exception) {
-                getLogger().severe("错误! 无法反射并修改 Enchantment Rarity $e")
-            }
-        }
     }
 }
 //

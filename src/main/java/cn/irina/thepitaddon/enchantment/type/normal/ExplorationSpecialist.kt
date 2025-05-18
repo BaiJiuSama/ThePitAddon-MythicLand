@@ -6,7 +6,7 @@ import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.LocationUtil
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying
 import org.bukkit.Bukkit
@@ -52,7 +52,7 @@ class ExplorationSpecialist : AbstractEnchantment(),  MovementHandler{
         p2: Location?,
         p3: PacketPlayInFlying?
     ) {
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val enchantLevel = ThePit.getApi().getItemEnchantLevel(player.inventory.leggings, this.nbtName)
 
             if (enchantLevel < 1) return@runTaskAsynchronously

@@ -8,7 +8,7 @@ import net.mizukilab.pit.util.cooldown.Cooldown;
 import net.mizukilab.pit.util.music.NBSDecoder;
 import net.mizukilab.pit.util.music.PositionSongPlayer;
 import net.mizukilab.pit.util.music.Song;
-import cn.irina.thepitaddon.ThePitAddon;
+import cn.irina.thepitaddon.Main;
 import cn.irina.thepitaddon.utils.SongUtil;
 import lombok.SneakyThrows;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
@@ -30,7 +30,7 @@ public class GirlsBandCry extends AbstractEnchantment implements  ITickTask, Mov
 
     @SneakyThrows
     public GirlsBandCry() {
-        this.music = NBSDecoder.parse(ThePitAddon.getInstance().getClass().getClassLoader().getResourceAsStream("GirlsBandCry.nbs"));
+        this.music = NBSDecoder.parse(Main.getInstance().getClass().getClassLoader().getResourceAsStream("GirlsBandCry.nbs"));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -48,7 +48,7 @@ public class GirlsBandCry extends AbstractEnchantment implements  ITickTask, Mov
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(ThePitAddon.getInstance(), 20, 20);
+        }.runTaskTimerAsynchronously(Main.getInstance(), 20, 20);
 
         try {
             iSpigot.INSTANCE.addMovementHandler(this);

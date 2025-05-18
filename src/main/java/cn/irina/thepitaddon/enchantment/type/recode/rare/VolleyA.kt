@@ -8,7 +8,7 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import net.mizukilab.pit.util.item.ItemBuilder
-import cn.irina.thepitaddon.ThePitAddon.Companion.instance
+import cn.irina.thepitaddon.Main
 import net.minecraft.server.v1_8_R3.EntityHuman
 import net.minecraft.server.v1_8_R3.ItemBow
 import org.bukkit.Material
@@ -103,6 +103,6 @@ class VolleyA : AbstractEnchantment(),  Listener {
                 ++tick
                 bow.a(nmsItem, entityPlayer.world, entityPlayer, value)
             }
-        }.runTaskTimer(instance, 0L, 1L)
+        }.runTaskTimer(Main.instance, 0L, 1L)
     }
 }

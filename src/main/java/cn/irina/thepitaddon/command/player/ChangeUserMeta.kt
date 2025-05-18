@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.command.player
 
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -38,7 +38,7 @@ class ChangeUserMeta {
             return
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val node: Node
             when (type.lowercase(Locale.getDefault())) {
                 "suffix" -> {
@@ -68,7 +68,7 @@ class ChangeUserMeta {
             user.data().add(node)
 
             luckPerms.userManager.saveUser(user)
-            Bukkit.getScheduler().runTask(ThePitAddon.instance) {
+            Bukkit.getScheduler().runTask(Main.instance) {
                 player.sendMessage(
                     CC.translate(
                         "$PREFIX&a成功! 当前你的 &e" + type.uppercase(
@@ -81,6 +81,6 @@ class ChangeUserMeta {
     }
 
     companion object {
-        private const val PREFIX = ThePitAddon.PREFIX
+        private val PREFIX = Main.instance.PREFIX
     }
 }

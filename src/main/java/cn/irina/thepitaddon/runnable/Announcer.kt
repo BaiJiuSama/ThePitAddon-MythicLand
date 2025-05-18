@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.runnable
 
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 
 
 class Announcer : Runnable {
@@ -12,7 +12,7 @@ class Announcer : Runnable {
     }
 
     companion object {
-        private val messages: List<String> = ThePitAddon.instance.config.getStringList("Announcements")
+        private val messages: List<String> = Main.instance.config.getStringList("Announcements")
 
         private var currentIndex = 0
     }

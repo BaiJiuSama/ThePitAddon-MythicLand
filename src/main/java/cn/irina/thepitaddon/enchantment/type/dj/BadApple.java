@@ -1,6 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.dj;
 
-import cn.irina.thepitaddon.ThePitAddon;
+import cn.irina.thepitaddon.Main;
 import net.mizukilab.pit.enchantment.AbstractEnchantment;
 import cn.irina.thepitaddon.utils.SongUtil;
 
@@ -30,7 +30,7 @@ public class BadApple extends AbstractEnchantment implements  ITickTask, Movemen
 
     @SneakyThrows
     public BadApple() {
-        this.music = NBSDecoder.parse(ThePitAddon.getInstance().getClass().getClassLoader().getResourceAsStream("BadApple.nbs"));
+        this.music = NBSDecoder.parse(Main.getInstance().getClass().getClassLoader().getResourceAsStream("BadApple.nbs"));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -48,7 +48,7 @@ public class BadApple extends AbstractEnchantment implements  ITickTask, Movemen
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(ThePitAddon.getInstance(), 20, 20);
+        }.runTaskTimerAsynchronously(Main.getInstance(), 20, 20);
 
         try {
             iSpigot.INSTANCE.addMovementHandler(this);

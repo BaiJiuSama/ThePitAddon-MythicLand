@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.enchantment.type.recode.rare
 import cn.irina.thepitaddon.utils.RandomUtil
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.util.PlayerUtil
@@ -12,6 +13,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import java.util.concurrent.atomic.AtomicBoolean
 
+@WeaponOnly
 class Gamble: AbstractEnchantment(), IAttackEntity {
     override fun getEnchantName(): String {
         return "赌徒"

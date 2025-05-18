@@ -2,7 +2,7 @@ package cn.irina.thepitaddon.enchantment.type.dj;
 
 import net.mizukilab.pit.parm.listener.IAttackEntity;
 import net.mizukilab.pit.parm.listener.IPlayerDamaged;
-import cn.irina.thepitaddon.ThePitAddon;
+import cn.irina.thepitaddon.Main;
 import net.mizukilab.pit.enchantment.AbstractEnchantment;
 import cn.irina.thepitaddon.utils.SongUtil;
 
@@ -35,7 +35,7 @@ public class FlowerDance extends AbstractEnchantment implements  ITickTask, Move
 
     @SneakyThrows
     public FlowerDance() {
-        this.music = NBSDecoder.parse(ThePitAddon.getInstance().getClass().getClassLoader().getResourceAsStream("FlowerDance.nbs"));
+        this.music = NBSDecoder.parse(Main.getInstance().getClass().getClassLoader().getResourceAsStream("FlowerDance.nbs"));
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -53,7 +53,7 @@ public class FlowerDance extends AbstractEnchantment implements  ITickTask, Move
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(ThePitAddon.getInstance(), 20, 20);
+        }.runTaskTimerAsynchronously(Main.getInstance(), 20, 20);
 
         try {
             iSpigot.INSTANCE.addMovementHandler(this);

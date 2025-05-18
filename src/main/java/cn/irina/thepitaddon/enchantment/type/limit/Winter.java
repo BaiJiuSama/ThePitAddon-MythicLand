@@ -9,7 +9,7 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity;
 import net.mizukilab.pit.parm.listener.IAttackEntity;
 import net.mizukilab.pit.util.cooldown.Cooldown;
 
-import cn.irina.thepitaddon.ThePitAddon;
+import cn.irina.thepitaddon.Main;
 import com.google.common.util.concurrent.AtomicDouble;
 
 import org.bukkit.entity.Entity;
@@ -87,9 +87,9 @@ public class Winter extends AbstractEnchantment implements  IAttackEntity, Liste
 
         targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (enchantLevel + 1) * 20, 1, false, true));
 
-        if (targetPlayer.hasMetadata(WINTER_FRAIL)) targetPlayer.removeMetadata(WINTER_FRAIL, ThePitAddon.getInstance());
+        if (targetPlayer.hasMetadata(WINTER_FRAIL)) targetPlayer.removeMetadata(WINTER_FRAIL, Main.getInstance());
 
-        targetPlayer.setMetadata(WINTER_FRAIL, new FixedMetadataValue(ThePitAddon.getInstance(), System.currentTimeMillis() + ((enchantLevel * 2L) + 2) * 1000L));
+        targetPlayer.setMetadata(WINTER_FRAIL, new FixedMetadataValue(Main.getInstance(), System.currentTimeMillis() + ((enchantLevel * 2L) + 2) * 1000L));
 
         if (enchantLevel >= 3 && player.hasPotionEffect(PotionEffectType.SLOW)) player.removePotionEffect(PotionEffectType.SLOW);
     }

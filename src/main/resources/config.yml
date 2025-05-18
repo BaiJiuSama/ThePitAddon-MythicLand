@@ -1,3 +1,6 @@
+#插件消息前缀
+Prefix: "&8[&bI&fRINA&8] &f| "
+
 #此段填入你想生效的伤害范围 0% ~ Infinity (0.00 ~ Infinity)
 #窝是暗改大王。嘻嘻嘻嘻嘻嘻嘻嘻嘻。
 DamageValidRange:

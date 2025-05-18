@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.command.player
 
 import net.mizukilab.pit.util.chat.CC
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
@@ -25,7 +25,7 @@ class PlayerSuicide {
                         checkSuicideNumber.replace(player.uniqueId, 0)
                     }
                 }
-                (task as BukkitRunnable).runTaskLater(ThePitAddon.instance, 8 * 20L)
+                (task as BukkitRunnable).runTaskLater(Main.instance, 8 * 20L)
             }
         } else {
             if (task != null) {

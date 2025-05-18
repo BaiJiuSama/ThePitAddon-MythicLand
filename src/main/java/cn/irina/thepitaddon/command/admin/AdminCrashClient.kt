@@ -2,7 +2,7 @@ package cn.irina.thepitaddon.command.admin
 
 import net.mizukilab.pit.util.chat.CC
 
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable
 class AdminCrashClient : Listener {
     @Execute
     fun freezeClient(@Context sender: CommandSender, @Arg target: Player) {
-        Bukkit.getScheduler().runTaskAsynchronously(ThePitAddon.instance) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             crashPlayer(target)
         }
         freezePlayers.add(target)
@@ -112,12 +112,12 @@ class AdminCrashClient : Listener {
                     }
                     index++
                 }
-            }.runTaskTimerAsynchronously(ThePitAddon.instance, 0, 12 * 20L)
+            }.runTaskTimerAsynchronously(Main.instance, 0, 12 * 20L)
         }.start()
     }
 
     companion object {
         private val freezePlayers: MutableList<Player> = ArrayList()
-        private const val PREFIX = ThePitAddon.PREFIX
+        private val PREFIX = Main.instance.PREFIX
     }
 }

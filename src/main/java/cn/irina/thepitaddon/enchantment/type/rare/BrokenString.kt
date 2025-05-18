@@ -9,7 +9,7 @@ import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -108,11 +108,11 @@ class BrokenString : AbstractEnchantment(),  IPlayerShootEntity, IAttackEntity, 
     @EventHandler(priority = EventPriority.LOWEST)
     fun onDeath(event: PlayerDeathEvent) {
         val player = event.entity
-        if (player.hasMetadata(brokenString)) player.removeMetadata(brokenString, ThePitAddon.instance)
+        if (player.hasMetadata(brokenString)) player.removeMetadata(brokenString, Main.instance)
     }
 
     private fun onActive(attacker: Player, targetPlayer: Player) {
-        if (targetPlayer.hasMetadata(brokenString)) targetPlayer.removeMetadata(brokenString, ThePitAddon.instance)
+        if (targetPlayer.hasMetadata(brokenString)) targetPlayer.removeMetadata(brokenString, Main.instance)
 
         targetPlayer.addPotionEffect(
             PotionEffect(
@@ -125,7 +125,7 @@ class BrokenString : AbstractEnchantment(),  IPlayerShootEntity, IAttackEntity, 
         )
         targetPlayer.setMetadata(
             brokenString,
-            FixedMetadataValue(ThePitAddon.instance, System.currentTimeMillis() + (2 * 1000L))
+            FixedMetadataValue(Main.instance, System.currentTimeMillis() + (2 * 1000L))
         )
 
         attacker.sendMessage(CC.translate("&c&l断弦! &f" + targetPlayer.displayName + " &7将在接下来 &e2s &7内无法发射箭矢!"))

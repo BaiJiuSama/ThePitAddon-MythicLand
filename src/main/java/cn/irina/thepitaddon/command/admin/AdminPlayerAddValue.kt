@@ -3,7 +3,7 @@ package cn.irina.thepitaddon.command.admin
 import cn.charlotte.pit.data.PlayerProfile
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.level.LevelUtil
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -45,6 +45,6 @@ class AdminPlayerAddValue {
             "points" -> profile.genesisData.points += amount
         }
 
-        player.sendMessage(CC.translate(ThePitAddon.PREFIX + "&a添加成功!"))
+        player.sendMessage(CC.translate(Main.instance.PREFIX + "&a添加成功!"))
     }
 }

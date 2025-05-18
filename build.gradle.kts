@@ -28,13 +28,14 @@ dependencies {
     implementation("dev.rollczi:litecommands-bukkit:3.9.7")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     implementation("org.reflections:reflections:0.10.2")
+    implementation("org.mongojack:mongojack:5.0.0")
     compileOnly(fileTree(baseDir = "lib"))
 
 }
 
 group = "cn.irina"
 version = "1.0"
-description = "ThePitAddon"
+description = "IrinaThePitAddon"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -67,9 +68,18 @@ tasks{
         minimize()
 
         relocate("kotlin", "cn.irina.thirdparty.kotlin")
-        relocate("org.reflections", "cn.irina.thirdparty.org.reflections")
+        relocate("javassist", "cn.irina.thirdparty.javassist")
+//        relocate("javax", "cn.irina.thirdparty.javax")
+        relocate("org.reflections", "cn.irina.thirdparty.reflections")
+        relocate("org.mongojack", "cn.irina.thirdparty.mongojack")
+        relocate("org.slf4j", "cn.irina.thirdparty.slf4j")
+        relocate("org.jetbrains", "cn.irina.thirdparty.jetbrains")
+        relocate("org.bson", "cn.irina.thirdparty.bson")
+        relocate("dev.rollczi", "cn.irina.thirdparty.rollczi")
+        relocate("com.fasterxml", "cn.irina.thirdparty.fasterxml")
+        relocate("com.mongodb", "cn.irina.thirdparty.mongodb")
 
-        archiveFileName.set("ThePitAddon.jar")
+        archiveFileName.set("IrinaThePitAddon.jar")
     }
 
     jar {

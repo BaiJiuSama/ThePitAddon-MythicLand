@@ -1,6 +1,6 @@
 package cn.irina.thepitaddon.command.admin
 
-import cn.irina.thepitaddon.ThePitAddon
+import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
@@ -18,7 +18,7 @@ import java.util.UUID
 @Command(name = "god")
 @Permission("irina.staff")
 class GodMode : Listener {
-    private val prefix = ThePitAddon.PREFIX
+    private val prefix = Main.instance.PREFIX
     private val activeGodPlayers: MutableSet<UUID> = mutableSetOf()
 
     private val activeMessage = CC.translate("$prefix&c你已开启God模式, 将不被允许 攻击 & 受击!")

@@ -30,7 +30,7 @@ class FixListeners : Listener {
                     Bukkit.getPluginManager().callEvent(playerMoveEvent)
                 }
             }
-        }.runTaskTimer(ThePitAddon.instance, 0L, 2 * 60 * 20L)
+        }.runTaskTimer(Main.instance, 0L, 2 * 60 * 20L)
 
         blockTypes.add(Material.HOPPER)
         blockTypes.add(Material.DISPENSER)
@@ -79,6 +79,6 @@ class FixListeners : Listener {
 
     companion object {
         @JvmField
-        val LimitAbsorptionHearts: Float = ThePitAddon.plugin?.config?.getInt("LimitAbsorptionHearts")?.toFloat() ?: 120F
+        val LimitAbsorptionHearts: Float = Main.instance.config?.getInt("LimitAbsorptionHearts")?.toFloat() ?: 120F
     }
 }
