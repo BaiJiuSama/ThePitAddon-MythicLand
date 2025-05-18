@@ -1,6 +1,6 @@
 name: IrinaThePitAddon
 version: '1.0'
-author: Irina, MindsMaster_
+author: Irina, MindsMaster_, ShanguanLinG
 main: cn.irina.thepitaddon.Main
 load: STARTUP
 depend:

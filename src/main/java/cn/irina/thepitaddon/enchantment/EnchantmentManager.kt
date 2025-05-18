@@ -1,15 +1,14 @@
 package cn.irina.thepitaddon.enchantment
 
 import cn.charlotte.pit.ThePit
-import net.mizukilab.pit.enchantment.AbstractEnchantment
 import cn.irina.thepitaddon.Main
-import cn.irina.thepitaddon.enchantment.type.recode.rare.VolleyA
 import lombok.Getter
+import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity.*
-import net.mizukilab.pit.util.chat.CC
-import net.mizukilab.pit.util.chat.CC.*
+import net.mizukilab.pit.util.chat.CC.translate
 import org.bukkit.Bukkit
 import org.reflections.Reflections
+
 
 //@Getter
 //class EnchantmentManager {
@@ -71,18 +70,74 @@ class EnchantmentManager {
     private val rageRareEnchants: MutableList<String> = ArrayList()
     private val darkEnchants: MutableList<String> = ArrayList()
     private val darkRareEnchants: MutableList<String> = ArrayList()
+    private val unregisterEnchantmentNbt: MutableList<String> = ArrayList()
+
+    private fun initUnregisterEnchantmentNbts() {
+        val list = ArrayList(
+            listOf(
+                "stifle",
+                "volley_enchant_B",
+                "interdiction",
+                //"fugue_in_d_minor_dj",
+                //"diamond_breaker",
+                "control",
+                "clotting",
+                //"girls_band_cry_dj",
+                "rationalist",
+                "kill_angels",
+                "parasite",
+                "Combo_Broken_String",
+                "break_armor",
+                "winter",
+                "ender_sword",
+                "micro_anti_gravity",
+                "gamble_enchant",
+                //"bad_apple_dj",
+                //"gerudo_valley_dj",
+                //"volley_enchant",
+                "unpredictably_enchant",
+                "combo_ladder",
+                "theswiftwind_enchant",
+                "revengeance",
+                "doom_pact",
+                "devil_chicken",
+                //"everybody_dance_now_dj",
+                //"flower_dance_dj",
+                //"mortal_kombat_dj",
+                "FightOrDie",
+                //"rainbow_tylenol_dj",
+                "verdict",
+                "exploration_specialist",
+                "last_stand",
+                "back_stab",
+                "combo_radiant_gold",
+                "judgment_strike",
+                "divine_miracle_enchant",
+                "lunar_deity"
+            )
+        )
+        for (enchantNbt in list) {
+            unregisterEnchantmentNbt.add(enchantNbt)
+        }
+    }
 
     fun registerEnchantment() {
         val reflections = Reflections("cn.irina.thepitaddon")
-
         val enchantmentClasses = reflections.getSubTypesOf(
             AbstractEnchantment::class.java
         )
 
         Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&e扫描到的附魔类数量: ${enchantmentClasses.size}"))
+        initUnregisterEnchantmentNbts()
         for (clazz in enchantmentClasses) {
             val newInstance = clazz.getDeclaredConstructor().newInstance()
+            val nbtName = newInstance.nbtName
             val enchantName = newInstance.enchantName
+            if (unregisterEnchantmentNbt.contains(nbtName)) {
+                Bukkit.getConsoleSender()
+                    .sendMessage(translate("$PREFIX&c跳过加载: $enchantName  $nbtName"))
+                continue
+            }
             when (newInstance.rarity) {
                 OP -> opEnchants.add(translate("&c限定 &f$enchantName"))
                 RARE -> rareEnchants.add(translate("&d稀有 &f$enchantName"))
@@ -94,7 +149,6 @@ class EnchantmentManager {
                 else -> null
             }
         }
-
         formatEnchantList.addAll(opEnchants)
         formatEnchantList.addAll(rageEnchants)
         formatEnchantList.addAll(rageRareEnchants)
@@ -102,13 +156,19 @@ class EnchantmentManager {
         formatEnchantList.addAll(darkRareEnchants)
         formatEnchantList.addAll(rareEnchants)
         formatEnchantList.addAll(normalEnchants)
-
         for (enchant in formatEnchantList) {
             Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&a附魔加载: $enchant"))
         }
-
         ThePit.getInstance().enchantmentFactor.init(enchantmentClasses)
+        unregisterEnchantments()
     }
+
+    private fun unregisterEnchantments() {
+        for (enchantNbt in unregisterEnchantmentNbt) {     // Unregister
+            ThePit.getInstance().enchantmentFactor.unregister(enchantNbt, "NULL")
+        }
+    }
+
     companion object {
         val PREFIX = Main.instance.PREFIX
     }
