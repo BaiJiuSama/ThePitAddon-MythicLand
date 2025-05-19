@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 重构商店购买的逻辑
  * @author ShanguanLinG
- * @since 2025/12/5/19
+ * @since 2025/5/19
  */
 
 @Command(name = "buyStrengthenDiamondItem")
