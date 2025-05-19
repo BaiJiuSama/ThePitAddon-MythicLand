@@ -3,6 +3,9 @@ package cn.irina.thepitaddon
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
+import cn.irina.thepitaddon.command.player.buyItems.BuyEntityCoin
+import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
+import cn.irina.thepitaddon.command.player.buyItems.BuyStrengthenDiamondItem
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
@@ -11,19 +14,15 @@ import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
-import lombok.Getter
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
-import net.mizukilab.pit.util.music.NoteBlockPlayerMain.plugin
 import net.mizukilab.pit.util.music.Song
 import org.bukkit.Bukkit
-import org.bukkit.Bukkit.getLogger
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.Listener
-import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.scheduler.BukkitRunnable
 import org.reflections.Reflections
@@ -193,8 +192,9 @@ class Main : JavaPlugin() {
 //                GodMode(),
 //                ChangeItemEnchant(),
                 ChangeUserMeta(),
-                GetEXDiamondItem(),
-                GetIronHelmet(),
+                BuyStrengthenDiamondItem(),
+                BuyIronHelmet(),
+                BuyEntityCoin(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),
                 ShowDevelopmentCommand()
