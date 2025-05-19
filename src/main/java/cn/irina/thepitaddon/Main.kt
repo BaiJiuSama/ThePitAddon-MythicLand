@@ -3,6 +3,7 @@ package cn.irina.thepitaddon
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
+import cn.irina.thepitaddon.command.player.buyItems.BuyEgg
 import cn.irina.thepitaddon.command.player.buyItems.BuyEntityCoin
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.command.player.buyItems.BuyStrengthenDiamondItem
@@ -195,6 +196,7 @@ class Main : JavaPlugin() {
                 BuyStrengthenDiamondItem(),
                 BuyIronHelmet(),
                 BuyEntityCoin(),
+                BuyEgg(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),
                 ShowDevelopmentCommand()
