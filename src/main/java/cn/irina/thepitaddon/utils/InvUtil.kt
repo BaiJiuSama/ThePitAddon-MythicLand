@@ -4,6 +4,7 @@ import net.mizukilab.pit.util.item.ItemBuilder
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 object InvUtil {
     fun hasEmptySlot(player: Player, slots: Int): Boolean {
@@ -53,6 +54,17 @@ object InvUtil {
                 }
 
             }
+        }
+    }
+
+    fun takeItemInHand(player: Player) {
+        val its = player.itemInHand
+        if (its == null || its.type == Material.AIR) return
+
+        if (its.amount >= 1) {
+            player.itemInHand = ItemStack(Material.AIR)
+        } else {
+            player.itemInHand.amount -= 1
         }
     }
 }

@@ -2,6 +2,7 @@ package cn.irina.thepitaddon.enchantment
 
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.utils.Log
 import lombok.Getter
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity.*
@@ -62,6 +63,8 @@ import org.reflections.Reflections
 
 @Getter
 class EnchantmentManager {
+    val prefix = Main.instance.PREFIX
+
     private val formatEnchantList: MutableList<String> = ArrayList()
     private val opEnchants: MutableList<String> = ArrayList()
     private val rareEnchants: MutableList<String> = ArrayList()
@@ -70,10 +73,9 @@ class EnchantmentManager {
     private val rageRareEnchants: MutableList<String> = ArrayList()
     private val darkEnchants: MutableList<String> = ArrayList()
     private val darkRareEnchants: MutableList<String> = ArrayList()
-    private val unregisterEnchantmentNbt: MutableList<String> = ArrayList()
 
-    private fun initUnregisterEnchantmentNbts() {
-        val list = ArrayList(
+    private fun removalEnchants(): List<String> {
+        return ArrayList(
             listOf(
                 "stifle",
                 "volley_enchant_B",
@@ -116,9 +118,6 @@ class EnchantmentManager {
                 "lunar_deity"
             )
         )
-        for (enchantNbt in list) {
-            unregisterEnchantmentNbt.add(enchantNbt)
-        }
     }
 
     fun registerEnchantment() {
@@ -127,17 +126,16 @@ class EnchantmentManager {
             AbstractEnchantment::class.java
         )
 
-        Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&e扫描到的附魔类数量: ${enchantmentClasses.size}"))
-        initUnregisterEnchantmentNbts()
+        Bukkit.getConsoleSender().sendMessage(translate("$prefix&e扫描到的附魔类数量: ${enchantmentClasses.size}"))
         for (clazz in enchantmentClasses) {
             val newInstance = clazz.getDeclaredConstructor().newInstance()
-            val nbtName = newInstance.nbtName
             val enchantName = newInstance.enchantName
-            if (unregisterEnchantmentNbt.contains(nbtName)) {
-                Bukkit.getConsoleSender()
-                    .sendMessage(translate("$PREFIX&c跳过加载: $enchantName  $nbtName"))
+
+            if (removalEnchants().contains(newInstance.nbtName)) {
+                Log.send("&c跳过加载: &f$enchantName")
                 continue
             }
+
             when (newInstance.rarity) {
                 OP -> opEnchants.add(translate("&c限定 &f$enchantName"))
                 RARE -> rareEnchants.add(translate("&d稀有 &f$enchantName"))
@@ -146,9 +144,10 @@ class EnchantmentManager {
                 RAGE_RARE -> rageRareEnchants.add(translate("&4暴怒稀有 &f$enchantName"))
                 DARK_NORMAL -> darkEnchants.add(translate("&5暗黑 &f$enchantName"))
                 DARK_RARE -> darkRareEnchants.add(translate("&5暗黑稀有 &f$enchantName"))
-                else -> null
+                else -> continue
             }
         }
+
         formatEnchantList.addAll(opEnchants)
         formatEnchantList.addAll(rageEnchants)
         formatEnchantList.addAll(rageRareEnchants)
@@ -156,21 +155,10 @@ class EnchantmentManager {
         formatEnchantList.addAll(darkRareEnchants)
         formatEnchantList.addAll(rareEnchants)
         formatEnchantList.addAll(normalEnchants)
-        for (enchant in formatEnchantList) {
-            Bukkit.getConsoleSender().sendMessage(translate("$PREFIX&a附魔加载: $enchant"))
-        }
+
+        for (enchant in formatEnchantList) { Log.send("&a附魔加载: $enchant") }
+
         ThePit.getInstance().enchantmentFactor.init(enchantmentClasses)
-        unregisterEnchantments()
-    }
-
-    private fun unregisterEnchantments() {
-        for (enchantNbt in unregisterEnchantmentNbt) {     // Unregister
-            ThePit.getInstance().enchantmentFactor.unregister(enchantNbt, "NULL")
-        }
-    }
-
-    companion object {
-        val PREFIX = Main.instance.PREFIX
     }
 }
 
