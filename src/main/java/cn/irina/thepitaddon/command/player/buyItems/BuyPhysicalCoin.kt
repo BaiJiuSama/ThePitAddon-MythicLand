@@ -37,7 +37,9 @@ class BuyPhysicalCoin {
         "&7实体货币",
         "",
         "&7在神话天坑内广泛流通",
-        "&7可用于兑换购买一些物品"
+        "&7可用于兑换购买一些物品",
+        "",
+        "&8右键时可以快速兑换为硬币"
     ))}
 
     private fun physicalCoin(i: Int): ItemStack {
@@ -58,6 +60,7 @@ class BuyPhysicalCoin {
             .canTrade(true)
             .canSaveToEnderChest(true)
             .internalName("coin")
+            .shiny()
             .build()
     }
 }
