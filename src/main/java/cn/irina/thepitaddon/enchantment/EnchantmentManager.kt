@@ -159,6 +159,9 @@ class EnchantmentManager {
         for (enchant in formatEnchantList) { Log.send("&a附魔加载: $enchant") }
 
         ThePit.getInstance().enchantmentFactor.init(enchantmentClasses)
+        for (removalEnchants in removalEnchants()) {
+            ThePit.getInstance().enchantmentFactor.unregister(removalEnchants,null)
+        }
     }
 }
 
