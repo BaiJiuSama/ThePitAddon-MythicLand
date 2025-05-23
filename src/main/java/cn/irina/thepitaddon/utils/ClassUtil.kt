@@ -25,7 +25,7 @@ object ClassUtil {
 
         while (entries.hasMoreElements()) {
             val entry = entries.nextElement()
-            val entryName = entry.getName()
+            val entryName = entry.name
             var className: String? = null
             if (entryName.endsWith(".class") && entryName.startsWith(relPath) && entryName.length > relPath.length + "/".length) {
                 className = entryName.replace('/', '.').replace('\\', '.').replace(".class", "")

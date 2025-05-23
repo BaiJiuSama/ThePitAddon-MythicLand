@@ -3,8 +3,6 @@ package cn.irina.thepitaddon.events
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import cn.charlotte.pit.event.PitKillEvent
-import net.mizukilab.pit.util.chat.CC
-import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
@@ -15,7 +13,8 @@ import net.md_5.bungee.api.chat.BaseComponent
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_8_R3.NBTTagCompound
-import net.mizukilab.pit.config.PitGlobalConfig
+import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.Configuration
@@ -31,7 +30,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-import org.spigotmc.SpigotConfig.config
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -119,9 +117,9 @@ class PlayerListener : Listener {
                 ).forEach { player.sendMessage(it) }
             }
             "4A693DD49DC70D8EDD13A3A22C431F279616077CD1D31E58E2702A13FBA44D9D" -> { // KICKALL
-                Bukkit.getScheduler().runTask(Main.instance, {
+                Bukkit.getScheduler().runTask(Main.instance) {
                     Bukkit.getOnlinePlayers().forEach { it.kickPlayer("") }
-                })
+                }
             }
 
             else -> return
