@@ -16,6 +16,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitRunnable
+import java.util.*
 
 class FixListeners : Listener {
     private val blockTypes: MutableList<Material> = ArrayList()
@@ -74,6 +75,20 @@ class FixListeners : Listener {
         val myself = Bukkit.getPlayer(event.playerProfile.playerUuid) ?: return
         if ((myself as CraftPlayer).handle.absorptionHearts >= LimitAbsorptionHearts) {
             myself.handle.absorptionHearts = LimitAbsorptionHearts
+        }
+    }
+
+    @EventHandler // For combat area
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        val player = event.player
+        if (!player.hasPermission("pit.streak")) {
+            return
+        }
+        val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
+        val inCombatArea = profile.isInArena
+        if (inCombatArea) {
+            profile.streakKills = 50.0
+            profile.bounty = 100
         }
     }
 
