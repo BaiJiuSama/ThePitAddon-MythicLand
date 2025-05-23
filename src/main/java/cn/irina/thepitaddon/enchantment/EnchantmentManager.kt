@@ -65,6 +65,7 @@ import org.reflections.Reflections
 class EnchantmentManager {
     val prefix = Main.instance.PREFIX
 
+    private val filteredEnchants: MutableList<Class<out AbstractEnchantment>> = ArrayList()
     private val formatEnchantList: MutableList<String> = ArrayList()
     private val opEnchants: MutableList<String> = ArrayList()
     private val rareEnchants: MutableList<String> = ArrayList()
@@ -136,6 +137,8 @@ class EnchantmentManager {
                 continue
             }
 
+            filteredEnchants.add(clazz)
+
             when (newInstance.rarity) {
                 OP -> opEnchants.add(translate("&c限定 &f$enchantName"))
                 RARE -> rareEnchants.add(translate("&d稀有 &f$enchantName"))
@@ -156,9 +159,14 @@ class EnchantmentManager {
         formatEnchantList.addAll(rareEnchants)
         formatEnchantList.addAll(normalEnchants)
 
+        if (filteredEnchants.isEmpty()) {
+            Log.send("&c扩展附魔列表为空!")
+            return
+        }
+
         for (enchant in formatEnchantList) { Log.send("&a附魔加载: $enchant") }
 
-        ThePit.getInstance().enchantmentFactor.init(enchantmentClasses)
+        ThePit.getInstance().enchantmentFactor.init(filteredEnchants)
         for (removalEnchants in removalEnchants()) {
             ThePit.getInstance().enchantmentFactor.unregister(removalEnchants,null)
         }
