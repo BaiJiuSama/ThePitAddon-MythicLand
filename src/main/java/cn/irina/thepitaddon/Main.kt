@@ -3,10 +3,10 @@ package cn.irina.thepitaddon
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
+import cn.irina.thepitaddon.command.player.buyItems.BuyEgg
+import cn.irina.thepitaddon.command.player.buyItems.BuyEntityCoin
 import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
-import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
-import cn.irina.thepitaddon.command.player.buyItems.BuyProp
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
@@ -194,8 +194,8 @@ class Main : JavaPlugin() {
 //                ChangeItemEnchant(),
                 ChangeUserMeta(),
                 BuyExDiamondItem(),
-                BuyProp(),
-                BuyPhysicalCoin(),
+                BuyEgg(),
+                BuyEntityCoin(),
                 BuyIronHelmet(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),

