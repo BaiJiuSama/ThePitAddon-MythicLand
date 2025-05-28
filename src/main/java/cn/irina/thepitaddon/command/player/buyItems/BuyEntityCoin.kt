@@ -1,54 +1,56 @@
 package cn.irina.thepitaddon.command.player.buyItems
 
-import cn.charlotte.pit.data.PlayerProfile
+import cn.irina.thepitaddon.Main
+import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.item.ItemBuilder
 import org.bukkit.Material
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-
 @Command(name = "buyEntityCoin")
 class BuyEntityCoin {
+    private val prefix = Main.instance.PREFIX
+
     @Execute
-    fun onDefault(@Context player: Player) {
-        player.sendMessage(CC.translate("&cUsage: /buyEntityCoin <1k/1w/10w/100w>"))
+    fun onCommand(@Context player: Player, @Arg str: String) {
+        when (str.uppercase()) {
+            "1k" -> BuyUtil.giveItem(player, physicalCoin(1), 1000)
+
+            "1w" -> BuyUtil.giveItem(player, physicalCoin(2), 10000)
+
+            "10w" -> BuyUtil.giveItem(player, physicalCoin(3), 100000)
+
+            "100w" -> BuyUtil.giveItem(player, physicalCoin(4), 1000000)
+
+            "1kw" -> BuyUtil.giveItem(player, physicalCoin(5), 10000000)
+
+            else -> player.sendMessage(CC.translate("$prefix&c/buyPhysicalCoin < 1k / 1w / 10w / 100w / 1kw >"))
+        }
     }
 
-    @Execute(name = "1k")
-    fun buy1kEntityCoin(@Context player: Player) {
-        BuyUtil.giveItem(player, getEntityCoin(1000, "&6一千硬币"), 1000)
-    }
+    private val lore: MutableList<String> by lazy {ArrayList(listOf(
+        "&7实体货币",
+        "",
+        "&7在神话天坑内广泛流通",
+        "&7可用于兑换购买一些物品"
+    ))}
 
-    @Execute(name = "1w")
-    fun buy1wEntityCoin(@Context player: Player) {
-        BuyUtil.giveItem(player, getEntityCoin(10000, "&6一万硬币"), 10000)
-    }
-
-    @Execute(name = "10w")
-    fun buy10wEntityCoin(@Context player: Player) {
-        BuyUtil.giveItem(player, getEntityCoin(100000, "&6十万硬币"), 100000)
-    }
-
-    @Execute(name = "100w")
-    fun buy100wEntityCoin(@Context player: Player) {
-        BuyUtil.giveItem(player, getEntityCoin(1000000, "&6一百万硬币"), 1000000)
-    }
-
-    private fun getEntityCoin(amount: Int, name: String): ItemStack {
-        val lore: MutableList<String> = ArrayList()
-
-        lore.add("&7实体货币")
-        lore.add("")
-        lore.add("&7在神话天坑内广泛流通")
-        lore.add("&7可用于兑换购买一些物品")
+    private fun physicalCoin(i: Int): ItemStack {
+        val name: String = when (i) {
+            1 -> "&6一千"
+            2 -> "&6一万"
+            3 -> "&6十万"
+            4 -> "&6一百万"
+            5 -> "&6一千万"
+            else -> "&c非法的"
+        }
 
         return ItemBuilder(Material.GOLD_INGOT)
-            .name(name)
+            .name("&f&k!!&r $name&r &e硬币 &f&k!!&r")
             .lore(lore)
             .removeOnJoin(false)
             .deathDrop(false)
