@@ -15,8 +15,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-import java.util.*
 
 class FixListeners : Listener {
     private val blockTypes: MutableList<Material> = ArrayList()
@@ -90,6 +90,9 @@ class FixListeners : Listener {
             profile.streakKills = 50.0
             profile.bounty = 100
         }
+        player.inventory.removeItem(ItemStack(Material.CHAINMAIL_BOOTS))
+        player.inventory.removeItem(ItemStack(Material.IRON_BOOTS))
+        player.inventory.removeItem(ItemStack(Material.IRON_SWORD))
     }
 
     companion object {

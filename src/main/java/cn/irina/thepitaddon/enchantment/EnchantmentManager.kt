@@ -117,6 +117,9 @@ class EnchantmentManager {
                 "judgment_strike",
                 "divine_miracle_enchant",
                 "lunar_deity"
+                //"athena"
+                //"tide"
+                //"war_rewards"
             )
         )
     }
@@ -164,7 +167,9 @@ class EnchantmentManager {
             return
         }
 
-        for (enchant in formatEnchantList) { Log.send("&a附魔加载: $enchant") }
+        for (enchant in formatEnchantList) {
+            Log.send("&a附魔加载: $enchant")
+        }
 
         ThePit.getInstance().enchantmentFactor.init(filteredEnchants)
 //        for (removalEnchants in removalEnchants()) {
