@@ -119,7 +119,7 @@ class EnchantmentManager {
                 "lunar_deity"
                 //"athena"
                 //"tide"
-                //"war_rewards"
+                //"war_pay"
             )
         )
     }
