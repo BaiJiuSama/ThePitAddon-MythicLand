@@ -10,10 +10,10 @@ import org.bukkit.entity.Player
 
 /*
  * @Author Irina
- * @Date 2025/6/6 23:55
+ * @Date 2025/6/6 23:50
  */
 
-class Tide: AbstractEnchantment(), IPlayerKilledEntity {
+class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "战酬"
     }
@@ -35,7 +35,7 @@ class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getUsefulnessLore(level: Int): String {
-        return "击杀获得的经验 &b+${30 + (level * 20)}%"
+        return "击杀获得的金币 &6+${30 + (level * 20)}%"
     }
 
     override fun handlePlayerKilled(
@@ -45,6 +45,6 @@ class Tide: AbstractEnchantment(), IPlayerKilledEntity {
         coin: AtomicDouble,
         exp: AtomicDouble,
     ) {
-        exp.getAndAdd(0.3 + (level * 0.2))
+        coin.getAndAdd(0.3 + (level * 0.2))
     }
 }
