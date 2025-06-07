@@ -6,6 +6,7 @@ import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IAttackEntity
+import net.mizukilab.pit.parm.listener.IPlayerDamaged
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
@@ -14,7 +15,7 @@ import org.bukkit.entity.Player
 import java.util.concurrent.atomic.AtomicBoolean
 
 @WeaponOnly
-class Gamble: AbstractEnchantment(), IAttackEntity {
+class Gamble : AbstractEnchantment(), IAttackEntity,IPlayerDamaged {
     override fun getEnchantName(): String {
         return "赌徒"
     }
@@ -36,8 +37,9 @@ class Gamble: AbstractEnchantment(), IAttackEntity {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7攻击时, 将对目标和自身随机选择一位目标 /s" +
-                "&7额外造成 &f${enchantLevel.toDouble()}❤ &7的&f必中&7伤害 /s" +
+        return "&7每 &e4 &7次击中目标/s" +
+                "&7对自身造成 &f${enchantLevel.toDouble() - 0.5}❤ 必中伤害 /s" +
+                "&7对目标造成 &f${enchantLevel.toDouble() + 0.5}❤ 必中伤害 /s" +
                 "&c(必中伤害无法被免疫与抵抗)"
     }
 
