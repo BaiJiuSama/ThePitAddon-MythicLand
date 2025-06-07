@@ -6,39 +6,44 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.inventory.ItemStack
 
-class LimitArrow: Listener {
-    private val pitArrow: ItemStack by lazy {
-        ItemBuilder(Material.ARROW)
-        .internalName("default_arrow")
-        .defaultItem()
-        .canDrop(false)
-        .canSaveToEnderChest(false)
-        .build()
-    }
-
+class LimitArrow : Listener {
     @EventHandler
-    fun onShoot(event: EntityShootBowEvent) {
-        val player = event.entity as? Player ?: return
-        player.inventory.addItem(pitArrow)
-    }
-
-    private val pitArrowClone by lazy {
-        val arrow = pitArrow.clone()
-        arrow.amount = 30
-        arrow
-    }
-    @EventHandler
-    fun onJoin(event: PlayerJoinEvent) {
-        val player = event.player
-
-        for (its in player.inventory) {
-            if (its.type != Material.ARROW) continue
-            its.type = Material.AIR
+    fun onPlayerShootsArrow(event: EntityShootBowEvent) {
+        if (event.entity is Player) {
+            val player = event.entity as Player
+            if (player.hasPermission("pit.shoot")) {
+                fillArrows(player)
+            }
         }
+    }
 
-        player.inventory.setItem(0, pitArrowClone)
+    private fun fillArrows(player: Player) {
+        val hasCount = player.inventory.contents
+            .filter { it != null && it.type == Material.ARROW }
+            .sumOf { it.amount }
+
+        val diff = 32 - hasCount
+        if (diff != 0) {
+            if (diff > 0) givePitArrows(player, diff)
+            else removePitArrows(player, -diff)
+        }
+    }
+
+    private fun givePitArrows(player: Player, count: Int) {
+        player.inventory.addItem(createPitArrow(count).build())
+    }
+
+    private fun removePitArrows(player: Player, count: Int) {
+        player.inventory.removeItem(createPitArrow(count).build())
+    }
+
+    private fun createPitArrow(amount: Int): ItemBuilder {
+        return ItemBuilder(Material.ARROW)
+            .internalName("default_arrow")
+            .defaultItem()
+            .canDrop(false)
+            .canSaveToEnderChest(false)
+            .amount(amount)
     }
 }

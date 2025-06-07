@@ -2,6 +2,8 @@ package cn.irina.thepitaddon.enchantment.type.rare
 
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.param.item.ArmorOnly
+import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerKilledEntity
 import net.mizukilab.pit.util.cooldown.Cooldown
@@ -13,6 +15,8 @@ import org.bukkit.entity.Player
  * @Date 2025/6/6 23:50
  */
 
+@WeaponOnly
+@ArmorOnly
 class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "战酬"
@@ -35,7 +39,7 @@ class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getUsefulnessLore(level: Int): String {
-        return "击杀获得的金币 &6+${30 + (level * 20)}%"
+        return "击杀获得的硬币 &6+${30 + (level * 20)}%"
     }
 
     override fun handlePlayerKilled(

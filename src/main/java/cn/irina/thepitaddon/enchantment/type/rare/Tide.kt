@@ -2,6 +2,8 @@ package cn.irina.thepitaddon.enchantment.type.rare
 
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.param.item.ArmorOnly
+import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerKilledEntity
 import net.mizukilab.pit.util.cooldown.Cooldown
@@ -13,9 +15,11 @@ import org.bukkit.entity.Player
  * @Date 2025/6/6 23:55
  */
 
+@WeaponOnly
+@ArmorOnly
 class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
-        return "战酬"
+        return "潮汐"
     }
 
     override fun getMaxEnchantLevel(): Int {
@@ -23,7 +27,7 @@ class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getNbtName(): String {
-        return "war_pay"
+        return "tide"
     }
 
     override fun getRarity(): EnchantmentRarity {
