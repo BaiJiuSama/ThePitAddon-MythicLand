@@ -55,7 +55,8 @@ class VolleyA : AbstractEnchantment(),  Listener {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢"
+        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢 /s" +
+                "&7此附魔每秒只能触发一次."
     }
 
     @EventHandler
