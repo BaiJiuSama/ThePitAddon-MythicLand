@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly("org.projectlombok:lombok:1.18.32")
-    implementation("dev.rollczi:litecommands-bukkit:3.9.7")
+    implementation("dev.rollczi:litecommands-bukkit:3.10.0")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.mongojack:mongojack:5.0.0")
