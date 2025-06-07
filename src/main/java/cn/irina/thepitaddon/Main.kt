@@ -4,7 +4,7 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.command.player.buyItems.BuyEgg
-import cn.irina.thepitaddon.command.player.buyItems.BuyEntityCoin
+import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
@@ -195,7 +195,7 @@ class Main : JavaPlugin() {
                 ChangeUserMeta(),
                 BuyExDiamondItem(),
                 BuyEgg(),
-                BuyEntityCoin(),
+                BuyPhysicalCoin(),
                 BuyIronHelmet(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),

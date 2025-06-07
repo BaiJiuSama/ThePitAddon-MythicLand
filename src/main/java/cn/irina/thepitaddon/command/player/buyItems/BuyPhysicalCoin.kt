@@ -11,8 +11,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-@Command(name = "buyEntityCoin")
-class BuyEntityCoin {
+@Command(name = "buyPhysicalCoin")
+class BuyPhysicalCoin {
     private val prefix = Main.instance.PREFIX
 
     @Execute
