@@ -36,7 +36,7 @@ class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7每 &e4 &7次击中目标时 /s" +
+        return "&7每 &e2 &7次击中目标时 /s" +
                 "&7对自身造成 &f${enchantLevel.toDouble() - 0.5}❤ 必中伤害 /s" +
                 "&7对目标造成 &f${enchantLevel.toDouble() + 0.5}❤ 必中伤害 /s" +
                 "&c(必中伤害无法被免疫与抵抗)"
@@ -66,12 +66,13 @@ class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
         if (attacker.itemInHand != null) hit = PlayerProfile.getRawCache(attacker.uniqueId).meleeHit
 
         val victim = entity as? Player ?: return
-        if (hit % 4 != 0) return
+        if (hit % 2 != 0) return
+
         PlayerUtil.damage(attacker, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() - 0.5, false)
         PlayerUtil.damage(victim, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() - 0.5, false)
     }
 
     override fun getText(p0: Int, player: Player?): String {
-        return getHitActionText(player, 4)
+        return getHitActionText(player, 2)
     }
 }
