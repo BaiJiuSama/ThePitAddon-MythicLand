@@ -18,15 +18,15 @@ class BuyPhysicalCoin {
     @Execute
     fun onCommand(@Context player: Player, @Arg str: String) {
         when (str.uppercase()) {
-            "1k" -> BuyUtil.giveItem(player, physicalCoin(1), 1000)
+            "1K" -> BuyUtil.giveItem(player, physicalCoin(1), 1000)
 
-            "1w" -> BuyUtil.giveItem(player, physicalCoin(2), 10000)
+            "1W" -> BuyUtil.giveItem(player, physicalCoin(2), 10000)
 
-            "10w" -> BuyUtil.giveItem(player, physicalCoin(3), 100000)
+            "10W" -> BuyUtil.giveItem(player, physicalCoin(3), 100000)
 
-            "100w" -> BuyUtil.giveItem(player, physicalCoin(4), 1000000)
+            "100W" -> BuyUtil.giveItem(player, physicalCoin(4), 1000000)
 
-            "1kw" -> BuyUtil.giveItem(player, physicalCoin(5), 10000000)
+            "1KW" -> BuyUtil.giveItem(player, physicalCoin(5), 10000000)
 
             else -> player.sendMessage(CC.translate("$prefix&c/buyPhysicalCoin < 1k / 1w / 10w / 100w / 1kw >"))
         }

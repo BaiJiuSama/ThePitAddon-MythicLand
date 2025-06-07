@@ -11,6 +11,7 @@ import net.mizukilab.pit.util.item.ItemBuilder
 import cn.irina.thepitaddon.Main
 import net.minecraft.server.v1_8_R3.EntityHuman
 import net.minecraft.server.v1_8_R3.ItemBow
+import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
@@ -22,12 +23,14 @@ import org.bukkit.scheduler.BukkitRunnable
 
 import java.lang.reflect.Field
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 @BowOnly
-class VolleyA : AbstractEnchantment(),  Listener {
+class VolleyA : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     private val playerUsingFiled: Field = EntityHuman::class.java.getDeclaredField("h")
     private val cooldown = HashMap<UUID, Cooldown>()
+    private val cooldown2 = ConcurrentHashMap<UUID, Cooldown>()
     private val arrowBuilder: ItemBuilder = ItemBuilder(Material.ARROW).internalName("default_arrow").defaultItem().canDrop(false).canSaveToEnderChest(false)
 
     init {
@@ -55,7 +58,7 @@ class VolleyA : AbstractEnchantment(),  Listener {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢"
+        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢 &7(1s冷却)"
     }
 
     @EventHandler
@@ -65,6 +68,9 @@ class VolleyA : AbstractEnchantment(),  Listener {
         val player = event.entity as Player
 
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
+
+        if (!cooldown2.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
+        cooldown2[player.uniqueId] = Cooldown(1L, TimeUnit.SECONDS)
 
         val itemInHand = player.itemInHand
         if (itemInHand == null || itemInHand.type != Material.BOW) return
@@ -87,13 +93,13 @@ class VolleyA : AbstractEnchantment(),  Listener {
             throw RuntimeException("Failed to access player field.", e)
         }
 
-        player.getInventory().addItem(arrowBuilder.amount(level + 1).build())
+        player.inventory.addItem(arrowBuilder.amount(level + 1).build())
 
         object : BukkitRunnable() {
             var tick: Int = 0
             override fun run() {
-                val profile = PlayerProfile.getRawCache(player.getUniqueId())
-                if (tick > level + 1 || cooldown.getOrDefault(player.getUniqueId(), Cooldown(0L))
+                val profile = PlayerProfile.getRawCache(player.uniqueId)
+                if (tick > level + 1 || cooldown.getOrDefault(player.uniqueId, Cooldown(0L))
                         .hasExpired() || !profile.isInArena
                 ) {
                     cancel()
@@ -104,5 +110,9 @@ class VolleyA : AbstractEnchantment(),  Listener {
                 bow.a(nmsItem, entityPlayer.world, entityPlayer, value)
             }
         }.runTaskTimer(Main.instance, 0L, 1L)
+    }
+
+    override fun getText(p0: Int, player: Player): String? {
+        return getCooldownActionText(cooldown2[player.uniqueId])
     }
 }
