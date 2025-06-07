@@ -58,7 +58,8 @@ class VolleyA : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢 &7(1s冷却)"
+        return "射箭时同时射出 &e${enchantLevel + 2} &7支箭矢 /s" +
+                "&7此附魔每秒只能触发一次."
     }
 
     @EventHandler
