@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @WeaponOnly
 class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
     override fun getEnchantName(): String {
-        return "奉献"
+        return "燃竭"
     }
 
     override fun getMaxEnchantLevel(): Int {
@@ -37,9 +37,9 @@ class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7每 &e2 &7次攻击命中目标时, 触发以下效果: /s" +
-                "&7对自身造成 &f${0.5 + enchantLevel.toDouble() * 0.5}❤ 必中伤害 /s" +
+                "&7消耗自身 &c${0.5 + enchantLevel.toDouble() * 0.5}❤ 生命值 /s" +
                 "&7对目标造成 &f${0.5 + enchantLevel.toDouble() * 0.5}❤ 必中伤害 /s" +
-                "&7当自身生命值低于 &c${2 * enchantLevel + 2}❤ &7时, 将不会对自己造成伤害. /s" +
+                "&7当自身生命值低于 &c${2 * enchantLevel + 2}❤ &7时, 将不会消耗生命值. /s" +
                 "&c(必中伤害无法被免疫与抵抗) /s" +
                 "&0(原: 赌徒)"
     }
