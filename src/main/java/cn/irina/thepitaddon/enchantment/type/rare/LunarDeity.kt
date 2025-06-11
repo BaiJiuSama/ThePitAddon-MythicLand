@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.utils.LocationUtil
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.BowOnly
@@ -75,26 +76,7 @@ class LunarDeity : AbstractEnchantment(), Listener, IPlayerShootEntity,  IAction
 
         val arrowLoc = arrow.location.clone()
 
-        val radius = checkRadius(enchantLevel)
-        var nearestDistanceSquared = Double.Companion.MAX_VALUE
-        var nearestPlayer: Player? = null
-        val radiusSquared = (radius * radius).toDouble()
-
-        for (entity in arrow.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())) {
-            if (entity !is Player) continue
-            val target = entity
-            if (target === shooter) continue
-
-            val dx = arrowLoc.x - target.location.x
-            val dy = arrowLoc.y - target.location.y
-            val dz = arrowLoc.z - target.location.z
-            val distanceSquared = dx * dx + dy * dy + dz * dz
-
-            if (distanceSquared < nearestDistanceSquared && distanceSquared <= radiusSquared) {
-                nearestDistanceSquared = distanceSquared
-                nearestPlayer = target
-            }
-        }
+        val nearestPlayer: Player? = LocationUtil.getNearbyPlayer(arrow, checkRadius(enchantLevel))
 
         if (nearestPlayer != null) {
             arrow.velocity = optimizedTrajectory(arrowLoc, nearestPlayer, arrow.velocity.length() + 0.2)
