@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @WeaponOnly
 class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
     override fun getEnchantName(): String {
-        return "赌徒"
+        return "燃竭"
     }
 
     override fun getMaxEnchantLevel(): Int {
@@ -36,10 +36,12 @@ class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7每 &e2 &7次击中目标时 /s" +
-                "&7对自身造成 &f${enchantLevel.toDouble() - 0.5}❤ 必中伤害 /s" +
-                "&7对目标造成 &f${enchantLevel.toDouble() + 0.5}❤ 必中伤害 /s" +
-                "&c(必中伤害无法被免疫与抵抗)"
+        return "&7每 &e2 &7次攻击命中目标时, 触发以下效果: /s" +
+                "&7消耗自身 &c${0.5 + enchantLevel.toDouble() * 0.5}❤ 生命值 /s" +
+                "&7对目标造成 &f${0.5 + enchantLevel.toDouble() * 0.5}❤ 必中伤害 /s" +
+                "&7当自身生命值低于 &c${2 * enchantLevel + 2}❤ &7时, 将不会消耗生命值. /s" +
+                "&c(必中伤害无法被免疫与抵抗) /s" +
+                "&0(原: 赌徒)"
     }
 
     override fun handleAttackEntity(
@@ -67,9 +69,10 @@ class Gamble : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant {
 
         val victim = entity as? Player ?: return
         if (hit % 2 != 0) return
-
-        PlayerUtil.damage(attacker, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() - 0.5, false)
-        PlayerUtil.damage(victim, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() - 0.5, false)
+        if (attacker.health >= (2 * enchantLevel + 2)) {
+            PlayerUtil.damage(attacker, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() * 2 - 1.0, false)
+        }
+        PlayerUtil.damage(victim, PlayerUtil.DamageType.TRUE, enchantLevel.toDouble() * 2 - 1.0, false)
     }
 
     override fun getText(p0: Int, player: Player?): String {

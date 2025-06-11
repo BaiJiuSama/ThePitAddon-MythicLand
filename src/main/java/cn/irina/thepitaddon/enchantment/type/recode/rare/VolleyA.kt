@@ -71,7 +71,7 @@ class VolleyA : AbstractEnchantment(), Listener, IActionDisplayEnchant {
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
 
         if (!cooldown2.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
-        cooldown2[player.uniqueId] = Cooldown(1L, TimeUnit.SECONDS)
+        cooldown2[player.uniqueId] = Cooldown(100L, TimeUnit.MILLISECONDS)
 
         val itemInHand = player.itemInHand
         if (itemInHand == null || itemInHand.type != Material.BOW) return
@@ -114,6 +114,6 @@ class VolleyA : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     }
 
     override fun getText(p0: Int, player: Player): String? {
-        return getCooldownActionText(cooldown2[player.uniqueId])
+        return getCooldownActionText(cooldown2.getOrDefault(player.uniqueId, Cooldown(0L)))
     }
 }
