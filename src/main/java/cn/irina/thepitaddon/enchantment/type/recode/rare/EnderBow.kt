@@ -4,7 +4,6 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.LocationUtil
 import com.google.common.util.concurrent.AtomicDouble
-import net.minecraft.server.v1_8_R3.DamageSource.arrow
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.BowOnly
@@ -12,6 +11,7 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
+import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
@@ -58,7 +58,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
 
     override fun getUsefulnessLore(level: Int): String {
         return StringBuilder("&7射击时若自身处于潜行状态, 射出的箭矢会将自身传送至箭矢落地点 (${120 - (level * 30)}s冷却) /s")
-            .append("&7(传送后视角将转向以自身为中心 &e10 &7格内距离自身最近的目标)")
+            .append("&7(传送后视角将转向以自身为中心 &e10 &7格内距离自身最近的目标) /s")
             .append("&7(箭矢命中目标时减少冷却3s)")
             .toString()
     }
@@ -128,6 +128,6 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
 
     override fun getText(p0: Int, player: Player): String {
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return "&c&l✘"
-        return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
+        return (if (cooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) "&a&l✔" else "&c&l" + TimeUtil.millisToRoundedTime(cooldown.getOrDefault(player.uniqueId, Cooldown(0)).remaining).replace(" ", ""))
     }
 }
