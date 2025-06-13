@@ -57,7 +57,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
     }
 
     override fun getUsefulnessLore(level: Int): String {
-        return StringBuilder("&7射击时若自身处于潜行状态, 射出的箭矢会将自身传送至箭矢落地点 (${if (level >= 3) level * 7 else level * 9}s冷却) /s")
+        return StringBuilder("&7射击时若自身处于潜行状态, 射出的箭矢会将自身传送至箭矢落地点 (${120 - (level * 30)}s冷却) /s")
             .append("&7(传送后视角将转向以自身为中心 &e10 &7格内距离自身最近的目标)")
             .append("&7(箭矢命中目标时减少冷却3s)")
             .toString()
@@ -93,7 +93,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
         val level = ThePit.getApi().getItemEnchantLevel(itemInHand, this.nbtName)
         if (level <= 0) return
 
-        cooldown[player.uniqueId] = Cooldown((if (level >= 3) level * 7 else level * 9).toLong(), TimeUnit.SECONDS)
+        cooldown[player.uniqueId] = Cooldown((120 - (level * 30)).toLong(), TimeUnit.SECONDS)
         event.projectile.setMetadata("ender_bow", FixedMetadataValue(Main.instance, true))
 
     }
@@ -127,7 +127,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
     }
 
     override fun getText(p0: Int, player: Player): String {
-        if (!PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return "&c&l✘"
+        if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return "&c&l✘"
         return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
     }
 }

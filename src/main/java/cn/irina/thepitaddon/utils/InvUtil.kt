@@ -61,7 +61,7 @@ object InvUtil {
         val its = player.itemInHand
         if (its == null || its.type == Material.AIR) return
 
-        if (its.amount >= 1) {
+        if (its.amount <= 1) {
             player.itemInHand = ItemStack(Material.AIR)
         } else {
             player.itemInHand.amount -= 1
