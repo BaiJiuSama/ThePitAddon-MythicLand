@@ -50,7 +50,7 @@ class BuyPhysicalCoin {
         }
 
         return ItemBuilder(Material.GOLD_INGOT)
-            .name("&f&k!!&r $name&r &e硬币 &f&k!!&r")
+            .name("$name&r &e硬币")
             .lore(lore)
             .removeOnJoin(false)
             .deathDrop(false)
