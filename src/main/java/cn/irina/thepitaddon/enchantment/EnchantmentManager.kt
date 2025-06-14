@@ -120,6 +120,7 @@ class EnchantmentManager {
                 //"athena"
                 //"tide"
                 //"war_pay"
+                //"terminator"
             )
         )
     }
