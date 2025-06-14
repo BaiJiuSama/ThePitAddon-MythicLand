@@ -32,12 +32,16 @@ class BuyPhysicalCoin {
         }
     }
 
-    private val lore: MutableList<String> by lazy {ArrayList(listOf(
-        "&7实体货币",
-        "",
-        "&7在神话天坑内广泛流通",
-        "&7可用于兑换购买一些物品"
-    ))}
+    private val lore: MutableList<String> by lazy {
+        ArrayList(
+            listOf(
+                "&7实体货币",
+                "",
+                "&7在神话天坑内广泛流通",
+                "&7可用于兑换购买一些物品"
+            )
+        )
+    }
 
     private fun physicalCoin(i: Int): ItemStack {
         val name: String = when (i) {
@@ -50,7 +54,7 @@ class BuyPhysicalCoin {
         }
 
         return ItemBuilder(Material.GOLD_INGOT)
-            .name("$name&r &e硬币")
+            .name("$name" + "硬币")
             .lore(lore)
             .removeOnJoin(false)
             .deathDrop(false)
