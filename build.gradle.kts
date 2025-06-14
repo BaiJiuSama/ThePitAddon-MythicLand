@@ -29,6 +29,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.mongojack:mongojack:5.0.0")
+    implementation("fastutil:fastutil:5.0.9")
     compileOnly(fileTree(baseDir = "lib"))
 
 }

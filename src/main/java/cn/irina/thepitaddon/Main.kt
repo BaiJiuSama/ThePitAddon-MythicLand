@@ -185,7 +185,7 @@ class Main : JavaPlugin() {
         this.liteCommands = LiteBukkitFactory.builder("ThePitAddon", this)
             .commands(
                 AdminChangeGameMode(),
-//                AdminCommandEnchant(),
+                AdminCommandEnchant(),
                 AdminCrashClient(),
                 AdminHealSelf(),
 //                AdminPlayerAddValue(),

@@ -30,8 +30,8 @@ object LocationUtil {
         return type == Material.WATER || type == Material.STATIONARY_WATER
     }
 
-    fun getNearestPlayer(center: Player, radius: Int): Player? {
-        return center.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())
+    fun getNearestPlayer(center: Entity, radius: Double): Player? {
+        return center.getNearbyEntities(radius, radius, radius)
             .filterIsInstance<Player>()
             .filter { it != center }
             .minByOrNull { it.location.distanceSquared(center.location) }

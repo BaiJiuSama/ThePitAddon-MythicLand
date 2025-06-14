@@ -76,7 +76,7 @@ class LunarDeity : AbstractEnchantment(), Listener, IPlayerShootEntity,  IAction
 
         val arrowLoc = arrow.location.clone()
 
-        val nearestPlayer: Player? = LocationUtil.getNearestPlayer(shooter, checkRadius(enchantLevel))
+        val nearestPlayer: Player? = LocationUtil.getNearestPlayer(arrow, checkRadius(enchantLevel).toDouble())
 
         if (nearestPlayer != null) {
             arrow.velocity = optimizedTrajectory(arrowLoc, nearestPlayer, arrow.velocity.length() + 0.2)

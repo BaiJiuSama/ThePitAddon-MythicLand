@@ -11,7 +11,6 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
-import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
@@ -25,8 +24,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.atan
 import kotlin.math.atan2
+import kotlin.math.max
 import kotlin.math.sqrt
 
 /*
@@ -74,7 +73,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
         p6: AtomicBoolean?,
     ) {
         if (cooldown[player.uniqueId] == null || cooldown[player.uniqueId]!!.hasExpired()) return
-        cooldown[player.uniqueId] = Cooldown(0L.coerceAtLeast(cooldown[player.uniqueId]!!.remaining - 3000L))
+        cooldown[player.uniqueId] = Cooldown(max(0L, cooldown[player.uniqueId]!!.remaining - 3000L))
     }
 
     @EventHandler
@@ -103,32 +102,43 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
         val arrow = event.entity as? Arrow ?: return
 
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
-
-        player.teleport(arrow.location)
-
-        val nearestPlayer = LocationUtil.getNearestPlayer(player, 10) ?: return
-
-        val targetLoc = nearestPlayer.location
-        val dx = targetLoc.x - player.location.x
-        val dy = targetLoc.y - player.location.y
-        val dz = targetLoc.z - player.location.z
-
-        val horizontalDist = sqrt(dx * dx + dz * dz)
-        var yaw = Math.toDegrees(atan2(dx, dz))
-        val pitch = Math.toDegrees(atan(-dy / horizontalDist))
-
-        yaw = (yaw + 360) % 360
-
-        val newLocation = player.location.clone().apply {
-            this.yaw = yaw.toFloat()
-            this.pitch = pitch.toFloat()
+        val arrowLoc = arrow.location.clone().apply {
+            yaw = player.location.yaw
+            pitch = player.location.pitch
         }
 
-        player.teleport(newLocation)
+        LocationUtil.getNearestPlayer(arrow, 10.0)?.let { target ->
+            if (target == player) return@let
+            val targetLoc = target.location
+            val arrowPos = arrowLoc.toVector()
+            val targetPos = targetLoc.toVector()
+
+            val toTarget = targetPos.subtract(arrowPos)
+            val dx = toTarget.x
+            val dy = toTarget.y
+            val dz = toTarget.z
+            val horizontalDist = sqrt(dx * dx + dz * dz)
+
+            val yaw = Math.toDegrees(atan2(dz, dx)).toFloat() - 90f
+            val pitch = Math.toDegrees(atan2(-dy, horizontalDist)).toFloat()
+
+            arrowLoc.apply {
+                this.yaw = normalizeAngle(yaw)
+                this.pitch = pitch
+            }
+        }
+
+        player.teleport(arrowLoc)
+    }
+
+    fun normalizeAngle(angle: Float): Float {
+        var normalized = angle % 360f
+        if (normalized < 0) normalized += 360f
+        return normalized
     }
 
     override fun getText(p0: Int, player: Player): String {
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return "&c&l✘"
-        return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
+        return getCooldownActionText(cooldown[player.uniqueId] ?: Cooldown(0L))
     }
 }
