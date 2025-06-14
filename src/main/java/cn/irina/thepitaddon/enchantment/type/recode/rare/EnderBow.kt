@@ -57,13 +57,13 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
     }
 
     override fun getUsefulnessLore(level: Int): String {
-        return StringBuilder("&7射击时若自身处于潜行状态, 射出的箭矢会将自身传送至箭矢落地点 (${120 - (level * 30)}s冷却) /s")
+        return StringBuilder("&7射击时若自身处于潜行状态, 射出的箭矢会将自身传送至箭矢落地点 (${if (level >= 3) 25 else 120 - (level * 30)}s冷却) /s")
             .append("&7(传送后视角将转向以自身为中心 &e10 &7格内距离自身最近的目标) /s")
             .append("&7(箭矢命中目标时减少冷却3s)")
             .toString()
     }
 
-    val cooldown = ConcurrentHashMap<UUID, Cooldown>()
+    private val cooldown = ConcurrentHashMap<UUID, Cooldown>()
     override fun handleShootEntity(
         level: Int,
         player: Player,
@@ -73,7 +73,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
         p5: AtomicDouble?,
         p6: AtomicBoolean?,
     ) {
-        cooldown.putIfAbsent(player.uniqueId, Cooldown(0L))
+        if (cooldown[player.uniqueId] == null || cooldown[player.uniqueId]!!.hasExpired()) return
         cooldown[player.uniqueId] = Cooldown(0L.coerceAtLeast(cooldown[player.uniqueId]!!.remaining - 3000L))
     }
 
@@ -84,50 +84,51 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
         val player = event.entity as? Player ?: return
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
 
-        cooldown.putIfAbsent(player.uniqueId, Cooldown(0L))
-        if (!cooldown[player.uniqueId]!!.hasExpired() || !player.isSneaking) return
-
         val itemInHand = player.itemInHand
         if (itemInHand == null || itemInHand.type == Material.AIR || itemInHand.type != Material.BOW) return
 
         val level = ThePit.getApi().getItemEnchantLevel(itemInHand, this.nbtName)
         if (level <= 0) return
+        if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired() || !player.isSneaking) return
 
-        cooldown[player.uniqueId] = Cooldown((120 - (level * 30)).toLong(), TimeUnit.SECONDS)
+        cooldown[player.uniqueId] = Cooldown((if (level >= 3) 25 else 120 - (level * 30)).toLong(), TimeUnit.SECONDS)
         event.projectile.setMetadata("ender_bow", FixedMetadataValue(Main.instance, true))
-
     }
 
     @EventHandler
     fun onBowHit(event: ProjectileHitEvent) {
-        if (!event.getEntity().hasMetadata("ender_bow") || event.getEntity().shooter == null) return
-        val player = event.getEntity().shooter as? Player ?: return
+        if (!event.entity.hasMetadata("ender_bow") || event.entity.shooter == null) return
+
+        val player = event.entity.shooter as? Player ?: return
         val arrow = event.entity as? Arrow ?: return
 
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
-        player.teleport(event.getEntity().location)
 
-        val nearestPlayer: Player = LocationUtil.getNearbyPlayer(arrow, 10) ?: return
+        player.teleport(arrow.location)
 
-        val myLocation = player.location.clone()
-        val targetLocation = nearestPlayer.location.clone()
+        val nearestPlayer = LocationUtil.getNearestPlayer(player, 10) ?: return
 
-        val dx = targetLocation.x - player.location.x
-        val dy = targetLocation.y - player.location.y
-        val dz = targetLocation.z - player.location.z
+        val targetLoc = nearestPlayer.location
+        val dx = targetLoc.x - player.location.x
+        val dy = targetLoc.y - player.location.y
+        val dz = targetLoc.z - player.location.z
 
-        var yaw = Math.toDegrees(atan2(-dx, dz))
-        val pitch = Math.toDegrees(atan(-dy / sqrt(dx * dx + dz * dz)))
+        val horizontalDist = sqrt(dx * dx + dz * dz)
+        var yaw = Math.toDegrees(atan2(dx, dz))
+        val pitch = Math.toDegrees(atan(-dy / horizontalDist))
 
         yaw = (yaw + 360) % 360
 
-        myLocation.yaw = yaw.toFloat()
-        myLocation.pitch = pitch.toFloat()
-        player.teleport(myLocation)
+        val newLocation = player.location.clone().apply {
+            this.yaw = yaw.toFloat()
+            this.pitch = pitch.toFloat()
+        }
+
+        player.teleport(newLocation)
     }
 
     override fun getText(p0: Int, player: Player): String {
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return "&c&l✘"
-        return (if (cooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) "&a&l✔" else "&c&l" + TimeUtil.millisToRoundedTime(cooldown.getOrDefault(player.uniqueId, Cooldown(0)).remaining).replace(" ", ""))
+        return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
     }
 }

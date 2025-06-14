@@ -30,27 +30,10 @@ object LocationUtil {
         return type == Material.WATER || type == Material.STATIONARY_WATER
     }
 
-    fun getNearbyPlayer(myself: Entity, radius: Int): Player? {
-        val myselfLoc = myself.location.clone()
-        var nearestDistanceSquared = Double.MAX_VALUE
-        val radiusSquared = (radius * radius).toDouble()
-        var nearestPlayer: Player? = null
-
-        for (entity in myself.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())) {
-            if (entity !is Player) continue
-            if (entity === myself) continue
-
-            val dx = myselfLoc.x - entity.location.x
-            val dy = myselfLoc.y - entity.location.y
-            val dz = myselfLoc.z - entity.location.z
-            val distanceSquared = dx * dx + dy * dy + dz * dz
-
-            if (distanceSquared < nearestDistanceSquared && distanceSquared <= radiusSquared) {
-                nearestDistanceSquared = distanceSquared
-                nearestPlayer = entity
-            }
-        }
-
-        return nearestPlayer
+    fun getNearestPlayer(center: Player, radius: Int): Player? {
+        return center.getNearbyEntities(radius.toDouble(), radius.toDouble(), radius.toDouble())
+            .filterIsInstance<Player>()
+            .filter { it != center }
+            .minByOrNull { it.location.distanceSquared(center.location) }
     }
 }
