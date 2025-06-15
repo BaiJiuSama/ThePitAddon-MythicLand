@@ -8,8 +8,10 @@ import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
+import cn.irina.thepitaddon.menu.type.RandomReward
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
+import cn.irina.thepitaddon.runnable.RefreshReward
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
@@ -145,6 +147,7 @@ class Main : JavaPlugin() {
         }
 
         scheduler.scheduleWithFixedDelay(Announcer(), 0L, 5L, TimeUnit.MINUTES)
+        scheduler.scheduleWithFixedDelay(RefreshReward(), 0L, 1L, TimeUnit.MINUTES)
     }
 
     @HideAccess
@@ -180,6 +183,12 @@ class Main : JavaPlugin() {
         }
     }
 
+    var randomReward: RandomReward? = null
+    fun getRandomRewardObject(): RandomReward {
+        if (randomReward == null) randomReward = RandomReward()
+        return randomReward!!
+    }
+
     private var liteCommands: LiteCommands<CommandSender>? = null
     private fun registerCommands() {
         this.liteCommands = LiteBukkitFactory.builder("ThePitAddon", this)
@@ -190,6 +199,7 @@ class Main : JavaPlugin() {
                 AdminHealSelf(),
                 AdminClearBounty(),
                 PlayerHat(),
+                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),
 //                GodMode(),

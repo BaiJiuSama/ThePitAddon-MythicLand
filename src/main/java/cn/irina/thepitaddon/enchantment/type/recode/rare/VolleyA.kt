@@ -74,7 +74,7 @@ class VolleyA : AbstractEnchantment(), Listener {
         val level = ThePit.getApi().getItemEnchantLevel(itemInHand, this.nbtName)
         if (level <= 0) return
 
-        if (isShooting.getOrDefault(player.uniqueId, false) || !cooldown.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
+        if (isShooting.getOrDefault(player.uniqueId, false)) return
         event.isCancelled = true
 
         val nmsItem = CraftItemStack.asNMSCopy(itemInHand)
@@ -97,7 +97,6 @@ class VolleyA : AbstractEnchantment(), Listener {
             override fun run() {
                 val profile = PlayerProfile.getRawCache(player.uniqueId)
                 if (tick > level + 1 || !profile.isInArena) {
-                    cooldown[player.uniqueId] = Cooldown(15, TimeUnit.MILLISECONDS)
                     isShooting[player.uniqueId] = false
                     cancel()
                     return
