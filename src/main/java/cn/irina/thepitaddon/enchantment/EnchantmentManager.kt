@@ -116,11 +116,12 @@ class EnchantmentManager {
                 "combo_radiant_gold",
                 "judgment_strike",
                 "divine_miracle_enchant",
-                "lunar_deity"
+                "lunar_deity",
                 //"athena"
                 //"tide"
                 //"war_pay"
                 //"terminator"
+                "ender_bow_enchant"
             )
         )
     }
