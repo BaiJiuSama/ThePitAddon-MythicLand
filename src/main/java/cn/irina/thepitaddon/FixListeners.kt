@@ -14,8 +14,8 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 
 class FixListeners : Listener {
@@ -78,21 +78,20 @@ class FixListeners : Listener {
         }
     }
 
-    @EventHandler // For combat area
+    @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
-        if (!player.hasPermission("pit.streak")) {
-            return
-        }
+
         val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
-        val inCombatArea = profile.isInArena
-        if (inCombatArea) {
-            profile.streakKills = 50.0
-            profile.bounty = 100
-        }
-        player.inventory.removeItem(ItemStack(Material.CHAINMAIL_BOOTS))
-        player.inventory.removeItem(ItemStack(Material.IRON_BOOTS))
-        player.inventory.removeItem(ItemStack(Material.IRON_SWORD))
+
+        if (!profile.isInArena) return
+        if (!player.hasPermission("pit.streak")) return
+        if (profile.streakKills >= 50.0 && profile.bounty > 0) return
+        
+        profile.streakKills = 50.0
+        profile.bounty = 100
+        player.sendMessage(CC.translate("&a你离开了保护区, 已自动为你开启超级连杀!"))
+
     }
 
     companion object {
