@@ -4,9 +4,9 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.command.player.buyItems.BuyEgg
-import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
+import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
@@ -188,6 +188,8 @@ class Main : JavaPlugin() {
                 AdminCommandEnchant(),
                 AdminCrashClient(),
                 AdminHealSelf(),
+                AdminClearBounty(),
+                PlayerHat(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),
 //                GodMode(),
