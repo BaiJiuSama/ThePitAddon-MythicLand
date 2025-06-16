@@ -14,6 +14,7 @@ import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.libs.core.util.NumberUtil.range
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.item.ItemBuilder
@@ -220,12 +221,12 @@ class RandomReward: AbstractMenu(), Listener {
         when (event.slot) {
             11 -> {
                 if (rewardData.isReceivedEnchant[player.uniqueId] == true) {
-                    player.sendMessage(CC.translate("&c你已领取过此奖励!"))
+                    player.sendMessage(CC.translate("$prefix&c你已领取过此奖励!"))
                     return
                 }
                 val itemInHand = player.itemInHand
                 if (itemInHand == null || itemInHand.type == Material.AIR) {
-                    player.sendMessage(CC.translate("&c你的手持物不该为空"))
+                    player.sendMessage(CC.translate("$prefix&c你的手持物不该为空"))
                     return
                 }
                 val enchantData = enchantReward[player.uniqueId]
@@ -236,42 +237,45 @@ class RandomReward: AbstractMenu(), Listener {
                 paramMap["weapon"] = enchant::class.java.isAnnotationPresent(WeaponOnly::class.java)
                 paramMap["armor"] = enchant::class.java.isAnnotationPresent(ArmorOnly::class.java)
 
-                when (itemInHand.type)  {
-                    Material.GOLD_SWORD -> {
+                when (ItemUtil.getInternalName(itemInHand).uppercase())  {
+                    "MYTHIC_SWORD" -> {
                         if (paramMap["weapon"] == false) {
-                            player.sendMessage(CC.translate("&c此附魔不能附魔在 &e神话之剑 &c上!"))
+                            player.sendMessage(CC.translate("$prefix&c此附魔不能附魔在 &e神话之剑 &c上!"))
                             return
                         }
                     }
 
-                    Material.BOW -> {
+                    "MYTHIC_BOW" -> {
                         if (paramMap["bow"] == false) {
-                            player.sendMessage(CC.translate("&c此附魔不能附魔在 &e神话之弓 &c上!"))
+                            player.sendMessage(CC.translate("$prefix&c此附魔不能附魔在 &e神话之弓 &c上!"))
                             return
                         }
                     }
 
-                    Material.LEATHER_LEGGINGS -> {
+                    "MYTHIC_LEGGINGS" -> {
                         if (paramMap["armor"] == false) {
-                            player.sendMessage(CC.translate("&c此附魔不能附魔在 &e神话之甲 &c上!"))
+                            player.sendMessage(CC.translate("$prefix&c此附魔不能附魔在 &e神话之甲 &c上!"))
                             return
                         }
                     }
 
                     else -> {
-                        player.sendMessage(CC.translate("&c非法的物品!"))
+                        player.sendMessage(CC.translate("$prefix&c请手持对应可被附魔的物品!"))
                         return
                     }
                 }
 
+                player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
                 player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level)
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
+                player.closeInventory()
+                return
             }
 
             13 -> {
                 if (rewardData.isReceivedItem[player.uniqueId] == true) {
-                    player.sendMessage(CC.translate("&c你已领取过物品奖励"))
+                    player.sendMessage(CC.translate("$prefix&c你已领取过物品奖励"))
                     return
                 }
 
@@ -281,16 +285,23 @@ class RandomReward: AbstractMenu(), Listener {
 
             15 -> {
                 if (rewardData.isReceivedPlate[player.uniqueId] == true) {
-                    player.sendMessage(CC.translate("&c你已领取过物品奖励"))
+                    player.sendMessage(CC.translate("$prefix&c你已领取过物品奖励"))
                     return
                 }
-                player.inventory.addItem(item)
+
                 rewardData.isReceivedPlate[player.uniqueId] = true
                 rewardData.plateReward.remove(player.uniqueId)
             }
 
             else -> return
         }
+
+        player.sendMessage(CC.translate("$prefix&a领取成功!"))
+
+        val cloneItem = item.clone().apply { amount = 1 }
+        for (i in range(item.amount))
+            player.inventory.addItem(cloneItem)
+
         player.closeInventory()
     }
 
