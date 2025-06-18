@@ -4,10 +4,10 @@ import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.sub.EnchantmentRecord
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
+import cn.irina.thepitaddon.manager.PointsManager
 import cn.irina.thepitaddon.menu.AbstractMenu
 import cn.irina.thepitaddon.param.EnchantData
 import cn.irina.thepitaddon.param.RewardData
-import cn.irina.thepitaddon.param.RewardData.enchantReward
 import net.md_5.bungee.api.ChatColor
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
@@ -19,7 +19,6 @@ import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.item.ItemBuilder
 import net.mizukilab.pit.util.item.ItemUtil
-import net.mizukilab.pit.util.item.ItemUtil.canTrade
 import net.mizukilab.pit.util.random.RandomUtil
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -28,7 +27,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.java
 
 /*
@@ -38,6 +36,7 @@ import kotlin.jvm.java
 
 class RandomReward: AbstractMenu(), Listener {
     val prefix = Main.instance.PREFIX
+    val pointsManager = PointsManager
 
     override fun getMenuName(): String {
         return CC.translate("&f&k!!&r &b流浪的魔女 &f&k!!&r")
@@ -88,7 +87,11 @@ class RandomReward: AbstractMenu(), Listener {
                         "&7适用于:",
                         (if (enchant::class.java.isAnnotationPresent(ArmorOnly::class.java)) CC.translate("&f[ &a神话之甲 &f]") else "&f[ &c神话之甲 &f]") +
                         (if (enchant::class.java.isAnnotationPresent(WeaponOnly::class.java)) CC.translate("&f[ &a神话之剑 &f]") else "&f[ &c神话之剑 &f]") +
-                        (if (enchant::class.java.isAnnotationPresent(BowOnly::class.java)) CC.translate("&f[ &a神话之弓 &f]") else "&f[ &c神话之弓 &f]")
+                        (if (enchant::class.java.isAnnotationPresent(BowOnly::class.java)) CC.translate("&f[ &a神话之弓 &f]") else "&f[ &c神话之弓 &f]"),
+                        if (enchant.rarity == EnchantmentRarity.RARE)
+                            if (PointsManager.getPoints(player) <= 40) "&f[ &c你没有足够的点卷 &f]" else "&f[ &a点击购买并领取 &f(40点卷) &f]"
+                        else
+                            "&f[ &a点击领取 &f]"
                     )
                     .changeNbt("EnchantName", enchantData.enchant.nbtName)
                     .changeNbt("EnchantLevel", enchantData.level)
@@ -113,7 +116,10 @@ class RandomReward: AbstractMenu(), Listener {
             addItemToInventory(13,
                 ItemBuilder(item)
                     .name(item.itemMeta.displayName)
-                    .lore(item.itemMeta.lore)
+                    .lore(item.itemMeta.lore.apply {
+                        add("")
+                        add("&f[ &a点击领取 &f]")
+                    })
                     .amount(item.amount)
                     .build()
             )
@@ -136,7 +142,10 @@ class RandomReward: AbstractMenu(), Listener {
             addItemToInventory(15,
                 ItemBuilder(plate)
                     .name(plate.itemMeta.displayName)
-                    .lore(plate.itemMeta.lore)
+                    .lore(plate.itemMeta.lore.apply {
+                        add("")
+                        add("&f[ &a点击领取 &f]")
+                    })
                     .build()
             )
         }
@@ -144,7 +153,14 @@ class RandomReward: AbstractMenu(), Listener {
 
     fun randomEnchant(): AbstractEnchantment {
         val enchants = ThePit.getInstance().enchantmentFactor.enchantments
-        val filteredEnchants = enchants.filter { it.rarity == EnchantmentRarity.RARE || it.rarity == EnchantmentRarity.NORMAL}
+        val filteredEnchants = enchants
+            .filter {
+                if (RandomUtil.hasSuccessfullyByChance(0.1))
+                    it.rarity == EnchantmentRarity.RARE
+                else
+                    it.rarity == EnchantmentRarity.NORMAL
+            }
+
         return filteredEnchants.random()
     }
 
@@ -232,6 +248,18 @@ class RandomReward: AbstractMenu(), Listener {
                 val enchantData = enchantReward[player.uniqueId]
                 val enchant = enchantData!!.enchant
 
+                var isRare = false
+                if (enchant.rarity == EnchantmentRarity.RARE) {
+                    isRare = true
+
+                    if (pointsManager.getPoints(player) <= 40) {
+                        player.sendMessage(CC.translate("$prefix&c你的点卷不足!"))
+                        return
+                    }
+
+                    pointsManager.takePoints(player, 40)
+                }
+
                 val paramMap = HashMap<String, Boolean>()
                 paramMap["bow"] = enchant::class.java.isAnnotationPresent(BowOnly::class.java)
                 paramMap["weapon"] = enchant::class.java.isAnnotationPresent(WeaponOnly::class.java)
@@ -266,7 +294,7 @@ class RandomReward: AbstractMenu(), Listener {
                 }
 
                 player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
-                player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level)
+                player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level, isRare)
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
                 player.closeInventory()
@@ -305,7 +333,7 @@ class RandomReward: AbstractMenu(), Listener {
         player.closeInventory()
     }
 
-    fun onEnchant(player: Player, item: ItemStack, name: String, level: Int): ItemStack? {
+    fun onEnchant(player: Player, item: ItemStack, name: String, level: Int, isRare: Boolean): ItemStack? {
         if (ItemUtil.getItemIntData(item, "tier") >= 3) {
             player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为阶数大于或等于 3"))
             return item
@@ -315,6 +343,19 @@ class RandomReward: AbstractMenu(), Listener {
         if (pitItem.enchantments.size >= 3) {
             player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
             return item
+        }
+
+        var rares = 0
+        if (isRare) {
+            for (e in pitItem.enchantments) {
+                if (e.key.rarity != EnchantmentRarity.RARE) continue
+                rares++
+            }
+
+            if (rares >= 1) {
+                player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为稀有附魔数量大于 1"))
+                return item
+            }
         }
 
         var tier = ItemUtil.getItemIntData(item, "tier") + 1

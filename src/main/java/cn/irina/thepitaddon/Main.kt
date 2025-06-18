@@ -21,6 +21,8 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
 import net.mizukilab.pit.util.music.Song
+import org.black_ixx.playerpoints.PlayerPoints
+import org.black_ixx.playerpoints.PlayerPointsAPI
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.FileConfiguration
@@ -49,13 +51,15 @@ class Main : JavaPlugin() {
 
     private val depends = listOf(
         "LuckPerms",
-        "ThePitUltimate"
+        "ThePitUltimate",
+        "PlayerPoints"
     )
 
     private val file: File = File("plugins/ThePitAddon", "config.yml")
     private val cfg: FileConfiguration = YamlConfiguration.loadConfiguration(file)
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
+    val pointsAPI = PlayerPoints.getInstance().api
 
 
     fun modifyRarityPrefix() {
@@ -194,7 +198,7 @@ class Main : JavaPlugin() {
         this.liteCommands = LiteBukkitFactory.builder("ThePitAddon", this)
             .commands(
                 AdminChangeGameMode(),
-                AdminCommandEnchant(),
+                CommandEnchant(),
                 AdminCrashClient(),
                 AdminHealSelf(),
                 AdminClearBounty(),
