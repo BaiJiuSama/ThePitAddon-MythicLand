@@ -1,6 +1,6 @@
 package cn.irina.thepitaddon.runnable
 
-import cn.irina.thepitaddon.param.RewardData
+import cn.irina.thepitaddon.data.RewardData
 import cn.irina.thepitaddon.utils.Log
 import net.mizukilab.pit.util.chat.CC
 import java.time.ZoneId

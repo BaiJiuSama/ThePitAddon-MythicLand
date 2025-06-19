@@ -1,4 +1,4 @@
-package cn.irina.thepitaddon.param
+package cn.irina.thepitaddon.data
 
 import org.bukkit.inventory.ItemStack
 import java.util.UUID

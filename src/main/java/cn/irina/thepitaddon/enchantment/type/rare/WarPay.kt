@@ -39,7 +39,7 @@ class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getUsefulnessLore(level: Int): String {
-        return "击杀获得的硬币 &6+${30 + (level * 20)}%"
+        return "&7击杀获得的硬币 &6+${30 + (level * 20)}%"
     }
 
     override fun handlePlayerKilled(

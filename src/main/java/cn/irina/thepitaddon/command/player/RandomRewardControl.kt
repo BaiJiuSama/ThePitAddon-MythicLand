@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.command.player
 
 import cn.irina.thepitaddon.Main
-import cn.irina.thepitaddon.param.RewardData
+import cn.irina.thepitaddon.data.RewardData
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context

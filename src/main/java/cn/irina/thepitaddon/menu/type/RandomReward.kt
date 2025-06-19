@@ -6,15 +6,14 @@ import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
 import cn.irina.thepitaddon.manager.PointsManager
 import cn.irina.thepitaddon.menu.AbstractMenu
-import cn.irina.thepitaddon.param.EnchantData
-import cn.irina.thepitaddon.param.RewardData
+import cn.irina.thepitaddon.data.EnchantData
+import cn.irina.thepitaddon.data.RewardData
 import net.md_5.bungee.api.ChatColor
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.libs.core.util.NumberUtil.range
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.item.ItemBuilder
@@ -76,12 +75,14 @@ class RandomReward: AbstractMenu(), Listener {
             if (enchantReward[player.uniqueId] == null) enchantReward[player.uniqueId] = EnchantData(listOf(1, 2, 3).random(), randomEnchant())
             val enchantData = enchantReward[player.uniqueId]!!
             val enchant = enchantData.enchant
-            addItemToInventory(11,
-                ItemBuilder(Material.ENCHANTED_BOOK)
-                    .name("&9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
-                    .lore(
-                        "",
-                        CC.translate(enchant.getUsefulnessLore(enchantData.level).split("/s").toString().replace("[", "").replace("]", "")),
+
+            val loreList: MutableList<String> = ArrayList()
+            val split = enchant.getUsefulnessLore(enchantData.level).split("/s")
+
+            loreList.apply {
+                add("")
+                for (str in split) add(CC.translate(str))
+                addAll(listOf(
                         "",
                         "&7适用于:",
                         (if (enchant::class.java.isAnnotationPresent(ArmorOnly::class.java)) CC.translate("&f[ &a神话之甲 &f]") else "&f[ &c神话之甲 &f]") +
@@ -91,7 +92,14 @@ class RandomReward: AbstractMenu(), Listener {
                             if (PointsManager.getPoints(player) <= 40) "&f[ &c你没有足够的点卷 &f]" else "&f[ &a点击购买并领取 &f(40点卷) &f]"
                         else
                             "&f[ &a点击领取 &f]"
-                    )
+                ))
+            }
+
+
+            addItemToInventory(11,
+                ItemBuilder(Material.ENCHANTED_BOOK)
+                    .name("&9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
+                    .lore(loreList)
                     .changeNbt("EnchantName", enchantData.enchant.nbtName)
                     .changeNbt("EnchantLevel", enchantData.level)
                     .build()
@@ -202,36 +210,40 @@ class RandomReward: AbstractMenu(), Listener {
         return selectedItem
     }
 
-    val plateItem =
-        listOf(
-            ItemBuilder(Material.GOLD_SWORD)
-                .internalName("mythic_sword")
-                .name("&e神话之剑")
-                .lore(
-                    "&7死亡后保留",
-                    "",
-                    "&7在神话之井中附魔"
-                )
-                .canTrade(true)
-                .canSaveToEnderChest(true)
-                .deathDrop(false)
-                .removeOnJoin(false)
-                .buildWithUnbreakable()
-            ,
-            ItemBuilder(Material.BOW)
-                .internalName("mythic_bow")
-                .name("&b神话之弓")
-                .lore(
-                    "&7死亡后保留",
-                    "",
-                    "&7在神话之井中附魔"
-                )
-                .canTrade(true)
-                .canSaveToEnderChest(true)
-                .deathDrop(false)
-                .removeOnJoin(false)
-                .buildWithUnbreakable()
-            ,
+    val mythicSword: ItemStack by lazy {
+        ItemBuilder(Material.GOLD_SWORD)
+            .internalName("mythic_sword")
+            .name("&e神话之剑")
+            .lore(
+                "&7死亡后保留",
+                "",
+                "&7在神话之井中附魔"
+            )
+            .canTrade(true)
+            .canSaveToEnderChest(true)
+            .deathDrop(false)
+            .removeOnJoin(false)
+            .buildWithUnbreakable()
+    }
+
+    val mythicBow: ItemStack by lazy {
+        ItemBuilder(Material.BOW)
+            .internalName("mythic_bow")
+            .name("&b神话之弓")
+            .lore(
+                "&7死亡后保留",
+                "",
+                "&7在神话之井中附魔"
+            )
+            .canTrade(true)
+            .canSaveToEnderChest(true)
+            .deathDrop(false)
+            .removeOnJoin(false)
+            .buildWithUnbreakable()
+    }
+    val plateItem = listOf(
+            mythicBow,
+            mythicSword,
             ThePit.getApi().generateItem("Leggings")
         )
 
