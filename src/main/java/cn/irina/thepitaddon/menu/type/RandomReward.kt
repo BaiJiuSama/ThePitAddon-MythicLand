@@ -190,8 +190,10 @@ class RandomReward: AbstractMenu(), Listener {
         pitItem.cherry
     )
     fun randomItem(): ItemStack {
-        if (RandomUtil.hasSuccessfullyByChance(0.2))
-            return rarePitItems.random()
+        if (RandomUtil.hasSuccessfullyByChance(0.3))
+            return (rarePitItems.random()).apply {
+                amount = listOf(1, 2).random()
+            }
 
         val selectedItem = (pitItems.random()).apply {
             amount = listOf(1, 2, 3, 4, 5, 6).random()
@@ -235,7 +237,7 @@ class RandomReward: AbstractMenu(), Listener {
 
     fun randomPlate(): ItemStack {
         val selectedItem = (plateItem.random()).apply {
-            amount = listOf(1, 2, 3, 4).random()
+            amount = listOf(1, 2, 3).random()
         }
         return selectedItem
     }
@@ -255,17 +257,23 @@ class RandomReward: AbstractMenu(), Listener {
                     player.sendMessage(CC.translate("$prefix&c你已领取过此奖励!"))
                     return
                 }
+
                 val itemInHand = player.itemInHand
                 if (itemInHand == null || itemInHand.type == Material.AIR) {
                     player.sendMessage(CC.translate("$prefix&c你的手持物不该为空"))
                     return
                 }
+
                 val enchantData = enchantReward[player.uniqueId]
                 val enchant = enchantData!!.enchant
 
-                var isRare = false
                 if (enchant.rarity == EnchantmentRarity.RARE) {
-                    isRare = true
+                    val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(itemInHand)
+                    for (e in pitItem.enchantments) {
+                        if (e.key.rarity != EnchantmentRarity.RARE) continue
+                        player.sendMessage(CC.translate("$prefix&c无法领取附魔, 因为此物品稀有属性大于等于 1!"))
+                        return
+                    }
 
                     if (pointsManager.getPoints(player) <= 40) {
                         player.sendMessage(CC.translate("$prefix&c你的点卷不足!"))
@@ -308,8 +316,8 @@ class RandomReward: AbstractMenu(), Listener {
                     }
                 }
 
+                player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level)
                 player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
-                player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level, isRare)
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
                 player.closeInventory()
@@ -344,13 +352,13 @@ class RandomReward: AbstractMenu(), Listener {
         player.sendMessage(CC.translate("$prefix&a领取成功!"))
 
         val cloneItem = needClaimItem?.clone().apply { this?.amount = 1 } ?: return
-        for (i in range(item.amount - 1))
+        for (i in 1..item.amount)
             player.inventory.addItem(cloneItem)
 
         player.closeInventory()
     }
 
-    fun onEnchant(player: Player, item: ItemStack, name: String, level: Int, isRare: Boolean): ItemStack? {
+    fun onEnchant(player: Player, item: ItemStack, name: String, level: Int): ItemStack? {
         if (ItemUtil.getItemIntData(item, "tier") >= 3) {
             player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为阶数大于或等于 3"))
             return item
@@ -360,19 +368,6 @@ class RandomReward: AbstractMenu(), Listener {
         if (pitItem.enchantments.size >= 3) {
             player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
             return item
-        }
-
-        var rares = 0
-        if (isRare) {
-            for (e in pitItem.enchantments) {
-                if (e.key.rarity != EnchantmentRarity.RARE) continue
-                rares++
-            }
-
-            if (rares >= 1) {
-                player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为稀有附魔数量大于 1"))
-                return item
-            }
         }
 
         var tier = ItemUtil.getItemIntData(item, "tier") + 1

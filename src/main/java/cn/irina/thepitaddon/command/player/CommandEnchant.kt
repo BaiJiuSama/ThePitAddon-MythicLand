@@ -13,13 +13,14 @@ import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.item.ItemBuilder
 import net.mizukilab.pit.util.item.ItemUtil
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.java
 
-@Command(name = "enchantToHand")
+@Command(name = "enchantToTarget")
 class CommandEnchant {
     val prefix = Main.instance.PREFIX
 
@@ -27,10 +28,13 @@ class CommandEnchant {
     fun onCommand(
         @Context sender: CommandSender,
         @Arg str: String,
-        @Arg level: Int
+        @Arg level: Int,
+        @Arg player: Player
     ) {
-        val player = sender as? Player ?: return
-
+        if (player.itemInHand == null || player.itemInHand.type == Material.AIR) {
+            player.sendMessage(CC.translate("$prefix&c手持物不得为空!"))
+            return
+        }
         val enchantedItem = if (player.hasPermission("pit.admin")) {
             onEnchant(player.itemInHand, str, level)
         } else {
@@ -51,13 +55,20 @@ class CommandEnchant {
 
     fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack? {
         if (ItemUtil.getItemIntData(item, "tier") >= 3) {
-            player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为阶数大于或等于 3"))
+            player.sendMessage(CC.translate("$prefix&c此物品无法继续附魔, 因为阶数大于或等于 3"))
             return item
         }
 
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
+
+        for (record in pitItem.enchantmentRecords) {
+            if (!record.description.contains("EnchantCommand")) continue
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔过!"))
+            return item
+        }
+
         if (pitItem.enchantments.size >= 3) {
-            player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
+            player.sendMessage(CC.translate("$prefix&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
             return item
         }
 
