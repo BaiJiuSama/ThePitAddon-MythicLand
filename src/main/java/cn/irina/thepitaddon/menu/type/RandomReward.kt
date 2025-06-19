@@ -27,7 +27,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import kotlin.jvm.java
 
 /*
  * @Author Irina
@@ -111,15 +110,22 @@ class RandomReward: AbstractMenu(), Listener {
             )
         } else {
             if (itemReward[player.uniqueId] == null) itemReward[player.uniqueId] = randomItem()
-            val item = itemReward[player.uniqueId]!!
+            val item = itemReward[player.uniqueId]!!.clone()
+
+            val loreList: MutableList<String> = ArrayList()
+
+            loreList.apply {
+                addAll(item.itemMeta.lore)
+                addAll(listOf(
+                    "",
+                    "&f[ &a点击领取 &f]"
+                ))
+            }
 
             addItemToInventory(13,
                 ItemBuilder(item)
                     .name(item.itemMeta.displayName)
-                    .lore(item.itemMeta.lore.apply {
-                        add("")
-                        add("&f[ &a点击领取 &f]")
-                    })
+                    .lore(loreList)
                     .amount(item.amount)
                     .build()
             )
@@ -137,15 +143,22 @@ class RandomReward: AbstractMenu(), Listener {
             )
         } else {
             if (plateReward[player.uniqueId] == null) plateReward[player.uniqueId] = randomPlate()
-            val plate = plateReward[player.uniqueId]!!
+            val plate = plateReward[player.uniqueId]!!.clone()
+
+            val loreList: MutableList<String> = ArrayList()
+
+            loreList.apply {
+                addAll(plate.itemMeta.lore)
+                addAll(listOf(
+                    "",
+                    "&f[ &a点击领取 &f]"
+                ))
+            }
 
             addItemToInventory(15,
                 ItemBuilder(plate)
                     .name(plate.itemMeta.displayName)
-                    .lore(plate.itemMeta.lore.apply {
-                        add("")
-                        add("&f[ &a点击领取 &f]")
-                    })
+                    .lore(loreList)
                     .build()
             )
         }
@@ -155,7 +168,7 @@ class RandomReward: AbstractMenu(), Listener {
         val enchants = ThePit.getInstance().enchantmentFactor.enchantments
         val filteredEnchants = enchants
             .filter {
-                if (RandomUtil.hasSuccessfullyByChance(0.1))
+                if (RandomUtil.hasSuccessfullyByChance(0.3))
                     it.rarity == EnchantmentRarity.RARE
                 else
                     it.rarity == EnchantmentRarity.NORMAL
@@ -173,7 +186,8 @@ class RandomReward: AbstractMenu(), Listener {
     val rarePitItems = listOf(
         pitItem.totallyLegitGem,
         pitItem.repairKit,
-        pitItem.globalAttentionGem
+        pitItem.globalAttentionGem,
+        pitItem.cherry
     )
     fun randomItem(): ItemStack {
         if (RandomUtil.hasSuccessfullyByChance(0.2))
@@ -234,6 +248,7 @@ class RandomReward: AbstractMenu(), Listener {
         val player = event.whoClicked as? Player ?: return
         val item = event.currentItem
 
+        var needClaimItem: ItemStack?
         when (event.slot) {
             11 -> {
                 if (rewardData.isReceivedEnchant[player.uniqueId] == true) {
@@ -307,6 +322,7 @@ class RandomReward: AbstractMenu(), Listener {
                     return
                 }
 
+                needClaimItem = rewardData.itemReward[player.uniqueId]
                 rewardData.isReceivedItem[player.uniqueId] = true
                 rewardData.itemReward.remove(player.uniqueId)
             }
@@ -317,6 +333,7 @@ class RandomReward: AbstractMenu(), Listener {
                     return
                 }
 
+                needClaimItem = rewardData.plateReward[player.uniqueId]
                 rewardData.isReceivedPlate[player.uniqueId] = true
                 rewardData.plateReward.remove(player.uniqueId)
             }
@@ -326,8 +343,8 @@ class RandomReward: AbstractMenu(), Listener {
 
         player.sendMessage(CC.translate("$prefix&a领取成功!"))
 
-        val cloneItem = item.clone().apply { amount = 1 }
-        for (i in range(item.amount))
+        val cloneItem = needClaimItem?.clone().apply { this?.amount = 1 } ?: return
+        for (i in range(item.amount - 1))
             player.inventory.addItem(cloneItem)
 
         player.closeInventory()

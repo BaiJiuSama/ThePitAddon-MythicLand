@@ -19,58 +19,27 @@ import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.java
 
-@Command(name = "enchant")
+@Command(name = "enchantToHand")
 class CommandEnchant {
     val prefix = Main.instance.PREFIX
 
-//    @Execute
-//    fun enchant(
-//        @Context player: Player,
-//        @Arg enchantNBT: String,
-//        @Arg enchantLevel: Int
-//    ) {
-//        val item = addEnchantToItem(player.itemInHand, enchantNBT, enchantLevel)
-//        player.inventory.itemInHand = item
-//        player.sendMessage(CC.translate("&aSUCCESS!"))
-//    }
-//
-//    @Execute(name = "toTarget")
-//    fun enchantToTarget(
-//        @Context sender: CommandSender,
-//        @Arg target: Player,
-//        @Arg enchantNBT: String,
-//        @Arg enchantLevel: Int
-//    ) {
-//        val item = addEnchantToItem(target.itemInHand, enchantNBT, enchantLevel)
-//        target.inventory.itemInHand = item
-//        sender.sendMessage(CC.translate("&aSUCCESS!"))
-//    }
     @Execute
     fun onCommand(
-    @Context sender: CommandSender,
-    @Arg str: String,
-    @Arg level: Int
+        @Context sender: CommandSender,
+        @Arg str: String,
+        @Arg level: Int
     ) {
         val player = sender as? Player ?: return
-        if (player.hasPermission("pit.admin")) {
+
+        val enchantedItem = if (player.hasPermission("pit.admin")) {
             onEnchant(player.itemInHand, str, level)
         } else {
             onPlayerEnchant(player, player.itemInHand, str, level)
         }
+
+        player.itemInHand = enchantedItem
         player.sendMessage(CC.translate("&aSUCCESS!"))
     }
-
-//    @Execute(name = "toTarget")
-//    fun onCommand(
-//        @Context sender: CommandSender,
-//        @Arg target: Player,
-//        @Arg str: String,
-//        @Arg level: Int
-//    ) {
-//        sender.sendMessage(CC.translate("&aSUCCESS!"))
-//        val item = onEnchant(target.itemInHand, str, level)
-//        target.itemInHand = item
-//    }
 
     fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
@@ -143,7 +112,7 @@ class CommandEnchant {
             if (hasEnchantLevel >= 1) {
                 put(enchant, if (hasEnchantLevel + level > 3) 3 else hasEnchantLevel + level)
             } else {
-                put(enchant, level)
+                put(enchant, if (level > 3) 3 else level)
             }
         }
 

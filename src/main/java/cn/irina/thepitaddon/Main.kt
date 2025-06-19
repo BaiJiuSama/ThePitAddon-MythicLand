@@ -59,7 +59,7 @@ class Main : JavaPlugin() {
     private val cfg: FileConfiguration = YamlConfiguration.loadConfiguration(file)
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
-    val pointsAPI = PlayerPoints.getInstance().api
+    val pointsAPI: PlayerPointsAPI = PlayerPoints.getInstance().api
 
 
     fun modifyRarityPrefix() {

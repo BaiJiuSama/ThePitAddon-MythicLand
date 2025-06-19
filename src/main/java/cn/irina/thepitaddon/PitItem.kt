@@ -122,6 +122,20 @@ class PitItem {
             .buildWithUnbreakable()
     }
 
+    val cherry: ItemStack by lazy {
+        ItemBuilder(Material.APPLE)
+            .internalName("cherry")
+            .canDrop(true)
+            .canTrade(true)
+            .deathDrop(false)
+            .canSaveToEnderChest(true)
+            .name("&d樱桃")
+            .lore(
+                "&7死亡时保留"
+            )
+            .build()
+    }
+
     fun randomColorMythicLegging(): ItemStack {
         return thePit.generateItem("Leggings")
     }
