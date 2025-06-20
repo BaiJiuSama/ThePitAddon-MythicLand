@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.command.player
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.sub.EnchantmentRecord
 import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.utils.InvUtil
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -54,6 +55,13 @@ class CommandEnchant {
     }
 
     private fun takeAmazingGem(enchantName: String, level: Int, player: Player, amount: Int) {
+        if (!InvUtil.hasEnoughItemCount(player, "amazing_gem_$enchantName" + "_$level", amount, Material.NETHER_STAR)) {
+            player.sendMessage(CC.translate("$prefix&c你没有足够的 &f神话凝聚体!"))
+            return
+        }
+
+        InvUtil.removeEnoughItemCount(player, "amazing_gem_$enchantName" + "_$level", amount, Material.NETHER_STAR)
+        player.sendMessage(CC.translate("$prefix&aSUCCESS!"))
     }
 
     private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
@@ -61,7 +69,7 @@ class CommandEnchant {
         for (item in player.inventory.contents) {
             if (item == null) continue
             if (item.type != Material.NETHER_STAR) continue
-            player.sendMessage(CC.translate(CC.translate("$prefix&f检查物品: &e${item.type}")))
+            player.sendMessage(CC.translate("$prefix&f检查物品: &e${item.type}"))
             val amazingGemInternalName: String = "amazing_gem_$enchantName" + "_$level"
             val internalName = ItemUtil.getInternalName(item) ?: continue
             if (internalName == amazingGemInternalName) {
@@ -74,7 +82,7 @@ class CommandEnchant {
 
     private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
-        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return null
+        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return item
         val oldMap = pitItem.enchantments.apply { put(enchant, level) }
         pitItem.enchantments = oldMap
         return pitItem.toItemStack()
