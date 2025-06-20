@@ -3,7 +3,6 @@ package cn.irina.thepitaddon.command.player
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.sub.EnchantmentRecord
 import cn.irina.thepitaddon.Main
-import cn.irina.thepitaddon.utils.InvUtil
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -36,34 +35,21 @@ class CommandEnchant {
             return
         }
 
-        val amazingGemAmount = getAmazingGemAmount(player, enchantName)
-        if (amazingGemAmount <= 0 || amazingGemAmount - level <= 0) {
+        if (hasCommandEnchanted(player.itemInHand)) {
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
+            return
+        }
+
+        val amazingGemAmount = getAmazingGemAmount(player, enchantName, level)
+        if (amazingGemAmount <= 0) {
             player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
             return
         }
 
-        takeAmazingGem(player, enchantName, level)
-        val newItem = onPlayerEnchant(player, player.itemInHand, enchantName, level)
-        player.itemInHand = newItem
+        takeAmazingGem(player, enchantName, level, 1)
+        player.itemInHand = onPlayerEnchant(player, player.itemInHand, enchantName, level)
         player.sendMessage(CC.translate("$prefix&aSUCCESS"))
     }
-
-
-//    private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
-//        var amount = 0
-//        for (item in player.inventory.contents) {
-//            if (item == null) continue
-//            if (item.type != Material.NETHER_STAR) continue
-//            player.sendMessage(CC.translate("$prefix&f检查物品: &e${item.type}"))
-//            val amazingGemInternalName: String = "amazing_gem_$enchantName" + "_$level"
-//            val internalName = ItemUtil.getInternalName(item) ?: continue
-//            if (internalName == amazingGemInternalName) {
-//                val mythicCondenserAmount = item.amount
-//                amount += mythicCondenserAmount
-//            }
-//        }
-//        return amount
-//    }
 
     val amazingGemInternal = "AmazingGem"
     fun isAmazingGem(i: ItemStack): Boolean {
@@ -72,13 +58,18 @@ class CommandEnchant {
                 && amazingGemInternal == ItemUtil.getInternalName(i)
     }
 
-    fun getAmazingGemAmount(p: Player, e: String): Int {
+    fun getAmazingGemAmount(p: Player, e: String, l: Int): Int {
         var amount = 0
         for (i in p.inventory) {
+            if (i == null || i.type == Material.AIR) continue
+
             if (!isAmazingGem(i)) continue
 
             val enchant = ItemUtil.getItemStringData(i, "enchant")
             if (e != enchant) continue
+
+            val level = ItemUtil.getItemIntData(i, "level")
+            if (l != level) continue
 
             amount += i.amount
         }
@@ -86,28 +77,30 @@ class CommandEnchant {
         return amount
     }
 
-    fun takeAmazingGem(p: Player, e: String, count: Int) {
+    fun takeAmazingGem(p: Player, e: String, l: Int, count: Int) {
         var remaining = count
+        val inventory = p.inventory
 
-        val iterator = p.inventory.iterator()
-        while (iterator.hasNext() && remaining > 0) {
-            val item = iterator.next() ?: continue
+        for (slot in 0 until inventory.size) {
+            if (remaining <= 0) break
+            val item = inventory.getItem(slot) ?: continue
 
             if (!isAmazingGem(item)) continue
 
             if (e != ItemUtil.getItemStringData(item, "enchant")) continue
+            if (l != ItemUtil.getItemIntData(item, "level")) continue
 
             val takeAmount = minOf(item.amount, remaining)
 
             if (item.amount > takeAmount) {
                 item.amount -= takeAmount
+                inventory.setItem(slot, item)
             } else {
-                iterator.remove()
+                inventory.setItem(slot, null)
             }
 
             remaining -= takeAmount
         }
-
         p.updateInventory()
     }
 
@@ -117,6 +110,17 @@ class CommandEnchant {
         val oldMap = pitItem.enchantments.apply { put(enchant, level) }
         pitItem.enchantments = oldMap
         return pitItem.toItemStack()
+    }
+
+    fun hasCommandEnchanted(i: ItemStack): Boolean {
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i)
+
+        for (record in pitItem.enchantmentRecords) {
+            if (!record.description.contains("EnchantCommand")) continue
+            return true
+        }
+
+        return false
     }
 
     private fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack {
@@ -130,13 +134,12 @@ class CommandEnchant {
             return item
         }
 
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
-
-        for (record in pitItem.enchantmentRecords) {
-            if (!record.description.contains("EnchantCommand")) continue
-            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔过!"))
+        if (hasCommandEnchanted(item)) {
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
             return item
         }
+
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
 
         if (pitItem.enchantments.size >= 3) {
             player.sendMessage(CC.translate("$prefix&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
