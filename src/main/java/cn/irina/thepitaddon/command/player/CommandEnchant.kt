@@ -38,22 +38,22 @@ class CommandEnchant {
             player.sendMessage(CC.translate("$prefix&c你必须手持一个正确的物品!"))
             return
         }
-        val enchantedItem = if (player.hasPermission("pit.admin")) {
-            onPlayerEnchant(player, player.itemInHand, enchantName, level)
-        } else {
-            if (getAmazingGemAmount(enchantName, level, player) < 1) {
-                player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
-                return
-            }
-            onPlayerEnchant(player, player.itemInHand, enchantName, level)
+        if (getAmazingGemAmount(enchantName, level, player) < level) {
+            player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
+            return
         }
+        val enchantedItem = onPlayerEnchant(player, player.itemInHand, enchantName, level)
         val oldItem = player.itemInHand
         player.itemInHand = enchantedItem
         if (oldItem == player.itemInHand) {
             player.sendMessage(CC.translate("$prefix&cFAILED."))
             return
         }
+        takeAmazingGem(enchantName, level, player, level)
         player.sendMessage(CC.translate("&aSUCCESS!"))
+    }
+
+    private fun takeAmazingGem(enchantName: String, level: Int, player: Player, amount: Int) {
     }
 
     private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
@@ -69,7 +69,6 @@ class CommandEnchant {
                 amount += mythicCondenserAmount
             }
         }
-        player.sendMessage(CC.translate("$prefix&7你持有的神话凝聚体数量: &e$amount"))
         return amount
     }
 
@@ -167,10 +166,12 @@ class CommandEnchant {
             System.currentTimeMillis()
         )
 
-        return ItemBuilder(pitItem.toItemStack())
+        val resultItem = ItemBuilder(pitItem.toItemStack())
             .changeNbt("maxLive", maxLive)
             .changeNbt("live", live)
             .changeNbt("tier", tier)
             .buildWithUnbreakable()
+
+        return resultItem
     }
 }
