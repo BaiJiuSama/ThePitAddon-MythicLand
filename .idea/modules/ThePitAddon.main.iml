@@ -10,8 +10,7 @@
       </configuration>
     </facet>
     <facet external-system-id="GRADLE" type="kotlin-language" name="Kotlin">
-      <configuration version="5" platform="JVM 17" allPlatforms="JVM [17]" useProjectSettings="false" pureKotlinSourceFolders="C:\Users\Irina\Desktop\IdeaProjects\ThePitAddon-MythicLand\src\test\kotlin;C:\Users\Irina\Desktop\IdeaProjects\ThePitAddon-MythicLand\src\main\kotlin">
-        <compilerSettings />
+      <configuration version="5" platform="JVM 17" allPlatforms="JVM [17]" useProjectSettings="false">
         <compilerArguments>
           <flagArguments>
             <flagArg name="allowNoSourceFiles" arg="true" />
@@ -28,12 +27,12 @@
           <arrayArguments>
             <arrayArg name="pluginClasspaths">
               <args>
-                <arg>E:/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-lombok-compiler-plugin-embeddable/2.1.10/c3ee1914a4b215746c0d0d033c544e8b4108b5e/kotlin-lombok-compiler-plugin-embeddable-2.1.10.jar</arg>
-                <arg>E:/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/2.1.10/7992af0361147f5918380c58982a1eae2a4eb75e/kotlin-scripting-jvm-2.1.10.jar</arg>
-                <arg>E:/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/2.1.10/c6bc5aa794c482975bb0513e731c47a525cf8130/kotlin-scripting-common-2.1.10.jar</arg>
-                <arg>E:/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.10/d3028429e7151d7a7c1a0d63a4f60eac86a87b91/kotlin-stdlib-2.1.10.jar</arg>
-                <arg>$USER_HOME$/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar</arg>
-                <arg>E:/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.10/70000e6ef453308e55d42ea4ace5b8c32325ce75/kotlin-script-runtime-2.1.10.jar</arg>
+                <arg>C:/Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/2.1.10/7992af0361147f5918380c58982a1eae2a4eb75e/kotlin-scripting-jvm-2.1.10.jar</arg>
+                <arg>C:/Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/2.1.10/c6bc5aa794c482975bb0513e731c47a525cf8130/kotlin-scripting-common-2.1.10.jar</arg>
+                <arg>C:/Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/2.1.10/d3028429e7151d7a7c1a0d63a4f60eac86a87b91/kotlin-stdlib-2.1.10.jar</arg>
+                <arg>$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar</arg>
+                <arg>C:/Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/2.1.10/70000e6ef453308e55d42ea4ace5b8c32325ce75/kotlin-script-runtime-2.1.10.jar</arg>
+                <arg>$KOTLIN_BUNDLED$/lib/lombok-compiler-plugin.jar</arg>
               </args>
             </arrayArg>
             <arrayArg name="pluginOptions" />
@@ -55,7 +54,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: LuckPerms-Bukkit-5.4.139.jar">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../lib/LuckPerms-Bukkit-5.4.139.jar!/" />
         </CLASSES>
@@ -64,7 +63,16 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: spigot-1.8.8-R0.1-SNAPSHOT-latest.jar">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/PlayerPoints-3.3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../lib/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar!/" />
         </CLASSES>
@@ -73,9 +81,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: ThePitUltimate-4.2.0.jar">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../lib/ThePitUltimate-4.2.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/ThePitUltimate-4.3.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -83,20 +91,21 @@
     </orderEntry>
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.1.10" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.34" level="project" />
-    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-bukkit:3.9.7" level="project" />
+    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-bukkit:3.10.0" level="project" />
     <orderEntry type="library" name="Gradle: org.reflections:reflections:0.10.2" level="project" />
     <orderEntry type="library" name="Gradle: org.mongojack:mongojack:5.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:26.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-framework:3.9.7" level="project" />
+    <orderEntry type="library" name="Gradle: fastutil:fastutil:5.0.9" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:26.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-framework:3.10.0" level="project" />
     <orderEntry type="library" name="Gradle: org.javassist:javassist:3.28.0-GA" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:2.0.12" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver-sync:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.16.1" level="project" />
-    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-annotations:3.9.7" level="project" />
-    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-programmatic:3.9.7" level="project" />
-    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-core:3.9.7" level="project" />
+    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-annotations:3.10.0" level="project" />
+    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-programmatic:3.10.0" level="project" />
+    <orderEntry type="library" name="Gradle: dev.rollczi:litecommands-core:3.10.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:mongodb-driver-core:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mongodb:bson:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.16.1" level="project" />

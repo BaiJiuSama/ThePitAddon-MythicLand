@@ -19,6 +19,9 @@ class RandomRewardControl {
     fun onCommand(@Context player: Player, @Arg str: String) {
         when (str.uppercase()) {
             "OPEN" -> {
+                if (player.hasPermission("pit.randomReward.bypass")) {
+                    removeCD(player)
+                }
                 try {
                     Main.instance.getRandomRewardObject().open(player)
                 } catch (e: Exception) {
@@ -27,14 +30,18 @@ class RandomRewardControl {
             }
 
             "RESET" -> {
-                RewardData.isReceivedEnchant.remove(player.uniqueId)
-                RewardData.enchantReward.remove(player.uniqueId)
-                RewardData.isReceivedItem.remove(player.uniqueId)
-                RewardData.itemReward.remove(player.uniqueId)
-                RewardData.isReceivedPlate.remove(player.uniqueId)
-                RewardData.plateReward.remove(player.uniqueId)
+                removeCD(player)
             }
         }
 
+    }
+
+    private fun removeCD(player: Player) {
+        RewardData.isReceivedEnchant.remove(player.uniqueId)
+        RewardData.enchantReward.remove(player.uniqueId)
+        RewardData.isReceivedItem.remove(player.uniqueId)
+        RewardData.itemReward.remove(player.uniqueId)
+        RewardData.isReceivedPlate.remove(player.uniqueId)
+        RewardData.plateReward.remove(player.uniqueId)
     }
 }
