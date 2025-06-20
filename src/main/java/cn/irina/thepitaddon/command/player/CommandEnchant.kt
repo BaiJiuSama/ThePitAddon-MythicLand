@@ -44,7 +44,7 @@ class CommandEnchant {
 
         // 检查是否已用指令附魔
         if (hasCommandEnchanted(player.itemInHand)) {
-            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔, 或不是一件有效的神话物品!"))
             player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
@@ -138,13 +138,11 @@ class CommandEnchant {
     }
 
     private fun hasCommandEnchanted(i: ItemStack): Boolean {
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i)
-
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i) ?: return true
         for (record in pitItem.enchantmentRecords) {
             if (!record.description.contains("EnchantCommand")) continue
             return true
         }
-
         return false
     }
 
@@ -159,10 +157,11 @@ class CommandEnchant {
             return item
         }
 
-        if (hasCommandEnchanted(item)) {
-            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
-            return item
-        }
+//        // 不必要的逻辑
+//        if (hasCommandEnchanted(item)) {
+//            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
+//            return item
+//        }
 
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
 
