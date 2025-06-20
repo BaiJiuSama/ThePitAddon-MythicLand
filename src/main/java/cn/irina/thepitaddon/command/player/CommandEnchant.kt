@@ -35,49 +35,80 @@ class CommandEnchant {
             player.sendMessage(CC.translate("$prefix&c手持物不得为空!"))
             return
         }
-        if (ItemUtil.getInternalName(player.itemInHand) == null) {
-            player.sendMessage(CC.translate("$prefix&c你必须手持一个正确的物品!"))
-            return
-        }
-        if (getAmazingGemAmount(enchantName, level, player) < level) {
+
+        val amazingGemAmount = getAmazingGemAmount(player, enchantName)
+        if (amazingGemAmount <= 0 || amazingGemAmount - level <= 0) {
             player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
             return
         }
-        val enchantedItem = onPlayerEnchant(player, player.itemInHand, enchantName, level)
-        val oldItem = player.itemInHand
-        player.itemInHand = enchantedItem
-        if (oldItem == player.itemInHand) {
-            player.sendMessage(CC.translate("$prefix&cFAILED."))
-            return
-        }
-        takeAmazingGem(enchantName, level, player, level)
-        player.sendMessage(CC.translate("&aSUCCESS!"))
+
+        takeAmazingGem(player, enchantName, level)
+        val newItem = onPlayerEnchant(player, player.itemInHand, enchantName, level)
+        player.itemInHand = newItem
+        player.sendMessage(CC.translate("$prefix&aSUCCESS"))
     }
 
-    private fun takeAmazingGem(enchantName: String, level: Int, player: Player, amount: Int) {
-        if (!InvUtil.hasEnoughItemCount(player, "amazing_gem_$enchantName" + "_$level", amount, Material.NETHER_STAR)) {
-            player.sendMessage(CC.translate("$prefix&c你没有足够的 &f神话凝聚体!"))
-            return
-        }
 
-        InvUtil.removeEnoughItemCount(player, "amazing_gem_$enchantName" + "_$level", amount, Material.NETHER_STAR)
-        player.sendMessage(CC.translate("$prefix&aSUCCESS!"))
+//    private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
+//        var amount = 0
+//        for (item in player.inventory.contents) {
+//            if (item == null) continue
+//            if (item.type != Material.NETHER_STAR) continue
+//            player.sendMessage(CC.translate("$prefix&f检查物品: &e${item.type}"))
+//            val amazingGemInternalName: String = "amazing_gem_$enchantName" + "_$level"
+//            val internalName = ItemUtil.getInternalName(item) ?: continue
+//            if (internalName == amazingGemInternalName) {
+//                val mythicCondenserAmount = item.amount
+//                amount += mythicCondenserAmount
+//            }
+//        }
+//        return amount
+//    }
+
+    val amazingGemInternal = "AmazingGem"
+    fun isAmazingGem(i: ItemStack): Boolean {
+        return i.type != Material.AIR
+                && i.type == Material.NETHER_STAR
+                && amazingGemInternal == ItemUtil.getInternalName(i)
     }
 
-    private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
+    fun getAmazingGemAmount(p: Player, e: String): Int {
         var amount = 0
-        for (item in player.inventory.contents) {
-            if (item == null) continue
-            if (item.type != Material.NETHER_STAR) continue
-            player.sendMessage(CC.translate("$prefix&f检查物品: &e${item.type}"))
-            val amazingGemInternalName: String = "amazing_gem_$enchantName" + "_$level"
-            val internalName = ItemUtil.getInternalName(item) ?: continue
-            if (internalName == amazingGemInternalName) {
-                val mythicCondenserAmount = item.amount
-                amount += mythicCondenserAmount
-            }
+        for (i in p.inventory) {
+            if (!isAmazingGem(i)) continue
+
+            val enchant = ItemUtil.getItemStringData(i, "enchant")
+            if (e != enchant) continue
+
+            amount += i.amount
         }
+
         return amount
+    }
+
+    fun takeAmazingGem(p: Player, e: String, count: Int) {
+        var remaining = count
+
+        val iterator = p.inventory.iterator()
+        while (iterator.hasNext() && remaining > 0) {
+            val item = iterator.next() ?: continue
+
+            if (!isAmazingGem(item)) continue
+
+            if (e != ItemUtil.getItemStringData(item, "enchant")) continue
+
+            val takeAmount = minOf(item.amount, remaining)
+
+            if (item.amount > takeAmount) {
+                item.amount -= takeAmount
+            } else {
+                iterator.remove()
+            }
+
+            remaining -= takeAmount
+        }
+
+        p.updateInventory()
     }
 
     private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
@@ -88,7 +119,7 @@ class CommandEnchant {
         return pitItem.toItemStack()
     }
 
-    private fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack? {
+    private fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack {
         if (ItemUtil.getItemIntData(item, "tier") == null) {
             player.sendMessage(CC.translate("$prefix&c此物品没有阶数!"))
             return item
@@ -121,7 +152,7 @@ class CommandEnchant {
         var live = ItemUtil.getItemIntData(item, "live") + 10
         if (live <= 0) live = 10
 
-        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[enchantName] ?: return null
+        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[enchantName] ?: return item
         val typesMap = ConcurrentHashMap<String, Boolean>()
 
         enchant.apply {
