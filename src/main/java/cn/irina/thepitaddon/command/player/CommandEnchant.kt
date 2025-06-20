@@ -18,7 +18,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.jvm.java
 
 @Command(name = "enchantToTarget")
 class CommandEnchant {
@@ -27,7 +26,7 @@ class CommandEnchant {
     @Execute
     fun onCommand(
         @Context sender: CommandSender,
-        @Arg str: String,
+        @Arg enchantName: String,
         @Arg level: Int,
         @Arg player: Player
     ) {
@@ -35,17 +34,46 @@ class CommandEnchant {
             player.sendMessage(CC.translate("$prefix&c手持物不得为空!"))
             return
         }
-        val enchantedItem = if (player.hasPermission("pit.admin")) {
-            onEnchant(player.itemInHand, str, level)
-        } else {
-            onPlayerEnchant(player, player.itemInHand, str, level)
+        if (ItemUtil.getInternalName(player.itemInHand) == null) {
+            player.sendMessage(CC.translate("$prefix&c你必须手持一个正确的物品!"))
+            return
         }
-
+        val enchantedItem = if (player.hasPermission("pit.admin")) {
+            onPlayerEnchant(player, player.itemInHand, enchantName, level)
+        } else {
+            if (getAmazingGemAmount(enchantName, level, player) < 1) {
+                player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
+                return
+            }
+            onPlayerEnchant(player, player.itemInHand, enchantName, level)
+        }
+        val oldItem = player.itemInHand
         player.itemInHand = enchantedItem
+        if (oldItem == player.itemInHand) {
+            player.sendMessage(CC.translate("$prefix&cFAILED."))
+            return
+        }
         player.sendMessage(CC.translate("&aSUCCESS!"))
     }
 
-    fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
+    private fun getAmazingGemAmount(enchantName: String, level: Int, player: Player): Int {
+        var amount = 0
+        for (item in player.inventory.contents) {
+            if (item == null) continue
+            if (item.type != Material.NETHER_STAR) continue
+            player.sendMessage(CC.translate(CC.translate("$prefix&f检查物品: &e${item.type}")))
+            val amazingGemInternalName: String = "amazing_gem_$enchantName" + "_$level"
+            val internalName = ItemUtil.getInternalName(item) ?: continue
+            if (internalName == amazingGemInternalName) {
+                val mythicCondenserAmount = item.amount
+                amount += mythicCondenserAmount
+            }
+        }
+        player.sendMessage(CC.translate("$prefix&7你持有的神话凝聚体数量: &e$amount"))
+        return amount
+    }
+
+    private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
         val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return null
         val oldMap = pitItem.enchantments.apply { put(enchant, level) }
@@ -53,7 +81,12 @@ class CommandEnchant {
         return pitItem.toItemStack()
     }
 
-    fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack? {
+    private fun onPlayerEnchant(player: Player, item: ItemStack, enchantName: String, level: Int): ItemStack? {
+        if (ItemUtil.getItemIntData(item, "tier") == null) {
+            player.sendMessage(CC.translate("$prefix&c此物品没有阶数!"))
+            return item
+        }
+
         if (ItemUtil.getItemIntData(item, "tier") >= 3) {
             player.sendMessage(CC.translate("$prefix&c此物品无法继续附魔, 因为阶数大于或等于 3"))
             return item
@@ -90,7 +123,7 @@ class CommandEnchant {
             typesMap["armor"] = this::class.java.isAnnotationPresent(ArmorOnly::class.java)
         }
 
-        when (ItemUtil.getInternalName(item).uppercase())  {
+        when (ItemUtil.getInternalName(item).uppercase()) {
             "MYTHIC_SWORD" -> {
                 if (typesMap["weapon"] == false) {
                     player.sendMessage(CC.translate("$prefix&c此附魔不能附魔在 &e神话之剑 &c上!"))
