@@ -129,13 +129,13 @@ class CommandEnchant {
         p.updateInventory()
     }
 
-    private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
-        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return item
-        val oldMap = pitItem.enchantments.apply { put(enchant, level) }
-        pitItem.enchantments = oldMap
-        return pitItem.toItemStack()
-    }
+//    private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
+//        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
+//        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return item
+//        val oldMap = pitItem.enchantments.apply { put(enchant, level) }
+//        pitItem.enchantments = oldMap
+//        return pitItem.toItemStack()
+//    }
 
     private fun hasCommandEnchanted(i: ItemStack): Boolean {
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i) ?: return true
