@@ -361,12 +361,11 @@ class RandomReward: AbstractMenu(), Listener {
             else -> return
         }
 
-        player.sendMessage(CC.translate("$prefix&a领取成功!"))
-
         val cloneItem = needClaimItem?.clone().apply { this?.amount = 1 } ?: return
         for (i in 1..item.amount)
             player.inventory.addItem(cloneItem)
 
+        player.sendMessage(CC.translate("$prefix&a领取成功!"))
         player.closeInventory()
     }
 
