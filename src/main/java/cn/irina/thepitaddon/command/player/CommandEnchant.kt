@@ -19,6 +19,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 
+/*
+ * @Author Irina, ShanguanLinG
+ * @Date 2025/6/19
+ */
+
 @Command(name = "enchantToTarget")
 class CommandEnchant {
     val prefix = Main.instance.PREFIX
@@ -30,54 +35,74 @@ class CommandEnchant {
         @Arg level: Int,
         @Arg player: Player
     ) {
+        // 检查手持物品
         if (player.itemInHand == null || player.itemInHand.type == Material.AIR) {
             player.sendMessage(CC.translate("$prefix&c手持物不得为空!"))
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
 
+        // 检查是否已用指令附魔
         if (hasCommandEnchanted(player.itemInHand)) {
-            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔, 或不是一件有效的神话物品!"))
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
 
-        val amazingGemAmount = getAmazingGemAmount(player, enchantName, level)
+        // 检查是否含有足够的神话凝聚体
+        val amazingGemAmount = getMythicCondenserCount(player, enchantName, level)
         if (amazingGemAmount <= 0) {
             player.sendMessage(CC.translate("$prefix&c你没有足够的神话凝聚体!"))
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
 
-        takeAmazingGem(player, enchantName, level, 1)
+        val oldItem = player.itemInHand
+
+        // 尝试附魔
         player.itemInHand = onPlayerEnchant(player, player.itemInHand, enchantName, level)
+        // 检查是否附魔成功, 成功则每次附魔消耗一个凝聚体
+        if (hasSuccessfulEnchanted(oldItem, player.itemInHand)) {
+            takeMythicCondenser(player, enchantName, level, 1)
+        } else {
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
+            return
+        }
         player.sendMessage(CC.translate("$prefix&aSUCCESS"))
     }
 
-    val amazingGemInternal = "AmazingGem"
-    fun isAmazingGem(i: ItemStack): Boolean {
-        return i.type != Material.AIR
-                && i.type == Material.NETHER_STAR
-                && amazingGemInternal == ItemUtil.getInternalName(i)
+    private fun hasSuccessfulEnchanted(oldItem: ItemStack, newItem: ItemStack): Boolean {
+        return !(oldItem.type == newItem.type
+                && oldItem.itemMeta == newItem.itemMeta)
     }
 
-    fun getAmazingGemAmount(p: Player, e: String, l: Int): Int {
+    private val mythicCondenser = "mythic_condenser"
+    private fun isMythicCondenser(i: ItemStack): Boolean {
+        return i.type != Material.AIR
+                && i.type == Material.NETHER_STAR
+                && mythicCondenser == ItemUtil.getInternalName(i)
+    }
+
+    private fun getMythicCondenserCount(p: Player, e: String, l: Int): Int {
         var amount = 0
-        for (i in p.inventory) {
-            if (i == null || i.type == Material.AIR) continue
+        for (item in p.inventory) {
+            if (item == null || item.type == Material.AIR) continue
 
-            if (!isAmazingGem(i)) continue
+            if (!isMythicCondenser(item)) continue
 
-            val enchant = ItemUtil.getItemStringData(i, "enchant")
+            val enchant = ItemUtil.getItemStringData(item, "enchant")
             if (e != enchant) continue
 
-            val level = ItemUtil.getItemIntData(i, "level")
+            val level = ItemUtil.getItemIntData(item, "level")
             if (l != level) continue
 
-            amount += i.amount
+            amount += item.amount
         }
 
         return amount
     }
 
-    fun takeAmazingGem(p: Player, e: String, l: Int, count: Int) {
+    private fun takeMythicCondenser(p: Player, e: String, l: Int, count: Int) {
         var remaining = count
         val inventory = p.inventory
 
@@ -85,7 +110,7 @@ class CommandEnchant {
             if (remaining <= 0) break
             val item = inventory.getItem(slot) ?: continue
 
-            if (!isAmazingGem(item)) continue
+            if (!isMythicCondenser(item)) continue
 
             if (e != ItemUtil.getItemStringData(item, "enchant")) continue
             if (l != ItemUtil.getItemIntData(item, "level")) continue
@@ -104,22 +129,20 @@ class CommandEnchant {
         p.updateInventory()
     }
 
-    private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
-        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return item
-        val oldMap = pitItem.enchantments.apply { put(enchant, level) }
-        pitItem.enchantments = oldMap
-        return pitItem.toItemStack()
-    }
+//    private fun onEnchant(item: ItemStack, name: String, level: Int): ItemStack? {
+//        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
+//        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return item
+//        val oldMap = pitItem.enchantments.apply { put(enchant, level) }
+//        pitItem.enchantments = oldMap
+//        return pitItem.toItemStack()
+//    }
 
-    fun hasCommandEnchanted(i: ItemStack): Boolean {
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i)
-
+    private fun hasCommandEnchanted(i: ItemStack): Boolean {
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i) ?: return true
         for (record in pitItem.enchantmentRecords) {
             if (!record.description.contains("EnchantCommand")) continue
             return true
         }
-
         return false
     }
 
@@ -134,10 +157,11 @@ class CommandEnchant {
             return item
         }
 
-        if (hasCommandEnchanted(item)) {
-            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
-            return item
-        }
+//        // 不必要的逻辑
+//        if (hasCommandEnchanted(item)) {
+//            player.sendMessage(CC.translate("$prefix&c此物品已被指令附魔!"))
+//            return item
+//        }
 
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
 
