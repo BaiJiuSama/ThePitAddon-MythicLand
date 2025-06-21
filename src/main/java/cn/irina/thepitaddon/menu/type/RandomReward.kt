@@ -77,7 +77,7 @@ class RandomReward: AbstractMenu(), Listener {
             val enchant = enchantData.enchant
 
             val loreList: MutableList<String> = ArrayList()
-            val split = enchant.getUsefulnessLore(enchantData.level).split("/s")
+            val split = CC.translate(enchant.getUsefulnessLore(enchantData.level)).split("/s")
 
             loreList.apply {
                 add("")
@@ -98,7 +98,7 @@ class RandomReward: AbstractMenu(), Listener {
 
             addItemToInventory(11,
                 ItemBuilder(Material.ENCHANTED_BOOK)
-                    .name("&9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
+                    .name(if (enchant.rarity == EnchantmentRarity.RARE) "&6稀有!" else "&7普通" + " &9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
                     .lore(loreList)
                     .changeNbt("EnchantName", enchantData.enchant.nbtName)
                     .changeNbt("EnchantLevel", enchantData.level)
@@ -328,7 +328,15 @@ class RandomReward: AbstractMenu(), Listener {
                     }
                 }
 
+                val oldItem = player.itemInHand
+
                 player.itemInHand = onEnchant(player, itemInHand, enchant.nbtName, enchantData.level)
+
+                if (!hasSuccessEnchant(oldItem, player.itemInHand)) {
+                    player.sendMessage(CC.translate("$prefix&c附魔领取失败!"))
+                    return
+                }
+
                 player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
@@ -369,41 +377,52 @@ class RandomReward: AbstractMenu(), Listener {
         player.closeInventory()
     }
 
+    fun hasSuccessEnchant(oldItem: ItemStack, newItem: ItemStack): Boolean {
+        return oldItem.type == newItem.type && oldItem.itemMeta != newItem.itemMeta && oldItem != newItem
+    }
+
     fun onEnchant(player: Player, item: ItemStack, name: String, level: Int): ItemStack? {
-        if (ItemUtil.getItemIntData(item, "tier") >= 3) {
-            player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为阶数大于或等于 3"))
+        try {
+            if (ItemUtil.getItemIntData(item, "tier") >= 3) {
+                player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为阶数大于或等于 3"))
+                return item
+            }
+
+            val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
+            if (pitItem.enchantments.size >= 3) {
+                player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
+                return item
+            }
+
+            var tier = ItemUtil.getItemIntData(item, "tier") + 1
+            if (tier <= 0) tier = 1
+
+            var maxLive = ItemUtil.getItemIntData(item, "maxLive") + 10
+            if (maxLive <= 0) maxLive = 10
+
+            var live = ItemUtil.getItemIntData(item, "live") + 10
+            if (live <= 0) live = 10
+
+            val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return null
+            val oldMap = pitItem.enchantments.apply { put(enchant, level) }
+
+            pitItem.enchantments = oldMap
+            pitItem.enchantmentRecords += EnchantmentRecord(
+                player.displayName,
+                "流浪的魔女",
+                System.currentTimeMillis()
+            )
+
+            return ItemBuilder(pitItem.toItemStack())
+                .changeNbt("maxLive", maxLive)
+                .changeNbt("live", live)
+                .changeNbt("tier", tier)
+                .buildWithUnbreakable()
+        } catch (e: NullPointerException) {
+            player.sendMessage(CC.translate("$prefix&c此物品暂时无法附魔, 请放置于 &d神话之井 &c中后随即取出!"))
+            player.sendMessage(CC.translate("$prefix&c若依旧无法附魔, 请联系在线工作人员为你排忧!"))
+
             return item
         }
-
-        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
-        if (pitItem.enchantments.size >= 3) {
-            player.sendMessage(CC.translate("&c此物品无法继续附魔, 因为附魔数量大于或等于 3"))
-            return item
-        }
-
-        var tier = ItemUtil.getItemIntData(item, "tier") + 1
-        if (tier <= 0) tier = 1
-
-        var maxLive = ItemUtil.getItemIntData(item, "maxLive") + 10
-        if (maxLive <= 0) maxLive = 10
-
-        var live = ItemUtil.getItemIntData(item, "live") + 10
-        if (live <= 0) live = 10
-
-        val enchant = ThePit.getInstance().enchantmentFactor.enchantmentMap[name] ?: return null
-        val oldMap = pitItem.enchantments.apply { put(enchant, level) }
-
-        pitItem.enchantments = oldMap
-        pitItem.enchantmentRecords += EnchantmentRecord(
-            player.displayName,
-            "流浪的魔女",
-            System.currentTimeMillis()
-        )
-
-        return ItemBuilder(pitItem.toItemStack())
-            .changeNbt("maxLive", maxLive)
-            .changeNbt("live", live)
-            .changeNbt("tier", tier)
-            .buildWithUnbreakable()
     }
 }
