@@ -107,6 +107,8 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
             pitch = player.location.pitch
         }
 
+        player.teleport(arrowLoc)
+
         LocationUtil.getNearestPlayer(arrow, 10.0)?.let { target ->
             if (target == player) return@let
             val targetLoc = target.location
@@ -126,7 +128,7 @@ class EnderBow: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant
                 this.yaw = normalizeAngle(yaw)
                 this.pitch = pitch
             }
-        }
+        } ?: return
 
         player.teleport(arrowLoc)
     }

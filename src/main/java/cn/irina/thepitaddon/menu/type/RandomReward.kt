@@ -81,7 +81,7 @@ class RandomReward: AbstractMenu(), Listener {
 
             loreList.apply {
                 add("")
-                for (str in split) add(CC.translate(str))
+                for (str in split) add(CC.translate("&7$str"))
                 addAll(listOf(
                         "",
                         "&7适用于:",
@@ -95,10 +95,9 @@ class RandomReward: AbstractMenu(), Listener {
                 ))
             }
 
-
             addItemToInventory(11,
                 ItemBuilder(Material.ENCHANTED_BOOK)
-                    .name(if (enchant.rarity == EnchantmentRarity.RARE) "&6稀有!" else "&7普通" + " &9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
+                    .name((if (enchant.rarity == EnchantmentRarity.RARE) "&6稀有" else "&7普通") + " &9" + enchant.enchantName + " " + RomanUtil.convert(enchantData.level))
                     .lore(loreList)
                     .changeNbt("EnchantName", enchantData.enchant.nbtName)
                     .changeNbt("EnchantLevel", enchantData.level)
