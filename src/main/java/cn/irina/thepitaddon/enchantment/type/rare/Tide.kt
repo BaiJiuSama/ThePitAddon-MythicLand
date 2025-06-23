@@ -15,7 +15,6 @@ import org.bukkit.entity.Player
  * @Date 2025/6/6 23:55
  */
 
-@WeaponOnly
 @ArmorOnly
 class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {

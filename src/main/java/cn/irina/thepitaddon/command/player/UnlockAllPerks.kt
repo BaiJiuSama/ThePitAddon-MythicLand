@@ -24,7 +24,7 @@ class UnlockAllPerks {
 
     @Execute
     fun onCommand(@Context player: Player) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance, {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val pp = PlayerProfile.getRawCache(player.uniqueId)
 
             if (pp == null) {
@@ -42,11 +42,11 @@ class UnlockAllPerks {
                 unlockedMessages.add("${p.displayName}")
             }
 
-            Bukkit.getScheduler().runTask(Main.instance, {
+            Bukkit.getScheduler().runTask(Main.instance) {
                 for (msg in unlockedMessages) {
                     player.sendMessage(CC.translate("$prefix&a天赋解锁: &f$msg"))
                 }
-            })
-        })
+            }
+        }
     }
 }

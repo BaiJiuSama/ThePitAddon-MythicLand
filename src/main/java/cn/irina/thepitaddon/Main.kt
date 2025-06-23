@@ -211,6 +211,7 @@ class Main : JavaPlugin() {
                 ChangeUserMeta(),
                 BuyExDiamondItem(),
                 BuyEgg(),
+                UnlockAllPerks(),
                 BuyPhysicalCoin(),
                 BuyIronHelmet(),
                 PlayerOpenTrash(),
