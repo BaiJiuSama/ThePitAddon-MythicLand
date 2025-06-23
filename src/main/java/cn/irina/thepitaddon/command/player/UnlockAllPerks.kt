@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
  */
 
 @Command(name = "unlockAllPerks")
-@Permission("pit.prestigePerk.all")
+@Permission("pit.unlock")
 class UnlockAllPerks {
     val prefix = Main.instance.PREFIX
 
