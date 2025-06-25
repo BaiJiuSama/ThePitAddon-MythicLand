@@ -211,12 +211,13 @@ class Main : JavaPlugin() {
                 ChangeUserMeta(),
                 BuyExDiamondItem(),
                 BuyEgg(),
-                UnlockAllPerks(),
+                //UnlockAllPerks(),
                 BuyPhysicalCoin(),
                 BuyIronHelmet(),
                 PlayerOpenTrash(),
                 PlayerSuicide(),
-                ShowDevelopmentCommand()
+                ShowDevelopmentCommand(),
+                FixWipe()
             )
             .build()
     }

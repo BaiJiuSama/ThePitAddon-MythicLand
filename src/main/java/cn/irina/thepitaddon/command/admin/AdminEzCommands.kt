@@ -1,11 +1,14 @@
 package cn.irina.thepitaddon.command.admin
 
+import cn.charlotte.pit.data.PlayerProfile
+import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.mizukilab.pit.getPitProfile
 import net.mizukilab.pit.util.chat.CC
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 @Command(name = "heal")
@@ -27,6 +30,28 @@ class AdminClearBounty {
         val pitProfile = player.getPitProfile()
         pitProfile.bounty = 0
         player.sendMessage(CC.translate("&aSUCCESS."))
+    }
+}
+
+@Command(name = "fixWipe")
+@Permission("pit.admin")
+class FixWipe {
+    @Execute
+    fun onCommand(@Context sender: Player, @Arg player: Player) {
+        if (player == null) {
+            sender.sendMessage(CC.translate("&c该玩家不存在!"))
+            return
+        }
+        val onlinePlayers = Bukkit.getOnlinePlayers()
+        if (!onlinePlayers.contains(player)) {
+            sender.sendMessage(CC.translate("&c该玩家不在线!"))
+            return
+        }
+        val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
+        if (profile.wipedData != null) {
+            profile.wipedData.isKnow = true
+            player.sendMessage(CC.translate("&aSuccess."))
+        }
     }
 }
 

@@ -56,9 +56,7 @@ class CommandEnchant {
             player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
-
         val oldItem = player.itemInHand
-
         // 尝试附魔
         player.itemInHand = onPlayerEnchant(player, player.itemInHand, enchantName, level)
         // 检查是否附魔成功, 成功则每次附魔消耗一个凝聚体
@@ -87,15 +85,11 @@ class CommandEnchant {
         var amount = 0
         for (item in p.inventory) {
             if (item == null || item.type == Material.AIR) continue
-
             if (!isMythicCondenser(item)) continue
-
             val enchant = ItemUtil.getItemStringData(item, "enchant")
             if (e != enchant) continue
-
             val level = ItemUtil.getItemIntData(item, "level")
             if (l != level) continue
-
             amount += item.amount
         }
 
