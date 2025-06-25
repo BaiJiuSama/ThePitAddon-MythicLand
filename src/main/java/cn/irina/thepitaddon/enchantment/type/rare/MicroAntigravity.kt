@@ -1,34 +1,32 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.data.PlayerProfile
+import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.parm.listener.IPlayerDamaged
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
-import com.google.common.util.concurrent.AtomicDouble
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
-class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
+class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     private val keepBoost = HashMap<UUID, Cooldown>()
     private val hitCounts = HashMap<UUID, Int>()
     private val lastHitTimes = HashMap<UUID, Long>()
 
     override fun getEnchantName(): String {
-        return "微观反重力"
+        return "引力回溯"
     }
 
     override fun getMaxEnchantLevel(): Int {
@@ -36,7 +34,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
     }
 
     override fun getNbtName(): String {
-        return "micro_anti_gravity"
+        return "gravitational_backtracking"
     }
 
     override fun getRarity(): EnchantmentRarity {
@@ -48,11 +46,10 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当自身处于空中时被连续攻击 &f3 &7次, &7(0.5s内)/s" +
-                "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:05) /s" +
-                if (enchantLevel > 1) "&7同时, 在 &e6s &7内自身伤害提升 &c+${enchantLevel * 5}%" else null
+        return "&7当自身被穿着附魔 狂暴连击 时被连续攻击 &f2 &7次, &7(0.5s内)/s" +
+                "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:06) /s" +
+                if (enchantLevel > 1) "&7同时, 在 &e6s &7内获得 &c+${6 + enchantLevel * 2}% 伤害减免" else null
     }
-
 
 
     override fun handlePlayerDamaged(
@@ -85,7 +82,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
 
             if (hitCounts[playerUUID] == 2) {
                 val ap = PlayerProfile.getRawCache(entity.uniqueId)
-                player.sendMessage(CC.translate("&4&l微观反重力! &7针对触发 " + ap.formattedNameWithRoman))
+                player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
 
                 keepBoost[playerUUID] = Cooldown(6L, TimeUnit.SECONDS)
 
@@ -93,6 +90,10 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
 
                 if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
                 player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 5 * 20, enchantLevel - 1, false, true))
+
+                if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
+
+                reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.06))
 
                 hitCounts[playerUUID] = 0
             }
@@ -103,18 +104,5 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged,  IAttackEntity {
         lastHitTimes[playerUUID] = currentTime
     }
 
-    override fun handleAttackEntity(
-        enchantLevel: Int,
-        attacker: Player,
-        p2: Entity,
-        p3: Double,
-        p4: AtomicDouble,
-        boostDamage: AtomicDouble,
-        p6: AtomicBoolean
-    ) {
-        if (keepBoost[attacker.uniqueId] == null || keepBoost[attacker.uniqueId]!!.hasExpired()) return
-
-        boostDamage.getAndAdd(enchantLevel * 0.05)
-    }
 }
 

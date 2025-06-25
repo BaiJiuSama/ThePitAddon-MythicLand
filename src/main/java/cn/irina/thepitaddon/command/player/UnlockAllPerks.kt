@@ -38,6 +38,7 @@ class UnlockAllPerks {
             val unlockedMessages = mutableListOf<String>()
 
             for (p in perkFactory.perks) {
+                if(p.internalPerkName.equals("hermit_bundle")) continue
                 perkDataMap[p.internalPerkName] = PerkData(p.internalPerkName, p.maxLevel)
                 unlockedMessages.add("${p.displayName}")
             }
