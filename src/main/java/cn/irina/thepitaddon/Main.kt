@@ -17,6 +17,7 @@ import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
+import net.minecraft.server.v1_8_R3.CommandEnchant
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
@@ -230,7 +231,9 @@ class Main : JavaPlugin() {
             "GerudoValley.nbs",
             "MortalKombat.nbs",
             "RainbowTylenol.nbs",
-            "GirlsBandCry.nbs"
+            "GirlsBandCry.nbs",
+            "Megalovania.nbs",
+            "NeverGonnaGiveYouUp.nbs"
         )
 
         for (filePath in musicResources) {

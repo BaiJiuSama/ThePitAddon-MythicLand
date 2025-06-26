@@ -8,7 +8,7 @@ import java.util.*
 
 object SongUtil {
     @JvmStatic
-    fun songPlay(target: Player, playerMap: MutableMap<UUID?, PositionSongPlayer?>, music: Song) {
+    fun songPlay(target: Player, playerMap: MutableMap<UUID, PositionSongPlayer>, music: Song) {
         val songPlayer = playerMap[target.uniqueId]
         if (songPlayer == null) {
             val player = PositionSongPlayer(music)

@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
+import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
@@ -10,7 +11,6 @@ import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
@@ -51,7 +51,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
                 if (enchantLevel > 1) "&7同时, 在 &e6s &7内获得 &c+${6 + enchantLevel * 2}% 伤害减免" else null
     }
 
-
+    val thePit = ThePit.getApi()
     override fun handlePlayerDamaged(
         enchantLevel: Int,
         player: Player,
@@ -64,7 +64,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         if (entity !is Player) return
         val playerUUID = player.uniqueId
 
-        if ((player as CraftPlayer).handle.onGround) {
+        if (thePit.getItemEnchantLevel(entity.inventory.leggings, "regularity") <= 0) {
             hitCounts[playerUUID] = 0
             return
         }
