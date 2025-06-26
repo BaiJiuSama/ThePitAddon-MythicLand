@@ -60,7 +60,7 @@ class DJ16 : AbstractEnchantment(), ITickTask, MovementHandler {
     }
 
     override fun getEnchantName(): String {
-        return "DJ #15"
+        return "DJ #16"
     }
 
     override fun getMaxEnchantLevel(): Int {

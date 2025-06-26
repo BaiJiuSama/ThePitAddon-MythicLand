@@ -46,9 +46,9 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当自身被穿着附魔 狂暴连击 时被连续攻击 &f2 &7次, &7(0.5s内)/s" +
+        return "&7当自身被穿着附魔 &f狂暴连击 &7时被连续攻击 &f3 &7次(0.5s内)/s" +
                 "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:06) /s" +
-                if (enchantLevel > 1) "&7同时, 在 &e6s &7内获得 &c+${6 + enchantLevel * 2}% 伤害减免" else null
+                if (enchantLevel > 1) "&7同时, 在 &e6s &7内受到的伤害 &9-${6 + enchantLevel * 2}%" else null
     }
 
     val thePit = ThePit.getApi()
@@ -80,7 +80,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
             val count = hitCounts.getOrDefault(playerUUID, 0)
             hitCounts[playerUUID] = count + 1
 
-            if (hitCounts[playerUUID] == 2) {
+            if (hitCounts[playerUUID] == 3) {
                 val ap = PlayerProfile.getRawCache(entity.uniqueId)
                 player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
 
