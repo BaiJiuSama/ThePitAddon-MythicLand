@@ -48,7 +48,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7当自身被穿着附魔 狂暴连击 时被连续攻击 &f2 &7次, &7(0.5s内)/s" +
                 "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:06) /s" +
-                if (enchantLevel > 1) "&7同时, 在 &e6s &7内获得 &c+${6 + enchantLevel * 2}% 伤害减免" else null
+                if (enchantLevel > 1) "&7同时, 在 &e6s &7内获得 &c+${6 + enchantLevel * 2}% 伤害减免" else ""
     }
 
     val thePit = ThePit.getApi()

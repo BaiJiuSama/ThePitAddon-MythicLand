@@ -29,20 +29,12 @@ class DJ9 : AbstractEnchantment(), ITickTask, MovementHandler {
 
         object : BukkitRunnable() {
             override fun run() {
-                val entries: MutableSet<MutableMap.MutableEntry<UUID, PositionSongPlayer>> = HashSet()
+                for (entry in HashSet(playerMap.entries)) {
+                    val player: Player? = Bukkit.getPlayer(entry.key)
 
-                for (entry in entries) {
-                    val player = Bukkit.getPlayer(entry.key)
-
-                    if (player == null || !player.isOnline) {
-                        val remove: PositionSongPlayer = playerMap.remove(entry.key)!!
-                        remove.isPlaying = false
-                        continue
-                    }
-
-                    if (player.inventory.leggings == null || getItemEnchantLevel(player.inventory.leggings) == -1) {
-                        val remove: PositionSongPlayer = playerMap.remove(entry.key)!!
-                        remove.isPlaying = false
+                    if (player == null || !player.isOnline || player.inventory.leggings == null || getItemEnchantLevel(player.inventory.leggings) <= 0) {
+                        val player = playerMap.remove(entry.key)
+                        player?.isPlaying = false
                     }
                 }
             }
