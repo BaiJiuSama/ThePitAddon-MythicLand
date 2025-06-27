@@ -122,6 +122,7 @@ class EnchantmentManager {
                 //"war_pay"
                 //"terminator"
                 //"ender_bow_enchant"
+                //"gravitational_backtracking"
             )
         )
     }
