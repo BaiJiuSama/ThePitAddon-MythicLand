@@ -17,7 +17,6 @@ import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
-import net.minecraft.server.v1_8_R3.CommandEnchant
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
@@ -261,12 +260,19 @@ class Main : JavaPlugin() {
         enchantmentManager.registerEnchantment()
     }
 
+    val dontLoads = listOf(
+        "EnderBow"
+    )
     private fun loadListener() {
         val reflections = Reflections("cn.irina.thepitaddon")
         val classes = reflections.getSubTypesOf(Listener::class.java)
 
         send("&e扫描到的监听类数量: &f${classes.size}")
         for (clazz in classes) {
+            if (dontLoads.contains(clazz.simpleName)) {
+                send("&c跳过注册: &f${clazz.simpleName}")
+                continue
+            }
             send("&a注册: &f${clazz.simpleName}")
             val listener = clazz.getDeclaredConstructor().newInstance() as Listener
             Bukkit.getPluginManager().registerEvents(listener, this)

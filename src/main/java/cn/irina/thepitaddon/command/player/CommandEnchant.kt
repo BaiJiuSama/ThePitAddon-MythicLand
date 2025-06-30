@@ -164,7 +164,7 @@ class CommandEnchant {
             return item
         }
 
-        var tier = ItemUtil.getItemIntData(item, "tier") + 1
+        var tier = ItemUtil.getItemIntData(item, "tier")
         if (tier <= 0) tier = 1
 
         var maxLive = ItemUtil.getItemIntData(item, "maxLive") + 10
