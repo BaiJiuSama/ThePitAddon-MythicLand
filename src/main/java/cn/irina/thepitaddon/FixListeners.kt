@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.event.entity.ProjectileHitEvent
 
 class FixListeners : Listener {
     private val blockTypes: MutableList<Material> = ArrayList()
@@ -92,6 +93,14 @@ class FixListeners : Listener {
         profile.bounty = 100
         player.sendMessage(CC.translate("&a你离开了保护区, 已自动为你开启超级连杀!"))
 
+    }
+
+    @EventHandler
+    fun onArrowHit(event: ProjectileHitEvent) {
+        val arrow = event.entity
+        if (arrow is Arrow && arrow.shooter is Player) {
+            arrow.remove()
+        }
     }
 
     companion object {
