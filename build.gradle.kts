@@ -29,6 +29,7 @@ dependencies {
     implementation("org.mongojack:mongojack:5.0.0")
     implementation("fastutil:fastutil:5.0.9")
     compileOnly(fileTree(baseDir = "lib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
 }
 
