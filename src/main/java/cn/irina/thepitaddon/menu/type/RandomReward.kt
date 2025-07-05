@@ -4,10 +4,10 @@ import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.sub.EnchantmentRecord
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
-import cn.irina.thepitaddon.manager.PointsManager
-import cn.irina.thepitaddon.menu.AbstractMenu
 import cn.irina.thepitaddon.data.EnchantData
 import cn.irina.thepitaddon.data.RewardData
+import cn.irina.thepitaddon.manager.PointsManager
+import cn.irina.thepitaddon.menu.AbstractMenu
 import net.md_5.bungee.api.ChatColor
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
@@ -25,7 +25,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 /*
  * @Author Irina
@@ -339,6 +338,7 @@ class RandomReward: AbstractMenu(), Listener {
                 player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
+                Main.instance.receiveManager.addReceivedToConfig("Enchant", player.uniqueId)
                 player.closeInventory()
                 return
             }
@@ -352,6 +352,7 @@ class RandomReward: AbstractMenu(), Listener {
                 needClaimItem = rewardData.itemReward[player.uniqueId]
                 rewardData.isReceivedItem[player.uniqueId] = true
                 rewardData.itemReward.remove(player.uniqueId)
+                Main.instance.receiveManager.addReceivedToConfig("Item", player.uniqueId)
             }
 
             15 -> {
@@ -363,6 +364,7 @@ class RandomReward: AbstractMenu(), Listener {
                 needClaimItem = rewardData.plateReward[player.uniqueId]
                 rewardData.isReceivedPlate[player.uniqueId] = true
                 rewardData.plateReward.remove(player.uniqueId)
+                Main.instance.receiveManager.addReceivedToConfig("Plate", player.uniqueId)
             }
 
             else -> return

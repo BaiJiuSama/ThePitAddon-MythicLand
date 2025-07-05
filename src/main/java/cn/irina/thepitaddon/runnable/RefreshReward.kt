@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.runnable
 
+import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.data.RewardData
 import cn.irina.thepitaddon.utils.Log
 import net.mizukilab.pit.util.chat.CC
@@ -31,5 +32,9 @@ class RefreshReward : Runnable {
         RewardData.itemReward.clear()
         RewardData.isReceivedPlate.clear()
         RewardData.plateReward.clear()
+
+        Main.instance.receiveManager.clearReceivedList("Plate")
+        Main.instance.receiveManager.clearReceivedList("Enchant")
+        Main.instance.receiveManager.clearReceivedList("Item")
     }
 }

@@ -8,6 +8,7 @@ import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
+import cn.irina.thepitaddon.manager.ReceiveManager
 import cn.irina.thepitaddon.menu.type.RandomReward
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
@@ -139,6 +140,9 @@ class Main : JavaPlugin() {
         registerCommands()
         loadListener()
         modifyRarityPrefix()
+        receiveManager.loadReceivedData("Enchant")
+        receiveManager.loadReceivedData("Item")
+        receiveManager.loadReceivedData("Plate")
 
         if (config.getBoolean("DamageValidRange.Enable")) send("&e玩家伤害已被改动! 请注意!")
         send("&a天坑乱斗终极版扩展 已启动!")
@@ -192,6 +196,8 @@ class Main : JavaPlugin() {
         if (randomReward == null) randomReward = RandomReward()
         return randomReward!!
     }
+
+    val receiveManager = ReceiveManager
 
     private var liteCommands: LiteCommands<CommandSender>? = null
     private fun registerCommands() {
