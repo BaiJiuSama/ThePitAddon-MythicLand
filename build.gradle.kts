@@ -33,9 +33,10 @@ dependencies {
 
 }
 
+
 group = "cn.irina"
-version = "1.0"
-description = "IrinaThePitAddon"
+version = "0.0.1"
+description = "ThePitAddon-$version"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -81,7 +82,7 @@ tasks{
 
         destinationDirectory = file("$projectDir/jar")
 
-        archiveFileName.set("IrinaThePitAddon.jar")
+        archiveFileName.set("ThePitAddon-$version.jar")
     }
 
     jar {

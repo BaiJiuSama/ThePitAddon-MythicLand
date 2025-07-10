@@ -8,7 +8,6 @@ import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.mizukilab.pit.getPitProfile
 import net.mizukilab.pit.util.chat.CC
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 @Command(name = "heal")
@@ -38,16 +37,12 @@ class AdminClearBounty {
 class FixWipe {
     @Execute
     fun onCommand(@Context sender: Player, @Arg player: Player) {
-        if (player == null) {
-            sender.sendMessage(CC.translate("&c该玩家不存在!"))
+        if (!player.isOnline) {
+            sender.sendMessage(CC.translate("&c目标玩家并不在线"))
             return
         }
-        val onlinePlayers = Bukkit.getOnlinePlayers()
-        if (!onlinePlayers.contains(player)) {
-            sender.sendMessage(CC.translate("&c该玩家不在线!"))
-            return
-        }
-        val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
+
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
         if (profile.wipedData != null) {
             profile.wipedData.isKnow = true
             player.sendMessage(CC.translate("&aSuccess."))

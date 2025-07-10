@@ -33,8 +33,8 @@ class RefreshReward : Runnable {
         RewardData.isReceivedPlate.clear()
         RewardData.plateReward.clear()
 
-        Main.instance.receiveManager.clearReceivedList("Plate")
-        Main.instance.receiveManager.clearReceivedList("Enchant")
-        Main.instance.receiveManager.clearReceivedList("Item")
+        Main.instance.getReceiveManagerObject().clearReceivedList("Plate")
+        Main.instance.getReceiveManagerObject().clearReceivedList("Enchant")
+        Main.instance.getReceiveManagerObject().clearReceivedList("Item")
     }
 }

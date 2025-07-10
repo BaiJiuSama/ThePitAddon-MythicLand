@@ -1,8 +1,10 @@
-name: IrinaThePitAddon
-version: '1.0'
+name: ThePitAddon
+version: 0.0.1
 author: Irina, MindsMaster_, ShanguanLinG
 main: cn.irina.thepitaddon.Main
 load: STARTUP
 depend:
   - ThePitUltimate
   - LuckPerms
+
+

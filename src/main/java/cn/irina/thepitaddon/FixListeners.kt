@@ -12,12 +12,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.event.entity.ProjectileHitEvent
 
 class FixListeners : Listener {
     private val blockTypes: MutableList<Material> = ArrayList()
@@ -83,7 +82,7 @@ class FixListeners : Listener {
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
 
-        val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
 
         if (!profile.isInArena) return
         if (!player.hasPermission("pit.streak")) return

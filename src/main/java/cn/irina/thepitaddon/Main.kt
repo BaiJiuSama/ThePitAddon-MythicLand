@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit
 
 
 class Main : JavaPlugin() {
-
     init {
         instance = this
     }
@@ -95,8 +94,10 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         instance = this
         loadMusicResources()
+
         send("&e天坑斗斗终极版扩展 启动中...")
         send("&7作者: &fIrina &7| &fhttps://github.com/BaiJiuSama")
+
         saveResource("config.yml", false)
 
         Bukkit.getScheduler().runTaskLater(this, {
@@ -140,9 +141,9 @@ class Main : JavaPlugin() {
         registerCommands()
         loadListener()
         modifyRarityPrefix()
-        receiveManager.loadReceivedData("Enchant")
-        receiveManager.loadReceivedData("Item")
-        receiveManager.loadReceivedData("Plate")
+        receiveManager!!.loadReceivedData("Enchant")
+        receiveManager!!.loadReceivedData("Item")
+        receiveManager!!.loadReceivedData("Plate")
 
         if (config.getBoolean("DamageValidRange.Enable")) send("&e玩家伤害已被改动! 请注意!")
         send("&a天坑乱斗终极版扩展 已启动!")
@@ -197,7 +198,12 @@ class Main : JavaPlugin() {
         return randomReward!!
     }
 
-    val receiveManager = ReceiveManager
+    var receiveManager: ReceiveManager? = null
+    fun getReceiveManagerObject(): ReceiveManager {
+        if (receiveManager == null) receiveManager = ReceiveManager
+        return receiveManager!!
+    }
+
 
     private var liteCommands: LiteCommands<CommandSender>? = null
     private fun registerCommands() {

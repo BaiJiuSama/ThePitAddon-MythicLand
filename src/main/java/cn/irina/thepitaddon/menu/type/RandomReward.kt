@@ -338,7 +338,7 @@ class RandomReward: AbstractMenu(), Listener {
                 player.sendMessage(CC.translate("$prefix&a附魔领取成功!"))
                 rewardData.isReceivedEnchant[player.uniqueId] = true
                 rewardData.enchantReward.remove(player.uniqueId)
-                Main.instance.receiveManager.addReceivedToConfig("Enchant", player.uniqueId)
+                Main.instance.getReceiveManagerObject().addReceivedToConfig("Enchant", player.uniqueId)
                 player.closeInventory()
                 return
             }
@@ -352,7 +352,7 @@ class RandomReward: AbstractMenu(), Listener {
                 needClaimItem = rewardData.itemReward[player.uniqueId]
                 rewardData.isReceivedItem[player.uniqueId] = true
                 rewardData.itemReward.remove(player.uniqueId)
-                Main.instance.receiveManager.addReceivedToConfig("Item", player.uniqueId)
+                Main.instance.getReceiveManagerObject().addReceivedToConfig("Item", player.uniqueId)
             }
 
             15 -> {
@@ -364,7 +364,7 @@ class RandomReward: AbstractMenu(), Listener {
                 needClaimItem = rewardData.plateReward[player.uniqueId]
                 rewardData.isReceivedPlate[player.uniqueId] = true
                 rewardData.plateReward.remove(player.uniqueId)
-                Main.instance.receiveManager.addReceivedToConfig("Plate", player.uniqueId)
+                Main.instance.getReceiveManagerObject().addReceivedToConfig("Plate", player.uniqueId)
             }
 
             else -> return

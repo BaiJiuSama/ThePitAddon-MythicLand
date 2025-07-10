@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.manager
 
 import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.data.RewardData
 import cn.irina.thepitaddon.utils.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,7 @@ object ReceiveManager: CoroutineScope {
     lateinit var configFile: File
     lateinit var config: YamlConfiguration
 
-    private val rewardData = Main.instance.randomReward!!.rewardData
+    private var rewardData: RewardData? = null
 
     val enchantReceivedList = ArrayList<String>()
     val itemReceivedList = ArrayList<String>()
@@ -35,6 +36,7 @@ object ReceiveManager: CoroutineScope {
 
     init {
         loadReceiveFile()
+        rewardData = Main.instance.randomReward!!.rewardData
     }
 
     fun loadReceiveFile() {
@@ -78,15 +80,15 @@ object ReceiveManager: CoroutineScope {
             when (path.uppercase()) {
                 "ENCHANT" -> {
                     enchantReceivedList.add(it)
-                    rewardData.isReceivedEnchant[UUID.fromString(it)] = true
+                    rewardData!!.isReceivedEnchant[UUID.fromString(it)] = true
                 }
                 "ITEM" -> {
                     itemReceivedList.add(it)
-                    rewardData.isReceivedItem[UUID.fromString(it)] = true
+                    rewardData!!.isReceivedItem[UUID.fromString(it)] = true
                 }
                 "Plate" -> {
                     materialReceivedList.add(it)
-                    rewardData.isReceivedPlate[UUID.fromString(it)] = true
+                    rewardData!!.isReceivedPlate[UUID.fromString(it)] = true
                 }
                 else -> return@forEach
             }
