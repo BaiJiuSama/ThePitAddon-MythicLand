@@ -94,7 +94,7 @@ class EnchantmentManager {
                 "winter",
                 "ender_sword",
                 "micro_anti_gravity",
-                "gamble_enchant",
+                //"gamble_enchant",
                 //"bad_apple_dj",
                 //"gerudo_valley_dj",
                 //"volley_enchant",
