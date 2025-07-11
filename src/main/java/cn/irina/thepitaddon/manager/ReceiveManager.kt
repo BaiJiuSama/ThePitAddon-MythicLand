@@ -7,8 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import net.mizukilab.pit.util.chat.CC
-import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.util.*
@@ -32,37 +30,35 @@ object ReceiveManager: CoroutineScope {
 
     val enchantReceivedList = ArrayList<String>()
     val itemReceivedList = ArrayList<String>()
-    val materialReceivedList = ArrayList<String>()
+    val plateReceivedList = ArrayList<String>()
 
     init {
         loadReceiveFile()
-        rewardData = Main.instance.randomReward!!.rewardData
+        rewardData = Main.instance.getRandomRewardObject().rewardData
     }
 
     fun loadReceiveFile() {
-        launch {
-            configFile = File(plugin.dataFolder, "ReceiveData.yml")
+        configFile = File(plugin.dataFolder, "ReceiveData.yml")
 
-            if (!configFile.exists()) {
-                try {
-                    configFile.createNewFile()
-                    Log.send(CC.translate("$prefix&a已创建 &f\"ReceivedData.yml\""))
-                } catch (e: Exception) {
-                    Log.send(e.localizedMessage)
-                    return@launch
-                }
+        if (!configFile.exists()) {
+            try {
+                configFile.createNewFile()
+                Log.send("&a已创建 &f\"ReceivedData.yml\"")
+            } catch (e: Exception) {
+                Log.send(e.localizedMessage)
+                return
             }
-
-            config = YamlConfiguration.loadConfiguration(configFile)
-            Log.send(CC.translate("$prefix&fReceivedData.yml &a已加载"))
         }
+
+        config = YamlConfiguration.loadConfiguration(configFile)
+        Log.send("&fReceivedData.yml &a已加载")
     }
 
     fun saveReceiveData() {
         launch {
             try {
                 config.save(configFile)
-                Log.send(CC.translate("$prefix&fReceivedData.yml &a保存完毕!"))
+                Log.send("&fReceivedData.yml &a保存完毕!")
             } catch (e: Exception) {
                 Log.send(e.localizedMessage)
             }
@@ -75,8 +71,6 @@ object ReceiveManager: CoroutineScope {
 
     fun loadReceivedData(path: String) {
         getReceivedPlayersUUID(path).forEach {
-            if (Bukkit.getPlayer(it) == null) return@forEach
-
             when (path.uppercase()) {
                 "ENCHANT" -> {
                     enchantReceivedList.add(it)
@@ -86,18 +80,24 @@ object ReceiveManager: CoroutineScope {
                     itemReceivedList.add(it)
                     rewardData!!.isReceivedItem[UUID.fromString(it)] = true
                 }
-                "Plate" -> {
-                    materialReceivedList.add(it)
+                "PLATE" -> {
+                    plateReceivedList.add(it)
                     rewardData!!.isReceivedPlate[UUID.fromString(it)] = true
                 }
-                else -> return@forEach
+                else -> {
+                    Log.send("&c$it")
+                    Log.send("&c该UUID无法被加载, 有点莫名其妙啊...")
+                    return@forEach
+                }
             }
         }
     }
 
-    fun addReceivedToConfig(path: String, uuid: UUID?) {
+    fun addReceivedToConfig(path: String, uuid: UUID) {
         launch {
-            config.set("Reward.$path", uuid?.toString())
+            val list = config.getStringList("Reward.$path")
+            list.add(uuid.toString())
+            config.set("Reward.$path", list)
 
             saveReceiveData()
         }

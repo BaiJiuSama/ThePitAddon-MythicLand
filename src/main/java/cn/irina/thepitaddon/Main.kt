@@ -141,13 +141,13 @@ class Main : JavaPlugin() {
         registerCommands()
         loadListener()
         modifyRarityPrefix()
-        receiveManager!!.loadReceivedData("Enchant")
-        receiveManager!!.loadReceivedData("Item")
-        receiveManager!!.loadReceivedData("Plate")
+        getReceiveManagerObject().loadReceivedData("Enchant")
+        getReceiveManagerObject().loadReceivedData("Item")
+        getReceiveManagerObject().loadReceivedData("Plate")
 
         if (config.getBoolean("DamageValidRange.Enable")) send("&e玩家伤害已被改动! 请注意!")
         send("&a天坑乱斗终极版扩展 已启动!")
-        send("&aPowered by _Ir1na_, ShanguanLinG.")
+        send("&aPowered by Irina, ShanguanLinG, MIYU")
 
         if (config.getBoolean("FreeCoinAndExperience.Enable")) {
             scheduler.scheduleWithFixedDelay(FreeCE(), 0L, 10L, TimeUnit.MINUTES)
