@@ -12,8 +12,8 @@ class LimitArrow : Listener {
     fun onPlayerShootsArrow(cnm: PlayerInteractEvent) {
         val cnm1 = cnm.player
         if (cnm1.hasPermission("pit.shoot") &&
-            cnm.action != null && cnm.action.name.contains("LEFT_CLICK") &&
-            cnm1.itemInHand.type == Material.GOLD_SWORD
+            cnm.action != null && cnm.action.name.contains("RIGHT_CLICK") &&
+            cnm1.itemInHand.type == Material.BOW
         ) {
             cnm2(cnm1)
         }

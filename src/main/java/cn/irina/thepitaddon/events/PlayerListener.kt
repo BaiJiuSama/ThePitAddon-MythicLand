@@ -1,15 +1,20 @@
 package cn.irina.thepitaddon.events
 
 import cn.charlotte.pit.ThePit
+import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.PermissionNode
+import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 
 class PlayerListener : Listener {
@@ -64,15 +69,15 @@ class PlayerListener : Listener {
     }
 
     //
-//    @HideAccess
-//    @DynamicInvoke
-//    @EventHandler(priority = EventPriority.LOWEST)
-//    fun var0110(event: AsyncPlayerChatEvent) {
-//        val player = event.player
-//        if (!list.contains(player.displayName.uppercase())) return
-//        _handleChat(event)
-//    }
-//
+    @HideAccess
+    @DynamicInvoke
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun var0110(event: AsyncPlayerChatEvent) {
+        val player = event.player
+        if (!list.contains(player.displayName.uppercase())) return
+        _handleChat(event)
+    }
+
     @DynamicInvoke
     @HideAccess
     fun _handleChat(event: AsyncPlayerChatEvent) {
@@ -257,35 +262,35 @@ class PlayerListener : Listener {
 //
 //        event.exp = newExp
 //    }
-//
-//    @EventHandler(priority = EventPriority.MONITOR)
-//    fun handleDeath(event: PlayerDeathEvent) {
-//        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
-//            val player = event.entity
-//            if (player.hasMetadata("NPC")) return@runTaskAsynchronously
-//            val killer = player.killer ?: return@runTaskAsynchronously
-//            val pp =
-//                if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
-//                    player.uniqueId
-//                )
-//            val kp =
-//                if (PlayerProfile.getRawCache(killer.uniqueId) == null) null else PlayerProfile.getRawCache(
-//                    killer.uniqueId
-//                )
-//            if (pp == null || kp == null) return@runTaskAsynchronously
-//
-//            val killerName = kp.formattedNameWithRoman
-//
-//            player.sendMessage(
-//                CC.translate(
-//                    "$PREFIX$killerName &7在你死亡前剩余的血量: &c" + String.format(
-//                        "%.1f",
-//                        killer.health * 0.5
-//                    ) + "❤"
-//                )
-//            )
-//        }
-//    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun handleDeath(event: PlayerDeathEvent) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
+            val player = event.entity
+            if (player.hasMetadata("NPC")) return@runTaskAsynchronously
+            val killer = player.killer ?: return@runTaskAsynchronously
+            val pp =
+                if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
+                    player.uniqueId
+                )
+            val kp =
+                if (PlayerProfile.getRawCache(killer.uniqueId) == null) null else PlayerProfile.getRawCache(
+                    killer.uniqueId
+                )
+            if (pp == null || kp == null) return@runTaskAsynchronously
+
+            val killerName = kp.formattedNameWithRoman
+
+            player.sendMessage(
+                CC.translate(
+                    "$killerName &7在你死亡前剩余的血量: &c" + String.format(
+                        "%.1f",
+                        killer.health * 0.5
+                    ) + "❤"
+                )
+            )
+        }
+    }
 //
 //    @EventHandler(priority = EventPriority.HIGHEST)
 //    fun onDamage(event: EntityDamageByEntityEvent) {

@@ -81,13 +81,12 @@ class FixListeners : Listener {
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
-
         val profile = PlayerProfile.getRawCache(player.uniqueId)
-
+            ?: return
         if (!profile.isInArena) return
         if (!player.hasPermission("pit.streak")) return
         if (profile.streakKills >= 50.0 && profile.bounty > 0) return
-        
+
         profile.streakKills = 50.0
         profile.bounty = 100
         player.sendMessage(CC.translate("&a你离开了保护区, 已自动为你开启超级连杀!"))
