@@ -1,6 +1,5 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
-import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
@@ -46,12 +45,11 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当自身被穿着附魔 &f狂暴连击 &7时被连续攻击 &f3 &7次(0.5s内)/s" +
+        return "&7当自身在空中时, 被连续攻击 &f3 &7次(0.5s内)/s" +
                 "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:06) /s" +
-                if (enchantLevel > 1) "&7同时, 在 &e6s &7内受到的伤害 &9-${6 + enchantLevel * 2}%" else null
+                if (enchantLevel > 1) "&7同时, 在 &e12s &7内受到的伤害 &9-${10 + enchantLevel * 2}%" else ""
     }
 
-    val thePit = ThePit.getApi()
     override fun handlePlayerDamaged(
         enchantLevel: Int,
         player: Player,
@@ -64,13 +62,10 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         if (entity !is Player) return
         val playerUUID = player.uniqueId
 
-        if (thePit.getItemEnchantLevel(entity.inventory.leggings, "regularity") <= 0) {
-            hitCounts[playerUUID] = 0
-            return
-        }
+        if (player.isOnGround) return
 
         if (keepBoost.getOrDefault(playerUUID, Cooldown(0L)).hasExpired() && enchantLevel > 1) {
-            keepBoost[playerUUID] = Cooldown(6L, TimeUnit.SECONDS)
+            keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
         }
 
         val currentTime = System.currentTimeMillis()
@@ -84,7 +79,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
                 val ap = PlayerProfile.getRawCache(entity.uniqueId)
                 player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
 
-                keepBoost[playerUUID] = Cooldown(6L, TimeUnit.SECONDS)
+                keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
 
                 PlayerUtil.heal(player, 4.0)
 
@@ -93,7 +88,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
 
                 if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
 
-                reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.06))
+                reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.1))
 
                 hitCounts[playerUUID] = 0
             }

@@ -91,7 +91,7 @@ class EnchantmentManager {
                 "parasite",
                 "Combo_Broken_String",
                 "break_armor",
-                "winter",
+                //"winter",
                 //"ender_sword",
                 "micro_anti_gravity",
                 "gamble_enchant",
