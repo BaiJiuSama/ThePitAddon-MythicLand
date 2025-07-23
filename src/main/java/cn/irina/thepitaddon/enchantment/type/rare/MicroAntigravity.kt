@@ -45,8 +45,8 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当自身在空中时, 被连续攻击 &f3 &7次(0.5s内)/s" +
-                "则立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
+        return "&7当自身在空中时, 每被攻击 &f3 &7次/s" +
+                "立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
                 if (enchantLevel > 1) "&7同时, 在 &e12s &7内受到的伤害 &9-${10 + enchantLevel * 2}%" else ""
     }
 
@@ -71,30 +71,30 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         val currentTime = System.currentTimeMillis()
         val lastHitTime = lastHitTimes.getOrDefault(playerUUID, 0L)
 
-        if (currentTime - lastHitTime < 500) { //100 = 0.1s
-            val count = hitCounts.getOrDefault(playerUUID, 0)
-            hitCounts[playerUUID] = count + 1
+        //if (currentTime - lastHitTime < 500) { //100 = 0.1s
+        val count = hitCounts.getOrDefault(playerUUID, 0)
+        hitCounts[playerUUID] = count + 1
 
-            if (hitCounts[playerUUID] == 3) {
-                val ap = PlayerProfile.getRawCache(entity.uniqueId)
-                player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
+        if (hitCounts[playerUUID] == 3) {
+            val ap = PlayerProfile.getRawCache(entity.uniqueId)
+            player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
 
-                keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
+            keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
 
-                PlayerUtil.heal(player, 4.0)
+            PlayerUtil.heal(player, 4.0)
 
-                if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
-                player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 7 * 20, enchantLevel - 1, false, true))
+            if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
+            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 7 * 20, enchantLevel - 1, false, true))
 
-                if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
+            if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
 
-                reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.1))
+            reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.1))
 
-                hitCounts[playerUUID] = 0
-            }
-        } else {
-            hitCounts[playerUUID] = 1
+            hitCounts[playerUUID] = 0
         }
+//        } else {
+//            hitCounts[playerUUID] = 1
+//        }
 
         lastHitTimes[playerUUID] = currentTime
     }

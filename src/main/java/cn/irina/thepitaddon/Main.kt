@@ -229,7 +229,8 @@ class Main : JavaPlugin() {
                 PlayerOpenTrash(),
                 PlayerSuicide(),
                 ShowDevelopmentCommand(),
-                FixWipe()
+                FixWipe(),
+                PlayerProving()
             )
             .build()
     }
@@ -275,6 +276,7 @@ class Main : JavaPlugin() {
     val dontLoads = listOf(
         "EnderBow"
     )
+
     private fun loadListener() {
         val reflections = Reflections("cn.irina.thepitaddon")
         val classes = reflections.getSubTypesOf(Listener::class.java)

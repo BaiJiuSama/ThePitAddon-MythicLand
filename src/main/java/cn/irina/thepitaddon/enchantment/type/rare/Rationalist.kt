@@ -31,8 +31,8 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getRarity(): EnchantmentRarity {
-        //return EnchantmentRarity.RAGE_RARE
-        return EnchantmentRarity.OP
+        return EnchantmentRarity.RAGE_RARE
+        //return EnchantmentRarity.OP
     }
 
     override fun getCooldown(): Cooldown? {
@@ -40,7 +40,7 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "受到的伤害 &9-${4 + (enchantLevel * 2)}% /s" +
+        return "受到的伤害 &9-${4 + (enchantLevel * 4)}% /s" +
                 "&7同时, 受击时若敌方手持武器含有 &d赌徒 &7附魔 /s" +
                 "&7自身获得 &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) /s" +
                 "&7并获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收"
@@ -56,7 +56,7 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
         atomicBoolean: AtomicBoolean
     ) {
         if (entity !is Player) return
-        boostDamage.set(boostDamage.get() * (1 + (0.04 + (enchantLevel * 0.02))))
+        boostDamage.set(boostDamage.get() * (1 + (0.04 + (enchantLevel * 0.04))))
         if (ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "gamble_enchant") <= 0) return
         if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
         victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
