@@ -15,7 +15,9 @@ import org.bukkit.entity.Player
  * @Date 2025/6/6 23:55
  */
 
+@WeaponOnly
 @ArmorOnly
+
 class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "潮汐"
@@ -30,7 +32,7 @@ class Tide: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getRarity(): EnchantmentRarity {
-        return EnchantmentRarity.RARE
+        return EnchantmentRarity.OP
     }
 
     override fun getCooldown(): Cooldown? {

@@ -30,7 +30,7 @@ class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
     }
 
     override fun getRarity(): EnchantmentRarity {
-        return EnchantmentRarity.RARE
+        return EnchantmentRarity.OP
     }
 
     override fun getCooldown(): Cooldown? {
