@@ -65,7 +65,7 @@ class PlayerProving {
             player.sendMessage(CC.translate(""))
             player.sendMessage(CC.translate("&a你已获得认证."))
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p settemp storage.use 7d")
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p settemp storage.use true 7d")
         }
     }
 

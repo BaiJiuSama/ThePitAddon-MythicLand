@@ -4,6 +4,7 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import net.mizukilab.pit.menu.perk.normal.choose.PerkChooseMenu
 import net.mizukilab.pit.menu.prestige.PrestigeMainMenu
@@ -28,13 +29,16 @@ class OpenMenu {
     private val cooldown = 30L
 
     @Execute
-    fun handleCommand(player: Player, @Arg menuName: String) {
-        if (player.hasPermission("pit.admin")) handleOpenMenu(player, menuName)
+    fun handleCommand(@Context player: Player, @Arg menuName: String) {
+        if (player.hasPermission("pit.admin")) {
+            handleOpenMenu(player, menuName)
+            return
+        }
 
         val cd0: Cooldown = cd[player.uniqueId] ?: Cooldown(0L)
         if (!cd0.hasExpired()) {
             val lastCd = TimeUnit.MILLISECONDS.toSeconds(cd0.duration)
-            player.sendMessage(CC.translate("$prefix&c冷却中, 剩余 $lastCd &c秒..."))
+            player.sendMessage(CC.translate("&c冷却中, 请等待$lastCd&c秒..."))
             return
         }
 
@@ -51,7 +55,6 @@ class OpenMenu {
             "P" -> PrestigeMainMenu().openMenu(player)
             "PERK" -> PerkChooseMenu().openMenu(player)
             "PE" -> PerkChooseMenu().openMenu(player)
-
             else -> player.sendMessage(CC.translate("$prefix&c错误的菜单名称!"))
         }
     }
