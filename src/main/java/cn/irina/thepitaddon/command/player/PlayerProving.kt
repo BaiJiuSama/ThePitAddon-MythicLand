@@ -2,11 +2,13 @@ package cn.irina.thepitaddon.command.player
 
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.utils.Log
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import net.mizukilab.pit.libs.core.lang.UUID
 import net.mizukilab.pit.util.chat.CC
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -62,7 +64,8 @@ class PlayerProving {
             player.sendMessage(CC.translate(""))
             player.sendMessage(CC.translate("&a你已获得认证."))
 
-            // TODO 添加验证成功后的处理
+            Log.send("&e控制台执行: &fstorage.use 权限给予")
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p set storage.use")
         }
     }
 
