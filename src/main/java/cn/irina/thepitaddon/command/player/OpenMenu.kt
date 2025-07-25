@@ -25,6 +25,7 @@ class OpenMenu {
     private val prefix = Main.instance.PREFIX
 
     private val cd = ConcurrentHashMap<UUID, Cooldown>()
+    private val cooldown = 30L
 
     @Execute
     fun handleCommand(player: Player, @Arg menuName: String) {
@@ -37,17 +38,21 @@ class OpenMenu {
             return
         }
 
-        cd[player.uniqueId] = Cooldown(30L, TimeUnit.SECONDS)
+        cd[player.uniqueId] = Cooldown(cooldown, TimeUnit.SECONDS)
         handleOpenMenu(player, menuName)
     }
 
     private fun handleOpenMenu(player: Player, menu: String) {
         when (menu.uppercase()) {
             "SHOP" -> pitApi.openMenu(player, "shop")
+            "S" -> pitApi.openMenu(player, "shop")
             "PRESTIGE" -> PrestigeMainMenu().openMenu(player)
+            "PRE" -> PrestigeMainMenu().openMenu(player)
+            "P" -> PrestigeMainMenu().openMenu(player)
             "PERK" -> PerkChooseMenu().openMenu(player)
+            "PE" -> PerkChooseMenu().openMenu(player)
 
-            else -> player.sendMessage(CC.translate("$prefix&c错误的UI名称"))
+            else -> player.sendMessage(CC.translate("$prefix&c错误的菜单名称!"))
         }
     }
 }

@@ -14,10 +14,16 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
 class Rationalist : AbstractEnchantment(), IPlayerDamaged {
+    
+    // 存储玩家抗性提升效果的冷却时间
+    private val resistanceCooldowns = HashMap<UUID, Cooldown>()
+    
     override fun getEnchantName(): String {
         return "理性主义者"
     }
@@ -40,10 +46,11 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "受到的伤害 &9-${4 + (enchantLevel * 4)}% /s" +
-                "&7同时, 受击时若敌方手持武器含有 &d赌徒 &7附魔 /s" +
-                "&7自身获得 &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) /s" +
-                "&7并获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收"
+        return "&7受击时若敌方手持武器含有 &d赌徒 &7附魔, 立即获得以下效果: /s" +
+                " &f▶ &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) /s" +
+                " &f▶ &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 /s" +
+                (if (enchantLevel >= 2) "否则, 获得: /s" +
+                        " &f▶ &3抗性提升 " + RomanUtil.convert(enchantLevel - 1) + " &f(00:06) &7(6s冷却) /s" else "")
     }
 
     override fun handlePlayerDamaged(
@@ -56,14 +63,23 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
         atomicBoolean: AtomicBoolean
     ) {
         if (entity !is Player) return
-        boostDamage.set(boostDamage.get() * (1 + (0.04 + (enchantLevel * 0.04))))
-        if (ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "gamble_enchant") <= 0) return
-        if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
-        victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
 
-        val craftPlayer = victim as CraftPlayer
-        val absorptionHearts = craftPlayer.handle.absorptionHearts
-        if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
-        craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
+        val hasGambleEnchant = ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "gamble_enchant") > 0
+
+        if (hasGambleEnchant) {
+            if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
+            victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
+            val craftPlayer = victim as CraftPlayer
+            val absorptionHearts = craftPlayer.handle.absorptionHearts
+            if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
+            craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
+        } else if (enchantLevel >= 2) {
+            val cooldown = resistanceCooldowns.getOrDefault(victim.uniqueId, Cooldown(0L))
+            if (cooldown.hasExpired()) {
+                resistanceCooldowns[victim.uniqueId] = Cooldown(6L, TimeUnit.SECONDS)
+                if (victim.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) victim.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE)
+                victim.addPotionEffect(PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 120, enchantLevel - 2, false, true))
+            }
+        }
     }
 }

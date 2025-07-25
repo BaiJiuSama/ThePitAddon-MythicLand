@@ -65,14 +65,14 @@ class PlayerProving {
             player.sendMessage(CC.translate(""))
             player.sendMessage(CC.translate("&a你已获得认证."))
 
-            Log.send("&e控制台执行: &fstorage.use 权限给予")
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p set storage.use")
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p settemp storage.use 7d")
         }
     }
 
     private fun sendPromptMessage(@Context player: Player) {
         player.sendMessage(CC.translate(""))
         player.sendMessage(CC.translate("&c注意! 你当前正在使用 &e/proving &c指令认证!"))
+        player.sendMessage(CC.translate("&c认证有效期: &e7天"))
         player.sendMessage(CC.translate(""))
         player.sendMessage(CC.translate("&c需要满足以下条件: "))
         player.sendMessage(CC.translate("&e■ &7总游玩时间 到达 &e12 小时"))

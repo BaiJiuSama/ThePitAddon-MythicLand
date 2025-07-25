@@ -230,7 +230,8 @@ class Main : JavaPlugin() {
                 PlayerSuicide(),
                 ShowDevelopmentCommand(),
                 FixWipe(),
-                PlayerProving()
+                PlayerProving(),
+                OpenMenu()
             )
             .build()
     }
