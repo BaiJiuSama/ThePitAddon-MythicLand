@@ -117,7 +117,7 @@ class EnchantmentManager {
                 "judgment_strike",
                 "divine_miracle_enchant",
                 "lunar_deity",
-                //"athena"
+                "athena",
                 //"tide"
                 //"war_pay"
                 //"terminator"
