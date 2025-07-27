@@ -10,6 +10,7 @@ import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
@@ -45,9 +46,11 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当自身在空中时, 每被攻击 &f3 &7次/s" +
-                "立刻恢复 &c2.0❤ &7生命值 并获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
-                if (enchantLevel > 1) "&7同时, 在 &e12s &7内受到的伤害 &9-${10 + enchantLevel * 2}%" else ""
+        return "&7当自身在空中时, 每被攻击 &f3 &7次, 触发以下效果: /s" +
+                " &f▶ &7恢复 &c2.0❤ 生命值 /s" +
+                " &f▶ &7获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(可叠加, 最多两层) /s" +
+                " &f▶ &7获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
+                if (enchantLevel > 1) " &f▶ &7受到的伤害&9 -${10 + enchantLevel * 5}% &7(持续12秒, 不可叠加)" else ""
     }
 
     override fun handlePlayerDamaged(
@@ -88,7 +91,14 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
 
             if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
 
-            reduceDamage.getAndAdd((enchantLevel * 0.02 + 0.1))
+            reduceDamage.getAndAdd((enchantLevel * 0.05 + 0.1))
+
+            val craftPlayer = player as CraftPlayer
+            var absorptionHearts = player.handle.absorptionHearts
+            craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
+            if (absorptionHearts >= 8f) {
+                absorptionHearts == 8f
+            }
 
             hitCounts[playerUUID] = 0
         }

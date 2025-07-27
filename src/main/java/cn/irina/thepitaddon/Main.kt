@@ -215,7 +215,7 @@ class Main : JavaPlugin() {
                 AdminHealSelf(),
                 AdminClearBounty(),
                 PlayerHat(),
-                RandomRewardControl(),
+//                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),
 //                GodMode(),

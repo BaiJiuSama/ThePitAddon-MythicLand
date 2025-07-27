@@ -80,6 +80,8 @@ tasks{
         relocate("com.fasterxml", "cn.irina.thirdparty.fasterxml")
         relocate("com.mongodb", "cn.irina.thirdparty.mongodb")
 
+        relocate("dev.rollczi.litecommands.handler.result", "cn.irina.thirdparty.rollczi.litecommands.handler.result")
+
         destinationDirectory = file("$projectDir/jar")
 
         archiveFileName.set("ThePitAddon-$version.jar")
