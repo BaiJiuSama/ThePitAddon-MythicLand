@@ -18,7 +18,7 @@ import org.bukkit.potion.PotionEffectType
  */
 
 @ArmorOnly
-class Electrolytes: AbstractEnchantment(), IPlayerKilledEntity {
+class Electrolytes : AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "电解质"
     }
@@ -58,12 +58,22 @@ class Electrolytes: AbstractEnchantment(), IPlayerKilledEntity {
             if (p.type != PotionEffectType.SPEED) continue
 
             val duration = if (p.amplifier > 1)
-                p.duration + ((enchantLevel * 20) / 2)
-            else
                 p.duration + (enchantLevel * 20)
+            else
+                p.duration + (enchantLevel * 2 * 20)
 
             myself.removePotionEffect(p.type)
-            myself.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, p.amplifier, false, true))
+            val maxDuration = (enchantLevel + 2) * 6 * 20
+            val finalDuration = if (duration >= maxDuration) maxDuration else duration
+            myself.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    finalDuration,
+                    p.amplifier,
+                    false,
+                    true
+                )
+            )
         }
     }
 }

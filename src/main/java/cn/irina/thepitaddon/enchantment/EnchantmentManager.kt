@@ -124,7 +124,18 @@ class EnchantmentManager {
                 "ender_bow_enchant",
                 //"gravitational_backtracking"
                 //"electrolytes_enchant"
-                "regularity"
+                "regularity",
+                //"like_french"
+                //"desperation"
+                "coin_glorious",
+                //"frost"
+                "outnumbered_by_the_enemy",
+                //"tear"
+                //"vital_echo"
+                //"lonely_red_blood"
+                //"steal"
+                //"piercing_bow"
+                //"ddj"
             )
         )
     }

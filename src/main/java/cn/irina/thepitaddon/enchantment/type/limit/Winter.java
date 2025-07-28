@@ -1,17 +1,13 @@
 package cn.irina.thepitaddon.enchantment.type.limit;
 
+import cn.irina.thepitaddon.Main;
+import com.google.common.util.concurrent.AtomicDouble;
 import net.mizukilab.pit.enchantment.AbstractEnchantment;
-
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant;
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly;
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity;
-
 import net.mizukilab.pit.parm.listener.IAttackEntity;
 import net.mizukilab.pit.util.cooldown.Cooldown;
-
-import cn.irina.thepitaddon.Main;
-import com.google.common.util.concurrent.AtomicDouble;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @WeaponOnly
-public class Winter extends AbstractEnchantment implements  IAttackEntity, Listener, IActionDisplayEnchant {
+public class Winter extends AbstractEnchantment implements IAttackEntity, Listener, IActionDisplayEnchant {
     private static final String WINTER_FRAIL = "WinterFrail";
     private static final HashMap<UUID, Cooldown> cooldown = new HashMap<>();
 
@@ -66,7 +62,10 @@ public class Winter extends AbstractEnchantment implements  IAttackEntity, Liste
                 "   &f▶ &8脆弱 &7(00:0" + ((enchantLevel * 2) + 2) + ") /s" +
                 "&7效果 &b霜寒&7: 移速大幅降低, 对他人造成的伤害 &9-20% /s" +
                 "&7效果 &8脆弱&7: 受到的暴击伤害 &c+20% /s" +
-                (enchantLevel >= 3 ? "&7同时, 攻击目标时将清除自身的 &c缓慢 &7效果 /s" + "&8每秒只可触发一次" : "&8每秒只可触发一次");
+                (enchantLevel >= 3 ? "&7同时, 攻击目标时将清除自身的 &c缓慢 &7效果 /s" + "&8每秒只可触发一次" : "&8每秒只可触发一次/s") +
+                "/s "+
+                "/s  \"&7&o冰冷苦海, 那骨骸被雪覆盖" +
+                "/s      &7&o恐惧仍在, 深深印在你脑海\"";
     }
 
     @Override
@@ -91,7 +90,8 @@ public class Winter extends AbstractEnchantment implements  IAttackEntity, Liste
 
         targetPlayer.setMetadata(WINTER_FRAIL, new FixedMetadataValue(Main.getInstance(), System.currentTimeMillis() + ((enchantLevel * 2L) + 2) * 1000L));
 
-        if (enchantLevel >= 3 && player.hasPotionEffect(PotionEffectType.SLOW)) player.removePotionEffect(PotionEffectType.SLOW);
+        if (enchantLevel >= 3 && player.hasPotionEffect(PotionEffectType.SLOW))
+            player.removePotionEffect(PotionEffectType.SLOW);
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -99,7 +99,8 @@ public class Winter extends AbstractEnchantment implements  IAttackEntity, Liste
         if (!(event.getDamager() instanceof Player)) return;
         Player attacker = (Player) event.getDamager();
 
-        if (!attacker.hasMetadata(WINTER_FRAIL) || (attacker.getMetadata(WINTER_FRAIL).get(0)).asLong() <= System.currentTimeMillis()) return;
+        if (!attacker.hasMetadata(WINTER_FRAIL) || (attacker.getMetadata(WINTER_FRAIL).get(0)).asLong() <= System.currentTimeMillis())
+            return;
         event.setDamage(event.getDamage() * 0.8);
     }
 
@@ -108,7 +109,8 @@ public class Winter extends AbstractEnchantment implements  IAttackEntity, Liste
         if (!(event.getEntity() instanceof Player)) return;
         Player target = (Player) event.getEntity();
 
-        if (!target.hasMetadata(WINTER_FRAIL) || (target.getMetadata(WINTER_FRAIL).get(0)).asLong() <= System.currentTimeMillis()) return;
+        if (!target.hasMetadata(WINTER_FRAIL) || (target.getMetadata(WINTER_FRAIL).get(0)).asLong() <= System.currentTimeMillis())
+            return;
         event.setDamage(event.getDamage() * 1.2);
     }
 

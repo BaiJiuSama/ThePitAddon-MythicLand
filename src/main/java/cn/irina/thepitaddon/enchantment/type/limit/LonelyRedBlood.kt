@@ -1,4 +1,4 @@
-package cn.irina.thepitaddon.enchantment.type.rare
+package cn.irina.thepitaddon.enchantment.type.limit
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.event.PitRegainHealthEvent
@@ -22,18 +22,17 @@ import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @WeaponOnly
-class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Listener {
+class LonelyRedBlood : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Listener {
     private val cooldown: ConcurrentHashMap<UUID, Cooldown> = ConcurrentHashMap()
     private val pitAPI = ThePit.api
     private val healthCheckTaskMap: ConcurrentHashMap<UUID, BukkitRunnable> = ConcurrentHashMap()
     private val lastHealthMap: ConcurrentHashMap<UUID, Double> = ConcurrentHashMap()
 
     override fun getEnchantName(): String {
-        return "凝血"
+        return "孤红之恤: 吸血"
     }
 
     override fun getMaxEnchantLevel(): Int {
@@ -41,11 +40,11 @@ class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Li
     }
 
     override fun getNbtName(): String {
-        return "clotting"
+        return "lonely_red_blood"
     }
 
     override fun getRarity(): EnchantmentRarity {
-        return EnchantmentRarity.RARE
+        return EnchantmentRarity.OP
     }
 
     override fun getCooldown(): Cooldown? {
@@ -53,11 +52,11 @@ class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Li
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        // "&7攻击时造成的伤害将 &c-${(10 + (enchantLevel * 5))}% /s" +
-        return "&7攻击时对目标施加以下效果: /s" +
+        return "&7攻击恢复自身相当于伤害量 &c${enchantLevel * 4}% &7的生命 (上限&c1.5❤&7)/s" +
+                "&7并对目标施加以下效果: /s" +
                 "&7   &f▶ &4凝血 &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)})  /s" +
                 "&7   &f▶ &8凋零 &f(${TimeUtil.formatTotalSeconds(if (enchantLevel >= 3) 4 else 2)}) /s" +
-                "&7(${28 - (enchantLevel * 4)}s冷却) /s" +
+                "&7凝血与凋零效果每${28 - (enchantLevel * 4)}秒仅可触发一次 /s" +
                 "&7效果 &4凝血&7: 无法通过&c任何途径&7恢复生命值 /s" +
                 "&7效果 &8凋零&7: 持续缓慢地损失生命值"
     }
@@ -66,19 +65,26 @@ class Clotting : AbstractEnchantment(), IAttackEntity, IActionDisplayEnchant, Li
         enchantLevel: Int,
         player: Player,
         entity: Entity,
-        v: Double,
+        damage: Double,
         atomicDouble: AtomicDouble,
         boostDamage: AtomicDouble,
         atomicBoolean: AtomicBoolean
     ) {
         val target = entity as? Player ?: return
 
-        if (pitAPI.getItemEnchantLevel(
-                target.inventory.leggings,
-                "control"
-            ) >= 1 || !cooldown.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()
-        ) return
-        cooldown[player.uniqueId] = Cooldown((24 - (enchantLevel * 4)).toLong(), TimeUnit.SECONDS)
+        val healPercent = (enchantLevel * 4) / 100.0
+        var healAmount = damage * healPercent
+
+        if (healAmount > 1.5) {
+            healAmount = 1.5
+        }
+
+        val newHealth = player.health + healAmount
+        if (newHealth > player.maxHealth) {
+            player.health = player.maxHealth
+        } else {
+            player.health = newHealth
+        }
 
         stackBuff(target, if (enchantLevel >= 2) 4 else 2)
 
