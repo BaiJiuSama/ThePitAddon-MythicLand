@@ -44,8 +44,8 @@ class Stop : AbstractEnchantment(), IPlayerShootEntity, IPlayerDamaged {
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         val duration = enchantLevel + 1
-        val s = StringBuilder("&7弓箭命中敌人后对敌人施加 &c缓慢 II &f(00:0${duration}) /s")
-        if (enchantLevel >= 2) s.append("&7持有此附魔被击中后, 若对方拥有 &c缓慢 &7效果, 则为自身恢复 &c${enchantLevel * 0.5 - 0.5}❤ &7(2s冷却)")
+        val s = StringBuilder("&7弓箭命中敌人后对敌人施加 &c缓慢 I &f(00:0${duration}) /s")
+        if (enchantLevel >= 2) s.append("&7持有此附魔被击中后, 若对方拥有 &c缓慢 &7效果, 则为自身恢复 &c${enchantLevel * 0.5 - 0.5}❤ &7(1s冷却)")
         return s.toString()
     }
 
@@ -63,7 +63,7 @@ class Stop : AbstractEnchantment(), IPlayerShootEntity, IPlayerDamaged {
             target.removePotionEffect(
                 PotionEffectType.SLOW
             )
-        target.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (enchantLevel + 1) * 20, 1))
+        target.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (enchantLevel + 1) * 20, 0))
     }
 
     override fun handlePlayerDamaged(
@@ -82,7 +82,7 @@ class Stop : AbstractEnchantment(), IPlayerShootEntity, IPlayerDamaged {
         if (shooter.activePotionEffects.any { it.type == PotionEffectType.SLOW }) {
             val cooldown = cooldowns[myself.uniqueId]
             if (cooldown == null || cooldown.hasExpired()) {
-                cooldowns[myself.uniqueId] = Cooldown(2000)
+                cooldowns[myself.uniqueId] = Cooldown(1000)
                 val newHeal: Double = myself.health + (0.5 * enchantLevel - 0.5) * 2
                 myself.health = min(newHeal, myself.maxHealth)
             }

@@ -52,7 +52,7 @@ public class FrostEnchant extends AbstractEnchantment implements IPlayerDamaged,
     }
 
     private int onBlocks(int enchantLevel) {
-        return enchantLevel >= 3 ? 1 : 6 - enchantLevel;
+        return enchantLevel >= 3 ? 1 : 4 - enchantLevel;
     }
 
     @Override

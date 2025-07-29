@@ -126,12 +126,12 @@ class EnchantmentManager {
                 //"electrolytes_enchant"
                 "regularity",
                 //"like_french"
-                //"desperation"
+                "desperation",
                 "coin_glorious",
                 //"frost"
                 "outnumbered_by_the_enemy",
                 //"tear"
-                //"vital_echo"
+                "vital_echo"
                 //"lonely_red_blood"
                 //"steal"
                 //"piercing_bow"
