@@ -136,6 +136,8 @@ class EnchantmentManager {
                 //"steal"
                 //"piercing_bow"
                 //"ddj"
+                //"please_stop"
+                //"poet"
             )
         )
     }
