@@ -8,16 +8,15 @@ import net.mizukilab.pit.parm.listener.IAttackEntity;
 import net.mizukilab.pit.util.cooldown.Cooldown;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @WeaponOnly
-public class DDJ extends AbstractEnchantment implements IAttackEntity {
+public class Poet extends AbstractEnchantment implements IAttackEntity {
 
     @Override
     public String getEnchantName() {
-        return "酊酮剂酮剂，大口大口嚼嚼嚼，带兴奋兴奋剂，瘾短一段带一毒胺，定通缉定通缉，druggydruggy教教教，带粟剂带粟剂，出去出去碱亢麻";
+        return "诗人";
     }
 
     @Override
@@ -27,7 +26,7 @@ public class DDJ extends AbstractEnchantment implements IAttackEntity {
 
     @Override
     public String getNbtName() {
-        return "ddj";
+        return "poet";
     }
 
     @Override
@@ -35,7 +34,6 @@ public class DDJ extends AbstractEnchantment implements IAttackEntity {
         return EnchantmentRarity.OP;
     }
 
-    @Nullable
     @Override
     public Cooldown getCooldown() {
         return null;
@@ -43,27 +41,19 @@ public class DDJ extends AbstractEnchantment implements IAttackEntity {
 
     @Override
     public String getUsefulnessLore(int enchantLevel) {
-        return "&7攻击时将踢出目标玩家" +
-                "/s" +
-                "/s  \"&7&o长难句这一块\"" +
-                "/s    \"&7&o家里请什么都没用了\"";
-
+        return "&7握持时攻击他人自己瞬间暴毙";
     }
 
     @Override
     public void handleAttackEntity(
-            int i,
-            Player player,
-            Entity entity,
-            double v,
+            int i, Player attacker,
+            Entity entity, double v,
             AtomicDouble atomicDouble,
             AtomicDouble atomicDouble1,
             AtomicBoolean atomicBoolean) {
-        if (!(entity instanceof Player)) {
-            return;
+        if (entity instanceof Player) {
+            double maxHealth = ((Player) entity).getHealth();
+            attacker.damage(maxHealth * 100);
         }
-        if (entity.getCustomName().equalsIgnoreCase("bot")) return;
-        if (entity.getCustomName().equalsIgnoreCase("ShanguanLinG")) return;
-        ((Player) entity).kickPlayer("Ez");
     }
 }

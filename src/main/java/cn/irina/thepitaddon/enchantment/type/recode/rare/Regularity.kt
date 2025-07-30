@@ -4,7 +4,6 @@ import cn.charlotte.pit.ThePit
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.parm.AutoRegister
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
@@ -15,7 +14,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
 
-@AutoRegister
 @ArmorOnly
 class Regularity : AbstractEnchantment(), Listener {
     override fun getEnchantName(): String {
@@ -39,76 +37,67 @@ class Regularity : AbstractEnchantment(), Listener {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当近战伤害低于&c${getDamage(enchantLevel)}❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
+        return "&7当近战伤害低于&c${a(enchantLevel)}❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
             b(
                 enchantLevel
             )
         }%&7."
     }
 
-    fun getDamage(enchantLevel: Int): Double {
+    fun a(enchantLevel: Int): Double {
         return when (enchantLevel) {
-            1 -> 0.1
-            2 -> 1.3
-            else -> 1.5
+            1 -> 0.7
+            2 -> 1.7
+            else -> 1.9
         }
     }
-}
 
-fun b(enchantLevel: Int): Int {
-    return when (enchantLevel) {
-        1 -> 40
-        2 -> 45
-        else -> 60
-    }
-}
-
-@EventHandler(priority = EventPriority.HIGHEST)
-
-fun damage(event: EntityDamageByEntityEvent) {
-    val attacker = event.damager
-    if (attacker !is Player) return
-
-    val victim = event.entity
-    if (victim !is Player) return
-
-    if (PlayerUtil.shouldIgnoreEnchant(attacker, victim)) {
-        return
+    fun b(enchantLevel: Int): Int {
+        return when (enchantLevel) {
+            1 -> 40
+            2 -> 45
+            else -> 60
+        }
     }
 
-    val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
-    if (level < 1) return
+    @EventHandler(priority = EventPriority.HIGHEST)
+
+    fun damage(event: EntityDamageByEntityEvent) {
+        val attacker = event.damager
+        if (attacker !is Player) return
+
+        val victim = event.entity
+        if (victim !is Player) return
+
+        if (PlayerUtil.shouldIgnoreEnchant(attacker, victim)) {
+            return
+        }
+
+        val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
+        if (level < 1) return
 
 
-    if (event.finalDamage < getDamage(level)
-    ) {
-        val metadata = victim.getMetadata("regularity_cooldown")
-        metadata.firstOrNull()?.asLong()?.let {
-            if (System.currentTimeMillis() < it) {
-                return
+        if (event.finalDamage < a(level)
+        ) {
+            val metadata = victim.getMetadata("regularity_cooldown")
+            metadata.firstOrNull()?.asLong()?.let {
+                if (System.currentTimeMillis() < it) {
+                    return
+                }
+            }
+
+            if (!victim.isDead) {
+                val boost = b(level) * 0.01
+                Bukkit.getScheduler().runTaskLater(ThePit.getInstance(), {
+
+                    victim.noDamageTicks = 0
+                    victim.damage(event.damage * boost, attacker)
+                    victim.setMetadata(
+                        "regularity_cooldown",
+                        FixedMetadataValue(ThePit.getInstance(), System.currentTimeMillis() + 1000L + 2)
+                    )
+                }, 5L)
             }
         }
-
-        if (!victim.isDead) {
-            val boost = b(level) * 0.01
-
-            Bukkit.getScheduler().runTaskLater(ThePit.getInstance(), {
-
-                victim.noDamageTicks = 0
-                victim.damage(event.damage * boost, attacker)
-                victim.setMetadata(
-                    "regularity_cooldown",
-                    FixedMetadataValue(ThePit.getInstance(), System.currentTimeMillis() + 1000L + 2)
-                )
-            }, 5L)
-        }
-    }
-}
-
-fun getDamage(enchantLevel: Int): Double {
-    return when (enchantLevel) {
-        1 -> 0.1
-        2 -> 1.3
-        else -> 1.5
     }
 }
