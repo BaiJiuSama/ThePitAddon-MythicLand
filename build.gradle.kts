@@ -35,7 +35,7 @@ dependencies {
 
 
 group = "cn.irina"
-version = "0.0.2"
+version = "0.0.3"
 description = "ThePitAddon-$version"
 
 java {
