@@ -48,13 +48,9 @@ class OpenMenu {
 
     private fun handleOpenMenu(player: Player, menu: String) {
         when (menu.uppercase()) {
-            "SHOP" -> pitApi.openMenu(player, "shop")
-            "S" -> pitApi.openMenu(player, "shop")
-            "PRESTIGE" -> PrestigeMainMenu().openMenu(player)
-            "PRE" -> PrestigeMainMenu().openMenu(player)
-            "P" -> PrestigeMainMenu().openMenu(player)
-            "PERK" -> PerkChooseMenu().openMenu(player)
-            "PE" -> PerkChooseMenu().openMenu(player)
+            "SHOP", "S" -> pitApi.openMenu(player, "shop")
+            "PRESTIGE", "P", "PRE" -> PrestigeMainMenu().openMenu(player)
+            "PERK", "PE" -> PerkChooseMenu().openMenu(player)
             else -> player.sendMessage(CC.translate("$prefix&c错误的菜单名称!"))
         }
     }

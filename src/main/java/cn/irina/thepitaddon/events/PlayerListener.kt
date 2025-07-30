@@ -8,16 +8,26 @@ import cn.irina.thepitaddon.utils.HideAccess
 import net.luckperms.api.LuckPermsProvider
 import net.luckperms.api.node.Node
 import net.luckperms.api.node.types.PermissionNode
+import net.md_5.bungee.api.chat.BaseComponent
+import net.md_5.bungee.api.chat.HoverEvent
+import net.md_5.bungee.api.chat.TextComponent
+import net.minecraft.server.v1_8_R3.NBTTagCompound
 import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.inventory.ItemStack
 
 class PlayerListener : Listener {
+    val prefix = Main.instance.PREFIX
+
     val list = listOf(
         "_IR1NA_",
         "SHANGUANLING",
@@ -268,28 +278,60 @@ class PlayerListener : Listener {
         Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
             val player = event.entity
             if (player.hasMetadata("NPC")) return@runTaskAsynchronously
-            val killer = player.killer ?: return@runTaskAsynchronously
-            val pp =
-                if (PlayerProfile.getRawCache(player.uniqueId) == null) null else PlayerProfile.getRawCache(
-                    player.uniqueId
-                )
-            val kp =
-                if (PlayerProfile.getRawCache(killer.uniqueId) == null) null else PlayerProfile.getRawCache(
-                    killer.uniqueId
-                )
-            if (pp == null || kp == null) return@runTaskAsynchronously
 
+            val killer = player.killer ?: return@runTaskAsynchronously
+
+            val pp = if (PlayerProfile.getRawCache(player.uniqueId) == null) return@runTaskAsynchronously else PlayerProfile.getRawCache(player.uniqueId)
+            val kp = if (PlayerProfile.getRawCache(killer.uniqueId) == null) return@runTaskAsynchronously else PlayerProfile.getRawCache(killer.uniqueId)
+
+            val itemInHand = killer.inventory.itemInHand
+            val itemInLegging = killer.inventory.leggings
+
+            val victimName = pp.formattedNameWithRoman
             val killerName = kp.formattedNameWithRoman
 
-            player.sendMessage(
-                CC.translate(
-                    "$killerName &7在你死亡前剩余的血量: &c" + String.format(
-                        "%.1f",
-                        killer.health * 0.5
-                    ) + "❤"
-                )
-            )
+            val itemName = getItemDisplayName(itemInHand)
+
+            val mythicWeaponNbt = getItemNBT(itemInHand)
+            val mythicLeggingNbt = getItemNBT(itemInLegging)
+
+            val mythicWeapon = arrayOf<BaseComponent>(TextComponent(mythicWeaponNbt))
+            val mythicLegging = arrayOf<BaseComponent>(TextComponent(mythicLeggingNbt))
+
+            val mythicLeggingHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicLegging)
+            val mythicWeaponHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicWeapon)
+
+            val message = CC.translate("&b&l击杀!&7 $victimName &7被 $killerName &7用 $itemName&7 狠狠的蹂躏了!")
+
+            val legging = CC.translate(" &f[&6护腿&f] ")
+            val weapon = CC.translate(" &f[&6武器&f] ")
+
+            val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
+            val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
+
+            Bukkit.broadcastMessage(message)
+
+            val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+            Bukkit.getOnlinePlayers().forEach { p ->
+                if (!p.hasPermission("irina.deathCheck")) return@forEach
+                p.spigot().sendMessage(*msg)
+            }
+
+            player.sendMessage(CC.translate("$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format("%.1f", killer.health * 0.5) + "❤"))
         }
+    }
+
+    private fun getItemNBT(item: ItemStack?): String {
+        if (item == null || item.type == Material.AIR) return Material.AIR.toString()
+        val nmsItem = CraftItemStack.asNMSCopy(item)
+        val tag = NBTTagCompound()
+        nmsItem.save(tag)
+        return tag.toString()
+    }
+
+    private fun getItemDisplayName(item: ItemStack): String {
+        val meta = item.itemMeta
+        return if (meta != null && meta.hasDisplayName()) meta.displayName else item.type.name
     }
 //
 //    @EventHandler(priority = EventPriority.HIGHEST)
