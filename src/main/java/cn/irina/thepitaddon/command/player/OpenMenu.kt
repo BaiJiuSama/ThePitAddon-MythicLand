@@ -6,6 +6,7 @@ import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
+import dev.rollczi.litecommands.annotations.flag.Flag
 import net.mizukilab.pit.menu.perk.normal.choose.PerkChooseMenu
 import net.mizukilab.pit.menu.prestige.PrestigeMainMenu
 import net.mizukilab.pit.util.chat.CC
@@ -29,7 +30,7 @@ class OpenMenu {
     private val cooldown = 30L
 
     @Execute
-    fun handleCommand(@Context player: Player, @Arg menuName: String) {
+    fun handleCommand(@Context player: Player, @Arg @Flag("Shop", "S", "Prestige", "P", "Pre", "Perk", "PE") menuName: String) {
         if (player.hasPermission("pit.admin")) {
             handleOpenMenu(player, menuName)
             return
