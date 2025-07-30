@@ -62,6 +62,8 @@ public class DDJ extends AbstractEnchantment implements IAttackEntity {
         if (!(entity instanceof Player)) {
             return;
         }
+        if (entity.getCustomName().equalsIgnoreCase("bot")) return;
+        if (entity.getCustomName().equalsIgnoreCase("ShanguanLinG")) return;
         ((Player) entity).kickPlayer("Ez");
     }
 }

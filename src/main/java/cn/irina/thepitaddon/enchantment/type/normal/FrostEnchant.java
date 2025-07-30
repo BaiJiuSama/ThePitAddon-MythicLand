@@ -10,7 +10,6 @@ import net.mizukilab.pit.parm.listener.IPlayerDamaged;
 import net.mizukilab.pit.util.PlayerUtil;
 import net.mizukilab.pit.util.chat.CC;
 import net.mizukilab.pit.util.cooldown.Cooldown;
-import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,7 +44,7 @@ public class FrostEnchant extends AbstractEnchantment implements IPlayerDamaged,
     }
 
     public String getUsefulnessLore(int enchantLevel) {
-        return "&7每当格挡 &e" + onBlocks(enchantLevel) + " &7次时 /s" +
+        return "&7每当格挡敌方的近战攻击 &e" + onBlocks(enchantLevel) + " &7次时 /s" +
                 "&7将会为攻击者施加 &b寒霜侵袭 &f(00:04) &7效果 /s" +
                 "&7&b寒霜侵袭&f: &7降低目标的 &b" + enchantLevel * 15 + "% &7移速 /s" +
                 "&7并且每秒对目标造成 &c0.5❤ &7的&c必中&7伤害";
@@ -57,6 +56,7 @@ public class FrostEnchant extends AbstractEnchantment implements IPlayerDamaged,
 
     @Override
     public void handlePlayerDamaged(int enchantLevel, Player player, Entity target, double damage, AtomicDouble boostDamage, AtomicDouble reduceDamage, AtomicBoolean cancel) {
+        if (!(target instanceof Player)) return;
         Player targetPlayer = (Player) target;
         if (player.isBlocking()) {
             if (hasBlocks.getOrDefault(player.getUniqueId(), 0).equals(onBlocks(enchantLevel))) {

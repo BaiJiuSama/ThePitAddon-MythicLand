@@ -124,7 +124,7 @@ class EnchantmentManager {
                 "ender_bow_enchant",
                 //"gravitational_backtracking"
                 //"electrolytes_enchant"
-                "regularity",
+                //"regularity",
                 //"like_french"
                 "desperation",
                 "coin_glorious",
