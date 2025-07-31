@@ -307,7 +307,7 @@ class unEnchant {
         sender.sendMessage(CC.translate("$prefix&a成功!"))
     }
 
-    fun hasTargetReverseMythicCondenser(inv: Inventory, name: String, level: Int): Boolean {
+    private fun hasTargetReverseMythicCondenser(inv: Inventory, name: String, level: Int): Boolean {
         inv.forEach { i ->
             if (i == null || i.type == Material.AIR) return@forEach
             if (!isReverseMythicCondenser(i)) return@forEach
@@ -318,7 +318,7 @@ class unEnchant {
         return false
     }
 
-    fun isReverseMythicCondenser(i: ItemStack): Boolean {
+    private fun isReverseMythicCondenser(i: ItemStack): Boolean {
         return i.type != Material.AIR
                 && ItemUtil.getInternalName(i).equals("reverse_mythic_condenser", ignoreCase = true)
                 && ItemUtil.getItemStringData(i, "enchant") != null

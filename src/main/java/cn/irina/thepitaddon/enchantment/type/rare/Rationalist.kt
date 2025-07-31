@@ -14,10 +14,14 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
 class Rationalist : AbstractEnchantment(), IPlayerDamaged {
+
+    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
 
     override fun getEnchantName(): String {
         return "理性主义者"
@@ -42,8 +46,8 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7受击时若敌方手持武器含有 &d赌徒 &7附魔, 立即获得以下效果: /s" +
-                " &f▶ &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) /s" +
-                " &f▶ &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 /s" +
+                " &f▶ &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) &7(1s冷却)/s" +
+                " &f▶ &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(1s冷却) /s" +
                 "&7否则, " + "&7受到的伤害 &9-${enchantLevel * 4 + 4}%"
     }
 
@@ -64,11 +68,13 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
             reduceDamage.getAndAdd(enchantLevel * -0.04 - 0.04)
             return
         }
+        if (!cooldown.getOrDefault(victim.uniqueId, Cooldown(0L)).hasExpired()) return
         if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
         victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
         val craftPlayer = victim as CraftPlayer
         val absorptionHearts = craftPlayer.handle.absorptionHearts
         if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
         craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
+        cooldown[victim.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
     }
 }

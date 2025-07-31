@@ -30,7 +30,7 @@ class OpenMenu {
     private val cooldown = 30L
 
     @Execute
-    fun handleCommand(@Context player: Player, @Arg @Flag("Shop", "S", "Prestige", "P", "Pre", "Perk", "PE") menuName: String) {
+    fun handleCommand(@Context player: Player, @Flag("Shop", "S", "Prestige", "P", "Pre", "Perk", "PE") menuName: String) {
         if (player.hasPermission("pit.admin")) {
             handleOpenMenu(player, menuName)
             return
@@ -47,7 +47,7 @@ class OpenMenu {
         handleOpenMenu(player, menuName)
     }
 
-    private fun handleOpenMenu(player: Player, menu: String) {
+    private fun handleOpenMenu(@Context player: Player, menu: String) {
         when (menu.uppercase()) {
             "SHOP", "S" -> pitApi.openMenu(player, "shop")
             "PRESTIGE", "P", "PRE" -> PrestigeMainMenu().openMenu(player)
