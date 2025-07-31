@@ -10,13 +10,14 @@ import dev.rollczi.litecommands.annotations.execute.Execute
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
+import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.item.AbstractPitItem
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.item.ItemBuilder
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 
@@ -244,6 +245,12 @@ class unEnchant {
     @Execute
     fun onCommand(@Context sender: CommandSender, @Arg enchantName: String, @Arg level: Int, @Arg player: Player) {
         val enchantObject = ThePit.getInstance().enchantmentFactor.enchantmentMap[enchantName]
+        if (hasCommandUnEnchanted(player.itemInHand)) {
+            player.sendMessage(CC.translate("$prefix&c此物品已被指令祛魔, 或不是一件有效的神话物品!"))
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
+            return
+        }
+
         if (enchantObject == null) {
             sender.sendMessage(CC.translate("$prefix&c未知的附魔!"))
             return
@@ -254,12 +261,11 @@ class unEnchant {
             return
         }
 
-        val handItem = if (player.itemInHand == null || player.itemInHand.type == Material.AIR) player.itemInHand
-        else {
+        if (player.itemInHand == null || player.itemInHand.type == Material.AIR) {
             sender.sendMessage(CC.translate("$prefix&c非法的物品!"))
             return
         }
-
+        var handItem: ItemStack? = player.itemInHand
         val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(handItem) ?: return
         val enchants = pitItem.enchantments
 
@@ -274,18 +280,32 @@ class unEnchant {
         }
 
         val enchantLevel = enchants[enchantObject] ?: return
-        if (enchantLevel != level) {
-            sender.sendMessage(CC.translate("$prefix&c等级不匹配!"))
+
+        if (enchantLevel > level) {
+            sender.sendMessage(CC.translate("$prefix&c附魔等级不得高于逆向逆向神话凝聚体的等级!"))
             return
         }
 
-        if (!hasTargetReverseMythicCondenser(player.inventory, enchantName, level)) {
-            sender.sendMessage(CC.translate("$prefix&c你没有足够的 &f${enchantObject.enchantName} &5逆向神话凝聚体!"))
+        if (isExtraordinaryItem(pitItem)) {
+            sender.sendMessage(CC.translate("$prefix&c你不能在不凡或不朽的物品上使用逆向神话凝聚体!"))
+            return
+        }
+
+        if (hasOneRarerEnchantAndOneLimitedEnchant(pitItem)) {
+            sender.sendMessage(CC.translate("$prefix&c你不能在不凡或不朽的物品上使用逆向神话凝聚体!"))
+            sender.sendMessage(CC.translate("$prefix&c限定附魔也算一个稀有:)"))
+            return
+        }
+
+        val reverseMythicCondenserAmount = getReverseMythicCondenserCount(player, enchantName, level)
+
+        if (reverseMythicCondenserAmount <= 0) {
+            player.sendMessage(CC.translate("$prefix&c你没有足够的逆向神话凝聚体!"))
+            player.sendMessage(CC.translate("$prefix&cFAILED!"))
             return
         }
 
         enchants.remove(enchantObject)
-
         pitItem.enchantments = enchants
         pitItem.enchantmentRecords += EnchantmentRecord(
             player.displayName,
@@ -294,8 +314,8 @@ class unEnchant {
         )
 
         val pitItemToStack = pitItem.toItemStack()
-        val maxLive = ItemUtil.getItemIntData(pitItemToStack, "maxLive") - 10
-        val live = ItemUtil.getItemIntData(pitItemToStack, "live") - 10
+        val maxLive = ItemUtil.getItemIntData(pitItemToStack, "maxLive")
+        val live = ItemUtil.getItemIntData(pitItemToStack, "live")
         val tier = ItemUtil.getItemIntData(pitItemToStack, "tier") - 1
         val resultItem = ItemBuilder(pitItemToStack)
             .changeNbt("maxLive", maxLive)
@@ -304,18 +324,94 @@ class unEnchant {
             .buildWithUnbreakable()
 
         player.itemInHand = resultItem
-        sender.sendMessage(CC.translate("$prefix&a成功!"))
+        takeReverseMythicCondenser(player, enchantName, level, 1)
+        player.sendMessage(CC.translate("$prefix&aSUCCESS"))
     }
 
-    private fun hasTargetReverseMythicCondenser(inv: Inventory, name: String, level: Int): Boolean {
-        inv.forEach { i ->
-            if (i == null || i.type == Material.AIR) return@forEach
-            if (!isReverseMythicCondenser(i)) return@forEach
+    private fun isExtraordinaryItem(pitItem: AbstractPitItem): Boolean {
+        // 是不凡物品(双稀有)
+        return getRarerEnchantCount(pitItem) >= 2
+    }
 
-            return ItemUtil.getItemStringData(i, "enchant") != name || ItemUtil.getItemIntData(i, "level") != level
+    private fun hasOneRarerEnchantAndOneLimitedEnchant(pitItem: AbstractPitItem): Boolean {
+        var rarerEnchantCount = getRarerEnchantCount(pitItem)
+        var limitedEnchantCount = getLimitedEnchantCount(pitItem)
+        return rarerEnchantCount == 1 && limitedEnchantCount == 1
+    }
+
+    private fun getLimitedEnchantCount(pitItem: AbstractPitItem): Int {
+        var limitedEnchantCount = 0
+        for (enchant in pitItem.enchantments.keys) {
+            if (enchant.rarity == EnchantmentRarity.OP
+                || enchant.rarity == EnchantmentRarity.AUCTION_LIMITED
+                || enchant.rarity == EnchantmentRarity.AUCTION_LIMITED_RARE
+                || enchant.rarity == EnchantmentRarity.UBER_LIMITED
+                || enchant.rarity == EnchantmentRarity.UBER_LIMITED_RARE
+            ) {
+                limitedEnchantCount++
+            }
         }
+        return limitedEnchantCount
+    }
 
+    private fun getRarerEnchantCount(pitItem: AbstractPitItem): Int {
+        var rareEnchantCount = 0
+        for (enchant in pitItem.enchantments.keys) {
+            if (enchant.rarity == EnchantmentRarity.RARE
+                || enchant.rarity == EnchantmentRarity.RAGE_RARE
+                || enchant.rarity == EnchantmentRarity.DARK_RARE
+                || enchant.rarity == EnchantmentRarity.FISH_RARE
+                || enchant.rarity == EnchantmentRarity.SEWER_RARE
+                || enchant.rarity == EnchantmentRarity.NOSTALGIA_RARE
+            ) {
+                rareEnchantCount++
+            }
+        }
+        return rareEnchantCount
+    }
+
+    private fun hasCommandUnEnchanted(i: ItemStack): Boolean {
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(i) ?: return true
+        for (record in pitItem.enchantmentRecords) {
+            if (!record.description.contains("HasUnEnchanted")) continue
+            return true
+        }
         return false
+    }
+
+    private fun getReverseMythicCondenserCount(p: Player, e: String, l: Int): Int {
+        var amount = 0
+        for (item in p.inventory) {
+            if (item == null || item.type == Material.AIR) continue
+            if (!isReverseMythicCondenser(item)) continue
+            val enchant = ItemUtil.getItemStringData(item, "enchant")
+            if (e != enchant) continue
+            val level = ItemUtil.getItemIntData(item, "level")
+            if (l != level) continue
+            amount += item.amount
+        }
+        return amount
+    }
+
+    private fun takeReverseMythicCondenser(p: Player, e: String, l: Int, count: Int) {
+        var remaining = count
+        val inventory = p.inventory
+        for (slot in 0 until inventory.size) {
+            if (remaining <= 0) break
+            val item = inventory.getItem(slot) ?: continue
+            if (!isReverseMythicCondenser(item)) continue
+            if (e != ItemUtil.getItemStringData(item, "enchant")) continue
+            if (l != ItemUtil.getItemIntData(item, "level")) continue
+            val takeAmount = minOf(item.amount, remaining)
+            if (item.amount > takeAmount) {
+                item.amount -= takeAmount
+                inventory.setItem(slot, item)
+            } else {
+                inventory.setItem(slot, null)
+            }
+            remaining -= takeAmount
+        }
+        p.updateInventory()
     }
 
     private fun isReverseMythicCondenser(i: ItemStack): Boolean {
