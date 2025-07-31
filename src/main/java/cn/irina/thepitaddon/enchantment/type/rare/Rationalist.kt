@@ -14,7 +14,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
@@ -45,7 +44,7 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
         return "&7受击时若敌方手持武器含有 &d赌徒 &7附魔, 立即获得以下效果: /s" +
                 " &f▶ &c生命恢复 " + RomanUtil.convert(2 + enchantLevel) + " &f(00:01) /s" +
                 " &f▶ &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 /s" +
-                (if (enchantLevel >= 2) "否则, " + "&7受到的伤害 &9-${enchantLevel * 4 + 12}%" else "")
+                "&7否则, " + "&7受到的伤害 &9-${enchantLevel * 4 + 4}%"
     }
 
     override fun handlePlayerDamaged(
@@ -61,15 +60,15 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
 
         val hasGambleEnchant = ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "gamble_enchant") > 0
 
-        if (hasGambleEnchant) {
-            if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
-            victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
-            val craftPlayer = victim as CraftPlayer
-            val absorptionHearts = craftPlayer.handle.absorptionHearts
-            if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
-            craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
-        } else if (enchantLevel >= 2) {
-            reduceDamage.getAndAdd(enchantLevel * 0.04 + 0.12)
+        if (!hasGambleEnchant) {
+            reduceDamage.getAndAdd(enchantLevel * -0.04 - 0.04)
+            return
         }
+        if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
+        victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
+        val craftPlayer = victim as CraftPlayer
+        val absorptionHearts = craftPlayer.handle.absorptionHearts
+        if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
+        craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
     }
 }
