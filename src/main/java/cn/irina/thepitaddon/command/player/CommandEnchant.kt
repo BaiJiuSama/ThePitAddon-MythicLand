@@ -16,6 +16,7 @@ import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.ConcurrentHashMap
 
@@ -233,5 +234,94 @@ class CommandEnchant {
             .buildWithUnbreakable()
 
         return resultItem
+    }
+}
+
+@Command(name = "unEnchant")
+class unEnchant {
+    val prefix = Main.instance.PREFIX
+
+    @Execute
+    fun onCommand(@Context sender: CommandSender, @Arg enchantName: String, @Arg level: Int, @Arg player: Player) {
+        val enchantObject = ThePit.getInstance().enchantmentFactor.enchantmentMap[enchantName]
+        if (enchantObject == null) {
+            sender.sendMessage(CC.translate("$prefix&c未知的附魔!"))
+            return
+        }
+
+        if (level !in 1..3) {
+            sender.sendMessage(CC.translate("$prefix&c等级范围为 &f\"1 ~ 3\""))
+            return
+        }
+
+        val handItem = if (player.itemInHand == null || player.itemInHand.type == Material.AIR) player.itemInHand
+        else {
+            sender.sendMessage(CC.translate("$prefix&c非法的物品!"))
+            return
+        }
+
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(handItem) ?: return
+        val enchants = pitItem.enchantments
+
+        if (enchants.isEmpty()) {
+            sender.sendMessage(CC.translate("$prefix&f${player.displayName} &c手持物的附魔为空!"))
+            return
+        }
+
+        if (!enchants.contains(enchantObject)) {
+            sender.sendMessage(CC.translate("$prefix&c手持物没有目标附魔"))
+            return
+        }
+
+        val enchantLevel = enchants[enchantObject] ?: return
+        if (enchantLevel != level) {
+            sender.sendMessage(CC.translate("$prefix&c等级不匹配!"))
+            return
+        }
+
+        if (!hasTargetReverseMythicCondenser(player.inventory, enchantName, level)) {
+            sender.sendMessage(CC.translate("$prefix&c你没有足够的 &f${enchantObject.enchantName} &5逆向神话凝聚体!"))
+            return
+        }
+
+        enchants.remove(enchantObject)
+
+        pitItem.enchantments = enchants
+        pitItem.enchantmentRecords += EnchantmentRecord(
+            player.displayName,
+            "HasUnEnchanted",
+            System.currentTimeMillis()
+        )
+
+        val pitItemToStack = pitItem.toItemStack()
+        val maxLive = ItemUtil.getItemIntData(pitItemToStack, "maxLive") - 10
+        val live = ItemUtil.getItemIntData(pitItemToStack, "live") - 10
+        val tier = ItemUtil.getItemIntData(pitItemToStack, "tier") - 1
+        val resultItem = ItemBuilder(pitItemToStack)
+            .changeNbt("maxLive", maxLive)
+            .changeNbt("live", live)
+            .changeNbt("tier", tier)
+            .buildWithUnbreakable()
+
+        player.itemInHand = resultItem
+        sender.sendMessage(CC.translate("$prefix&a成功!"))
+    }
+
+    fun hasTargetReverseMythicCondenser(inv: Inventory, name: String, level: Int): Boolean {
+        inv.forEach { i ->
+            if (i == null || i.type == Material.AIR) return@forEach
+            if (!isReverseMythicCondenser(i)) return@forEach
+
+            return ItemUtil.getItemStringData(i, "enchant") != name || ItemUtil.getItemIntData(i, "level") != level
+        }
+
+        return false
+    }
+
+    fun isReverseMythicCondenser(i: ItemStack): Boolean {
+        return i.type != Material.AIR
+                && ItemUtil.getInternalName(i).equals("reverse_mythic_condenser", ignoreCase = true)
+                && ItemUtil.getItemStringData(i, "enchant") != null
+                && ItemUtil.getItemIntData(i, "level") != null
     }
 }
