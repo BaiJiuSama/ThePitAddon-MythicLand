@@ -303,8 +303,8 @@ class PlayerListener : Listener {
 
             val message = CC.translate("&b&l击杀!&7 $victimName &7被 $killerName &7用 $itemName&7 狠狠的蹂躏了!")
 
-            val legging = CC.translate(" &f[&6护腿&f] ")
-            val weapon = CC.translate(" &f[&6武器&f] ")
+            val legging = CC.translate(" &f[&b护腿&f] ")
+            val weapon = CC.translate(" &f[&b武器&f] ")
 
             val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
             val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
