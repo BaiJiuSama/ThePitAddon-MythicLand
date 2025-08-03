@@ -25,6 +25,8 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     private val hitCounts = HashMap<UUID, Int>()
     private val lastHitTimes = HashMap<UUID, Long>()
 
+//    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
+
     override fun getEnchantName(): String {
         return "引力回溯"
     }
@@ -48,9 +50,9 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7当自身在空中时, 每被攻击 &f3 &7次, 触发以下效果: /s" +
                 " &f▶ &7恢复 &c2.0❤ 生命值 /s" +
-                " &f▶ &7获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(可叠加, 最多两层) /s" +
+                " &f▶ &7获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(可叠加, 最多&64❤&7) /s" +
                 " &f▶ &7获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
-                if (enchantLevel > 1) " &f▶ &7受到的伤害&9 -${enchantLevel * 4}% &7(持续12秒, 不可叠加)" else ""
+                if (enchantLevel > 1) " &f▶ &7受到的伤害&9 -${enchantLevel * 4}% &7(持续12秒, 不可叠加) /s" else ""
     }
 
     override fun handlePlayerDamaged(
@@ -66,13 +68,11 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         val playerUUID = player.uniqueId
 
         if (player.isOnGround) return
-
+//        if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
         if (keepBoost.getOrDefault(playerUUID, Cooldown(0L)).hasExpired() && enchantLevel > 1) {
             keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
         }
 
-        val currentTime = System.currentTimeMillis()
-        val lastHitTime = lastHitTimes.getOrDefault(playerUUID, 0L)
 
         //if (currentTime - lastHitTime < 500) { //100 = 0.1s
         val count = hitCounts.getOrDefault(playerUUID, 0)
@@ -94,19 +94,22 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
             reduceDamage.getAndAdd(enchantLevel * -0.04)
 
             val craftPlayer = player as CraftPlayer
-            var absorptionHearts = player.handle.absorptionHearts
-            craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
-            if (absorptionHearts >= 8f) {
-                absorptionHearts == 8f
+
+            if (craftPlayer.handle.absorptionHearts < 4 * 2f - 2 * 2f) {
+                craftPlayer.handle.absorptionHearts += 2 * (0.5 + (0.5 * enchantLevel)).toFloat()
+            } else {
+                craftPlayer.handle.absorptionHearts = 4 * 2f
             }
 
+
+
             hitCounts[playerUUID] = 0
+//            cooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
         }
 //        } else {
 //            hitCounts[playerUUID] = 1
 //        }
 
-        lastHitTimes[playerUUID] = currentTime
     }
 
 }
