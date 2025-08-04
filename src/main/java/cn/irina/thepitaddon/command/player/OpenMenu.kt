@@ -27,7 +27,7 @@ class OpenMenu {
     private val prefix = Main.instance.PREFIX
 
     private val cd = ConcurrentHashMap<UUID, Cooldown>()
-    private val cooldown = 30L
+    private val cooldown = 15L
 
     @Execute
     fun handleCommand(@Context player: Player, @Flag("Shop", "S", "Prestige", "P", "Pre", "Perk", "PE") menuName: String) {
