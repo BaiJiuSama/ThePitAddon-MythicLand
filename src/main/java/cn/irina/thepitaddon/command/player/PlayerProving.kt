@@ -2,12 +2,12 @@ package cn.irina.thepitaddon.command.player
 
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
-import cn.irina.thepitaddon.utils.Log
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import net.mizukilab.pit.libs.core.lang.UUID
 import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -19,11 +19,6 @@ class PlayerProving {
 
     @Execute
     fun proving(@Context player: Player) {
-        if (player.hasPermission("storage.use")) {
-            player.sendMessage(CC.translate("&c你已经通过验证了, 无需重复验证!"))
-            return
-        }
-
         if (checkNumber.getOrDefault(player.uniqueId, 0) != 1) {
             checkNumber[player.uniqueId] = 1
             sendPromptMessage(player)
@@ -36,9 +31,14 @@ class PlayerProving {
                 (PlayerProving.task as BukkitRunnable).runTaskLater(Main.instance, 8 * 20L)
             }
         } else {
+            if (player.hasPermission("storage.use")) {
+                player.sendMessage(CC.translate("&c你已经通过验证了, 无需重复验证!"))
+                return
+            }
             checkNumber.replace(player.uniqueId, 0)
             val playerProfile = PlayerProfile.getRawCache(player.uniqueId) ?: return
-            val totalPlayedTime = playerProfile.totalPlayedTime
+            val totalPlayedTime =
+                System.currentTimeMillis() - playerProfile.lastLoginTime + playerProfile.totalPlayedTime
             val totalKills = playerProfile.kills
             val prestige = playerProfile.prestige
             val days = totalPlayedTime / (24 * 60 * 60 * 1000)
@@ -47,7 +47,7 @@ class PlayerProving {
             val totalPlayedTimeQualified = totalPlayedTime > (60 * 60 * 1000) * 12
             val totalKillsQualified = totalKills > 50000
             val prestigeQualified = prestige >= 35
-            player.sendMessage(CC.translate("&7你当前游玩时间为: &a${days}天${hours}小时${minutes}分钟"))
+            player.sendMessage(CC.translate("&7你当前游玩时间为: &a${TimeUtil.millisToRoundedTime(totalPlayedTime)}"))
             if (!totalPlayedTimeQualified) {
                 player.sendMessage(CC.translate("&c你没有达到12小时的游戏时长要求!"))
                 return
@@ -65,7 +65,10 @@ class PlayerProving {
             player.sendMessage(CC.translate(""))
             player.sendMessage(CC.translate("&a你已获得认证."))
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp u ${player.displayName} p settemp storage.use true 7d")
+            Bukkit.dispatchCommand(
+                Bukkit.getConsoleSender(),
+                "lp u ${player.displayName} p settemp storage.use true 7d"
+            )
         }
     }
 
