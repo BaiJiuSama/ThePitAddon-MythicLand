@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
+import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
@@ -24,8 +25,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
     private val keepBoost = HashMap<UUID, Cooldown>()
     private val hitCounts = HashMap<UUID, Int>()
     private val lastHitTimes = HashMap<UUID, Long>()
-
-//    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
+    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
 
     override fun getEnchantName(): String {
         return "引力回溯"
@@ -68,7 +68,7 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         val playerUUID = player.uniqueId
 
         if (player.isOnGround) return
-//        if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
+        if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0L)).hasExpired()) return
         if (keepBoost.getOrDefault(playerUUID, Cooldown(0L)).hasExpired() && enchantLevel > 1) {
             keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
         }
@@ -94,17 +94,25 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
             reduceDamage.getAndAdd(enchantLevel * -0.04)
 
             val craftPlayer = player as CraftPlayer
-
-            if (craftPlayer.handle.absorptionHearts < 4 * 2f - 2 * 2f) {
-                craftPlayer.handle.absorptionHearts += 2 * (0.5 + (0.5 * enchantLevel)).toFloat()
+            val hemorrhageEnchantLevel = ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "Hemorrhage")
+            if (hemorrhageEnchantLevel <= 0) {
+                if (craftPlayer.handle.absorptionHearts < 4 * 2f - 2 * 2f) {
+                    craftPlayer.handle.absorptionHearts += 2 * (0.5 + (0.5 * enchantLevel)).toFloat()
+                } else {
+                    craftPlayer.handle.absorptionHearts = 4 * 2f
+                }
             } else {
-                craftPlayer.handle.absorptionHearts = 4 * 2f
+                PlayerUtil.damage(
+                    player,
+                    PlayerUtil.DamageType.TRUE,
+                    hemorrhageEnchantLevel + 1.0,
+                    true
+                )
             }
 
 
-
             hitCounts[playerUUID] = 0
-//            cooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
+            cooldown[player.uniqueId] = Cooldown(500, TimeUnit.MILLISECONDS)
         }
 //        } else {
 //            hitCounts[playerUUID] = 1

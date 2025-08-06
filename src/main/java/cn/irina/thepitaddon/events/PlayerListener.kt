@@ -275,50 +275,51 @@ class PlayerListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.instance) {
-            val player = event.entity
-            if (player.hasMetadata("NPC")) return@runTaskAsynchronously
+        val player = event.entity
+        if (player.hasMetadata("NPC")) return
 
-            val killer = player.killer ?: return@runTaskAsynchronously
+        val killer = player.killer ?: return
 
-            val pp = if (PlayerProfile.getRawCache(player.uniqueId) == null) return@runTaskAsynchronously else PlayerProfile.getRawCache(player.uniqueId)
-            val kp = if (PlayerProfile.getRawCache(killer.uniqueId) == null) return@runTaskAsynchronously else PlayerProfile.getRawCache(killer.uniqueId)
+        val pp = PlayerProfile.getRawCache(player.uniqueId) ?: return
+        val kp = PlayerProfile.getRawCache(killer.uniqueId) ?: return
 
-            val itemInHand = killer.inventory.itemInHand
-            val itemInLegging = killer.inventory.leggings
+        val itemInHand = killer.inventory.itemInHand
+        val itemInLegging = killer.inventory.leggings
 
-            val victimName = pp.formattedNameWithRoman
-            val killerName = kp.formattedNameWithRoman
+        val victimName = pp.formattedNameWithRoman
+        val killerName = kp.formattedNameWithRoman
 
-            val itemName = getItemDisplayName(itemInHand)
+        val itemName = getItemDisplayName(itemInHand)
 
-            val mythicWeaponNbt = getItemNBT(itemInHand)
-            val mythicLeggingNbt = getItemNBT(itemInLegging)
+        val mythicWeaponNbt = getItemNBT(itemInHand)
+        val mythicLeggingNbt = getItemNBT(itemInLegging)
 
-            val mythicWeapon = arrayOf<BaseComponent>(TextComponent(mythicWeaponNbt))
-            val mythicLegging = arrayOf<BaseComponent>(TextComponent(mythicLeggingNbt))
+        val mythicWeapon = arrayOf<BaseComponent>(TextComponent(mythicWeaponNbt))
+        val mythicLegging = arrayOf<BaseComponent>(TextComponent(mythicLeggingNbt))
 
-            val mythicLeggingHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicLegging)
-            val mythicWeaponHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicWeapon)
+        val mythicLeggingHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicLegging)
+        val mythicWeaponHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicWeapon)
 
-            val message = CC.translate("&b&l击杀!&7 $victimName &7被 $killerName &7用 $itemName&7 狠狠的蹂躏了!")
+        val message = CC.translate("&b&l击杀!&7 $victimName &7被 $killerName &7用 $itemName&7 狠狠的蹂躏了!")
 
-            val legging = CC.translate(" &f[&b护腿&f] ")
-            val weapon = CC.translate(" &f[&b武器&f] ")
+        val legging = CC.translate(" &f[&b护腿&f] ")
+        val weapon = CC.translate(" &f[&b武器&f] ")
 
-            val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
-            val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
+        val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
+        val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
 
-            Bukkit.broadcastMessage(message)
+        Bukkit.broadcastMessage(message)
 
-            val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+        val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+
+        Bukkit.getScheduler().runTask(Main.instance, Runnable {
             Bukkit.getOnlinePlayers().forEach { p ->
                 if (!p.hasPermission("irina.deathCheck")) return@forEach
                 p.spigot().sendMessage(*msg)
             }
+        })
 
-            player.sendMessage(CC.translate("$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format("%.1f", killer.health * 0.5) + "❤"))
-        }
+        player.sendMessage(CC.translate("$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format("%.1f", killer.health * 0.5) + "❤"))
     }
 
     private fun getItemNBT(item: ItemStack?): String {

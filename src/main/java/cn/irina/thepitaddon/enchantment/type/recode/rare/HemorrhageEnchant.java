@@ -67,7 +67,8 @@ public class HemorrhageEnchant extends AbstractEnchantment implements IAttackEnt
     @Override
     public String getUsefulnessLore(int enchantLevel) {
         return "&7攻击对玩家施加 &c流血 &f(" + TimeUtil.millisToTimer((enchantLevel >= 3 ? 5 : 4) * 1000) + ") &7与 &c缓慢 I &f(" + TimeUtil.millisToTimer((enchantLevel >= 3 ? 5 : 4) * 1000) + ") &7效果. (" + (8 - enchantLevel * 2) + "秒冷却) /s"
-                + "&7攻击带有 &6生命吸收 &7的玩家将额外造成 &f" + getTrueDamage(enchantLevel) / 2 + "❤ &7的&f真实伤害 /s"
+                + "&7攻击带有 &6生命吸收 &7的玩家造成 &f" + getTrueDamage(enchantLevel) / 2 + "❤ &7的&f真实伤害 /s"
+                + "&7对触发 &f引力回溯 &7附魔的玩家额外造成 &f" + getTrueDamage(enchantLevel) / 2 + "❤ &7的&f真实伤害 /s"
                 + "&7效果 &c流血 &7: 无法受到与被施加 &6生命吸收 &7效果 /s";
 
     }
