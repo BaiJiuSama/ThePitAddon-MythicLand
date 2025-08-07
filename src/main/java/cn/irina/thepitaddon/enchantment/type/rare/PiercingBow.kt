@@ -115,39 +115,28 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
     private fun addAndBoostEffect(itemInHand: ItemStack, shooter: Player) {
         val enchantLevel = this.getItemEnchantLevel(itemInHand)
         val existingSpeed = shooter.activePotionEffects.find { it.type == PotionEffectType.SPEED }
-        if (existingSpeed == null) {
-            shooter.addPotionEffect(
-                PotionEffect(
-                    PotionEffectType.SPEED,
-                    enchantLevel * 20,
-                    0,
-                    false,
-                    true
-                )
-            )
-        } else {
-            var potionEffectTime = existingSpeed.duration
-            var potionEffectLevel = existingSpeed.amplifier
+        if (existingSpeed == null) return
+        var potionEffectTime = existingSpeed.duration
+        var potionEffectLevel = existingSpeed.amplifier
 
-            potionEffectTime += enchantLevel * 20 + 20
-            if (potionEffectTime > enchantLevel * 20 * 4) {
-                potionEffectTime = enchantLevel * 20 * 4
-            }
-            potionEffectLevel += 1
-            if (potionEffectLevel > enchantLevel) {
-                potionEffectLevel = enchantLevel
-            }
-            shooter.removePotionEffect(PotionEffectType.SPEED)
-            shooter.addPotionEffect(
-                PotionEffect(
-                    PotionEffectType.SPEED,
-                    potionEffectTime,
-                    potionEffectLevel,
-                    false,
-                    true
-                )
-            )
+        potionEffectTime += enchantLevel * 20 + 20
+        if (potionEffectTime > enchantLevel * 20 * 4) {
+            potionEffectTime = enchantLevel * 20 * 4
         }
+        potionEffectLevel += 1
+        if (potionEffectLevel > enchantLevel) {
+            potionEffectLevel = enchantLevel
+        }
+        shooter.removePotionEffect(PotionEffectType.SPEED)
+        shooter.addPotionEffect(
+            PotionEffect(
+                PotionEffectType.SPEED,
+                potionEffectTime,
+                potionEffectLevel,
+                false,
+                true
+            )
+        )
     }
 
     override fun getText(level: Int, player: Player): String {

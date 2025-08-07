@@ -2,12 +2,10 @@ package cn.irina.thepitaddon
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.api.PitInternalHook
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Util.internalName
 import net.mizukilab.pit.util.item.ItemBuilder
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 class PitItem {
     private val thePit: PitInternalHook = ThePit.getApi()
@@ -78,7 +76,7 @@ class PitItem {
             .deathDrop(false)
             .canDrop(false)
             .canTrade(true)
-            .enchant(Enchantment.DURABILITY,1)
+            .enchant(Enchantment.DURABILITY, 1)
             .canSaveToEnderChest(true)
             .build()
     }
