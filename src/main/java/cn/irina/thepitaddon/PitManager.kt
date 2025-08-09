@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon
 
 import cn.charlotte.pit.ThePit
+import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -18,6 +19,11 @@ class PitManager {
         fun hasInternalName(item: ItemStack, internalName: String): Boolean {
             val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
             return pitItem.internalName.equals(internalName)
+        }
+
+        @Throws(NullPointerException::class)
+        fun getInternalName(item: ItemStack): String {
+            return ItemUtil.getInternalName(item)
         }
 
         fun hasPitEnchant(item: ItemStack, enchantName: String): Boolean {
