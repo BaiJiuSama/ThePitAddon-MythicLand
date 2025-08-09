@@ -72,8 +72,9 @@ class FixListeners : Listener {
 
     @EventHandler
     fun onPitKill(event: PitStreakKillChangeEvent) {
-        val myself = Bukkit.getPlayer(event.playerProfile.playerUuid) ?: return
-        if ((myself as CraftPlayer).handle.absorptionHearts >= LimitAbsorptionHearts) {
+        val myself = (Bukkit.getPlayer(event.playerProfile.playerUuid) ?: return) as CraftPlayer
+        val myselfHearts = myself.handle.absorptionHearts
+        if (myselfHearts >= LimitAbsorptionHearts) {
             myself.handle.absorptionHearts = LimitAbsorptionHearts
         }
     }
@@ -81,8 +82,7 @@ class FixListeners : Listener {
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
-        val profile = PlayerProfile.getRawCache(player.uniqueId)
-            ?: return
+        val profile = PlayerProfile.getRawCache(player.uniqueId) ?: return
         if (!profile.isInArena) return
         if (!player.hasPermission("pit.streak")) return
         if (profile.streakKills >= 50.0 && profile.bounty > 0) return
