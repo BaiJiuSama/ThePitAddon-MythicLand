@@ -24,7 +24,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.inventory.ItemStack
-import kotlin.random.Random
 
 class PlayerListener : Listener {
     val prefix = Main.instance.PREFIX
@@ -274,6 +273,32 @@ class PlayerListener : Listener {
 //        event.exp = newExp
 //    }
 
+    private val messages = listOf(
+        "&b&l击杀!&7 #v &7被 #k &7轻松击毙。",
+        "&b&l击杀!&7 #v &7因 #k &7下不去坑了!",
+        "&b&l击杀!&7 #k &7似乎踩死了一只名为 #v &7的蚂蚁。",
+        "&b&l击杀!&7 #v &7被 #k &7化为粉尘。",
+        "&b&l击杀!&7 #v &7在面对 #k &7的时候网卡了。",
+        "&b&l击杀!&7 #v &7在与 #k &7战斗时丢弃了战斗之铲。",
+        "&b&l击杀!&7 #v &7被 #k &7逼入末路。",
+        "&b&l击杀!&7 #v &7输掉了与 #k &7的对决。",
+        "&b&l击杀!&7 #v &7与 #k &7战至边缘。",
+        "&b&l击杀!&7 #v &7死于 #k &7的百步穿杨之术。",
+        "&b&l击杀!&7 #v &7被 #k &7献祭。",
+        "&b&l击杀!&7 #v &7被 #k &7的魔法杀死了。",
+        "&b&l击杀!&7 #v &7被 #k &6击碎。",
+        "&b&l击杀!&7 #v &7被 #k &6主宰。",
+        "&b&l击杀!&7 #v &7被 #k &6权威。",
+        "&b&l击杀!&7 #v &7不敌 #k &6的随意一击。",
+        "&b&l击杀!&7 #v &7被 #k &b化作月尘。",
+        "&b&l击杀!&7 #v &7被 #k &7的陨石击中。",
+        "&b&l击杀!&7 #v &7被 #k &e随意践踏。",
+        "&b&l击杀!&7 #v &7被 #k &e掷落深渊。",
+        "&b&l击杀!&7 #v &7被 #k &e射杀。",
+        "&b&l击杀!&7 #v &7被 #k &e超越。",
+        "&b&l击杀!&7 #v &7被 #k &e审判。",
+        "&b&l击杀!&7 #v &7在与 #k 战斗时的方法不太理智。&7。",
+    )
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
         val player = event.entity
@@ -301,7 +326,12 @@ class PlayerListener : Listener {
         val mythicLeggingHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicLegging)
         val mythicWeaponHover = HoverEvent(HoverEvent.Action.SHOW_ITEM, mythicWeapon)
 
-        val message = getRandomKillMessage(victimName, killerName, itemName)
+        val message = messages
+            .random()
+            .replace("#v", victimName)
+            .replace("#k", killerName)
+
+        Bukkit.broadcastMessage(message)
 
         val legging = CC.translate(" &f[&b护腿&f] ")
         val weapon = CC.translate(" &f[&b武器&f] ")
@@ -309,56 +339,16 @@ class PlayerListener : Listener {
         val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
         val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
 
-        Bukkit.broadcastMessage(message)
-
         val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
 
-        Bukkit.getScheduler().runTask(Main.instance, Runnable {
+        Bukkit.getScheduler().runTask(Main.instance) {
             Bukkit.getOnlinePlayers().forEach { p ->
                 if (!p.hasPermission("irina.deathCheck")) return@forEach
                 p.spigot().sendMessage(*msg)
             }
-        })
+        }
 
-        player.sendMessage(
-            CC.translate(
-                "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
-                    "%.1f",
-                    killer.health * 0.5
-                ) + "❤"
-            )
-        )
-    }
-
-    private fun getRandomKillMessage(victimName: String, killerName: String, itemName: String): String {
-        val messages = listOf(
-            "&b&l击杀!&7 $victimName &7被 $killerName &7轻松击毙。",
-            "&b&l击杀!&7 $victimName &7因 $killerName &7下不去坑了!",
-            "&b&l击杀!&7 $killerName &7似乎踩死了一只名为 $victimName &7的蚂蚁。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &7化为粉尘。",
-            "&b&l击杀!&7 $victimName &7在面对 $killerName &7的时候网卡了。",
-            "&b&l击杀!&7 $victimName &7在与 $killerName &7战斗时丢弃了战斗之铲。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &7逼入末路。",
-            "&b&l击杀!&7 $victimName &7输掉了与 $killerName &7的对决。",
-            "&b&l击杀!&7 $victimName &7与 $killerName &7战至边缘。",
-            "&b&l击杀!&7 $victimName &7死于 $killerName &7的百步穿杨之术。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &7献祭。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &7的魔法杀死了。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &6击碎。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &6主宰。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &6权威。",
-            "&b&l击杀!&7 $victimName &7不敌 $killerName &6的随意一击。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &b化作月尘。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &7的陨石击中。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &e随意践踏。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &e掷落深渊。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &e射杀。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &e超越。",
-            "&b&l击杀!&7 $victimName &7被 $killerName &e审判。",
-            "&b&l击杀!&7 $victimName &7在与 $killerName 战斗时的方法不太理智。&7。",
-        )
-        val killMassage = messages[Random.nextInt(messages.size)]
-        return CC.translate(killMassage)
+        player.sendMessage(CC.translate("$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format("%.1f", killer.health * 0.5) + "❤"))
     }
 
     private fun getItemNBT(item: ItemStack?): String {
