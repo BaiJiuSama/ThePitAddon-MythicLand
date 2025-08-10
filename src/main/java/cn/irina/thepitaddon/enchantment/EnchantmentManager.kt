@@ -138,6 +138,7 @@ class EnchantmentManager {
                 //"ddj"
                 //"please_stop"
                 //"poet"
+                //"miners_enchant"
             )
         )
     }
