@@ -1,5 +1,4 @@
 package cn.irina.thepitaddon.runnable
-
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import net.mizukilab.pit.util.chat.CC
