@@ -299,6 +299,7 @@ class PlayerListener : Listener {
         "&b&l击杀!&7 #v &7被 #k &e审判。",
         "&b&l击杀!&7 #v &7在与 #k 战斗时的方法不太理智。&7。",
     )
+
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
         val player = event.entity
@@ -331,7 +332,7 @@ class PlayerListener : Listener {
             .replace("#v", victimName)
             .replace("#k", killerName)
 
-        Bukkit.broadcastMessage(message)
+        Bukkit.broadcastMessage(CC.translate(message))
 
         val legging = CC.translate(" &f[&b护腿&f] ")
         val weapon = CC.translate(" &f[&b武器&f] ")
@@ -348,7 +349,14 @@ class PlayerListener : Listener {
             }
         }
 
-        player.sendMessage(CC.translate("$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format("%.1f", killer.health * 0.5) + "❤"))
+        player.sendMessage(
+            CC.translate(
+                "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
+                    "%.1f",
+                    killer.health * 0.5
+                ) + "❤"
+            )
+        )
     }
 
     private fun getItemNBT(item: ItemStack?): String {

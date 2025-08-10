@@ -232,7 +232,8 @@ class Main : JavaPlugin() {
                 ShowDevelopmentCommand(),
                 FixWipe(),
                 PlayerProving(),
-                OpenMenu()
+                OpenMenu(),
+//                FreeCE()
             )
             .build()
     }
