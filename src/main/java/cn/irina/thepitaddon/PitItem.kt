@@ -10,6 +10,23 @@ import org.bukkit.inventory.ItemStack
 class PitItem {
     private val thePit: PitInternalHook = ThePit.getApi()
 
+
+    val afkFragment: ItemStack by lazy {
+        val lore: MutableList<String> = ArrayList()
+
+        lore.add("&e挂机奖励")
+        lore.add("&7在灵泉挂机池中获取的碎片")
+        lore.add("&7似乎可以兑换一些物品...")
+
+        ItemBuilder(Material.SUGAR)
+            .name("&b灵泉&f碎片")
+            .lore(lore)
+            .internalName("afk_fragment")
+            .canTrade(true)
+            .canSaveToEnderChest(true)
+            .build()
+    }
+
     val funkyFeather: ItemStack by lazy {
         val lore: MutableList<String> = ArrayList()
 

@@ -19,7 +19,7 @@ PlayerDataPath: ""
 # $PlayerName "玩家名称"
 # $PlayerDisplayName "也是玩家名称"
 JoinMessage:
-  Enable: true
+  Enable: false
   Messages:
     - "&7欢迎回家! &e$PlayerName"
     - "&7准备好迎接新的挑战了吗?"
@@ -31,11 +31,14 @@ Announcements:
   - "&e&l公告! &7禁止利用Bug以及其他破坏平衡性的特性进行作弊!"
   - "&e&l公告! &7如果您觉得这里很不错, 请多多为我们宣传!"
   #- "&e&l公告! &f我们的官方申诉群: &f1. &e&n534444410 &f2. &e&n831281451 &7玩家交流群: &e&n983380002"
-  - "&e&l公告! &7输入 &6/tps &7和 &6/ping &7可以查看服务器的当前状态!"
+  #- "&e&l公告! &7输入 &6/tps &7和 &6/ping &7可以查看服务器的当前状态!"
   - "&e&l公告! &7邀请玩家进服游玩拥有海量福利! 领到手软!"
 
 #此段填入你想给予玩家在挂机池中的免费福利的数额
 #不要在 Coin & Experience 的空中填入字符串。
 FreeCoinAndExperience:
   Enable: true
-  Message: "&b&l挂机奖励！ &7你获得了 &b%exp%经验."
+  GetEXP-Message: "&b&l挂机奖励！ &7你获得了 &b%exp%经验."
+  GetCoin-Message: "&6&l挂机奖励！ &7你获得了 &6%coin%硬币."
+  GetItem-Message: "&f&l挂机奖励！ &7你获得了 &f%count%x &b灵泉&f碎片."
+  GetKills-Message: "&c&l挂机奖励！ &7你获得了 &f%kills% &7击杀数."

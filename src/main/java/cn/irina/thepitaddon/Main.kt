@@ -150,7 +150,7 @@ class Main : JavaPlugin() {
         send("&aPowered by Irina, ShanguanLinG, MIYU")
 
         if (config.getBoolean("FreeCoinAndExperience.Enable")) {
-            scheduler.scheduleWithFixedDelay(FreeCE(), 0L, 10L, TimeUnit.MINUTES)
+            scheduler.scheduleWithFixedDelay(FreeCE(), 0L, 5L, TimeUnit.MINUTES)
         } else {
             send("&c未启用 免费经验与硬币")
         }

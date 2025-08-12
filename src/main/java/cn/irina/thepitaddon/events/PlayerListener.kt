@@ -16,14 +16,18 @@ import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.ChatComponentBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.inventory.ItemStack
+
 
 class PlayerListener : Listener {
     val prefix = Main.instance.PREFIX
@@ -357,6 +361,29 @@ class PlayerListener : Listener {
                 ) + "❤"
             )
         )
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    fun onPlayerDamageInAFKWorld(event: EntityDamageByEntityEvent) {
+        val worldName = event.entity.world.name
+        if (!worldName.equals("afk", ignoreCase = true)) return
+        val damager = event.damager
+        val entity = event.entity
+        if (damager is Player && entity is Player) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    fun onPlayerShootInAFKWorld(event: EntityShootBowEvent) {
+        val worldName = event.entity.world.name
+        if (!worldName.equals("afk", ignoreCase = true)) return
+        if (event.entity is Player) {
+            val player = event.entity as Player
+            player.sendMessage(CC.translate("&c你不能在这里射箭!"))
+            player.playSound(player.location, Sound.VILLAGER_NO, 1.0f, 1.0f)
+            event.isCancelled = true
+        }
     }
 
     private fun getItemNBT(item: ItemStack?): String {
