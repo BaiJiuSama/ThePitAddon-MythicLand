@@ -3,7 +3,7 @@ package cn.irina.thepitaddon.runnable
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
-import cn.irina.thepitaddon.utils.Log.send
+import cn.irina.thepitaddon.manager.PitManager
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.MessageType
 import net.mizukilab.pit.util.chat.RomanUtil
@@ -26,6 +26,7 @@ class FreeCE : Runnable {
                 giveCoin(player)
                 giveKillCounts(player)
                 giveAfkFragment(player)
+//                fixMythicItemsInHandWithCoal(player)
                 if (profile.level >= 120
                     && !equippedShadowBoots(player)
                     && !isFullLevel(player, 100)
@@ -34,6 +35,20 @@ class FreeCE : Runnable {
                     return@forEach
                 }
             }
+        }
+    }
+
+    private fun fixMythicItemsInHandWithCoal(player: Player) {
+        if (!isVIP(player)) return
+        val item = player.inventory.itemInHand
+        if (item == null || item.type == Material.AIR) return
+        if (!PitManager.hasEnoughInternalItem(player, "chunk_of_vile_item", 1)) return
+        var maxLive = ItemUtil.getItemIntData(item, "maxLive")
+        var lives = ItemUtil.getItemIntData(item, "lives")
+        if (maxLive == lives) return
+        else {
+            lives++
+            PitManager.takeInterNalItem(player, "chunk_of_vile_item", 1)
         }
     }
 
@@ -82,19 +97,21 @@ class FreeCE : Runnable {
     private fun giveKillCounts(player: Player) {
         val playerProfile = PlayerProfile.getRawCache(player.uniqueId) ?: return
         var kills = 0
-        if (isVIP(player)) kills = 250
-        else if (meetRequirements(player)) kills = 100
+        if (isVIP(player)) {
+            kills = 250
+        } else if (meetRequirements(player)) {
+            kills = 100
+        }
         playerProfile.kills += kills
         if (kills > 0) player.sendMessage(CC.translate(getKillsMessage).replace("%kills%", kills.toString()))
     }
 
     private fun giveAfkFragment(player: Player) {
-        var amount = 0
+        var amount = Random.nextInt(2)
         val pitItem = PitItem()
+        if (!meetRequirements(player)) return
         if (isVIP(player)) {
             amount = Random.nextInt(3) + 1
-        } else if (meetRequirements(player)) {
-            amount = Random.nextInt(2)
         }
         if (equippedInterstellarHelmet(player)) amount += 1
         for (i in 0 until amount) {
