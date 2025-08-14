@@ -40,7 +40,9 @@ class FreeCE : Runnable {
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         val exp = profile.experience
         val rewardExp = getRewardExp(profile.prestige)
-        if (isFullLevel(player, 100)) {
+        if (isFullLevel(player, 100)
+            || (profile.level == 120 && equippedShadowBoots(player))
+        ) {
             player.sendMessage(CC.translate("&b&l经验值已满! &7您已满级, 无法继续升级!"))
             return
         } else {
@@ -53,7 +55,7 @@ class FreeCE : Runnable {
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         var prestige = profile.prestige
         var kills = profile.kills
-        return prestige >= 30 && kills >= 10000
+        return prestige >= 30 && kills >= 20000
     }
 
     private fun isVIP(player: Player): Boolean {
