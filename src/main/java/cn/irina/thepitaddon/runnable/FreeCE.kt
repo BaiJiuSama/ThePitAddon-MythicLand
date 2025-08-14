@@ -21,43 +21,58 @@ class FreeCE : Runnable {
         Bukkit.getOnlinePlayers().toList().forEach { player ->
             if (player.world.name.equals("afk")) {
                 val profile = PlayerProfile.getRawCache(player.uniqueId)
-                val exp = profile.experience
+                giveExp(player)
+                giveCoin(player, Random.nextInt(500000) + 500000)
                 giveKillCounts(player, 250)
-                var count = Random.nextInt(3) + 1
-                if (equippedInterstellarHelmet(player)) count += 1
-                if (count != 0) {
-                    giveAfkFragment(player, count)
-                }
-                val coin = Random.nextInt(500000) + 500000
-                if (equippedChainMailGoldArmor(player)) giveCoin(player, coin)
-                if (isFullLevel(profile, 100, player)) return@forEach
-                if (profile.level >= 120) {
+                giveAfkFragment(player, Random.nextInt(3) + 1)
+                if (profile.level >= 120
+                    && !equippedShadowBoots(player)
+                    && !isFullLevel(player, 100)
+                ) {
                     autoPrestige(player)
                     return@forEach
                 }
-                val rewardExp = getRewardExp(profile.prestige)
-                profile.experience = exp + rewardExp
-                player.sendMessage(CC.translate(getEXPMessage).replace("%exp%", rewardExp.toInt().toString()))
             }
         }
     }
 
+    private fun giveExp(player: Player) {
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
+        val exp = profile.experience
+        val rewardExp = getRewardExp(profile.prestige)
+        if (isFullLevel(player, 100)) {
+            player.sendMessage(CC.translate("&b&l经验值已满! &7您已满级, 无法继续升级!"))
+            return
+        } else {
+            player.sendMessage(CC.translate(getEXPMessage).replace("%exp%", rewardExp.toInt().toString()))
+            profile.experience = exp + rewardExp
+        }
+    }
+
+    private fun meetRequirements(player: Player): Boolean {
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
+        var prestige = profile.prestige
+        var kills = profile.kills
+        return prestige >= 30 && kills >= 10000
+    }
+
+    private fun isVIP(player: Player): Boolean {
+        return player.hasPermission("pit.afk")
+    }
+
     private fun giveCoin(player: Player, coin: Int) {
+        if (!equippedChainMailGoldArmor(player)) return
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         profile.coins += coin
         player.sendMessage(CC.translate(getCoinMessage).replace("%coin%", coin.toString()))
     }
 
     private fun isFullLevel(
-        profile: PlayerProfile,
-        limit: Int,
-        player: Player
+        player: Player,
+        prestige: Int,
     ): Boolean {
-        if (profile.prestige >= limit && profile.level >= 120) {
-            player.sendMessage(CC.translate("&b&l经验值已满! &7您已满级, 无法继续升级!"))
-            return true
-        }
-        return false
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
+        return profile.prestige >= prestige && profile.level >= 120
     }
 
     private fun giveKillCounts(player: Player, kills: Int) {
@@ -67,7 +82,9 @@ class FreeCE : Runnable {
     }
 
     private fun giveAfkFragment(player: Player, count: Int) {
+        var amount = count
         val pitItem = PitItem()
+        if (equippedInterstellarHelmet(player)) amount += 1
         for (i in 0 until count) {
             player.inventory.addItem(pitItem.afkFragment)
         }
@@ -90,6 +107,16 @@ class FreeCE : Runnable {
             needExp += LevelUtil.getLevelExpRequired(prestige, level)
         }
         return needExp * booster + 10000
+    }
+
+    private fun isShadowBoots(boots: ItemStack): Boolean {
+        return ItemUtil.getInternalName(boots).equals("shadow_boots")
+    }
+
+    private fun equippedShadowBoots(player: Player): Boolean {
+        if (player.inventory.boots == null || player.inventory.boots.type == Material.AIR) return false
+        val boots = player.inventory.boots
+        return isShadowBoots(boots)
     }
 
     private fun isChainMailGoldArmor(chestPlate: ItemStack): Boolean {
