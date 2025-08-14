@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.runnable
 
+import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
@@ -7,6 +8,7 @@ import cn.irina.thepitaddon.manager.PitManager
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.MessageType
 import net.mizukilab.pit.util.chat.RomanUtil
+import net.mizukilab.pit.util.item.ItemBuilder
 import net.mizukilab.pit.util.item.ItemUtil
 import net.mizukilab.pit.util.level.LevelUtil
 import net.mizukilab.pit.util.rank.RankUtil
@@ -26,7 +28,7 @@ class FreeCE : Runnable {
                 giveCoin(player)
                 giveKillCounts(player)
                 giveAfkFragment(player)
-//                fixMythicItemsInHandWithCoal(player)
+                fixMythicItemsInHandWithCoal(player)
                 if (profile.level >= 120
                     && !equippedShadowBoots(player)
                     && !isFullLevel(player, 100)
@@ -42,14 +44,24 @@ class FreeCE : Runnable {
         if (!isVIP(player)) return
         val item = player.inventory.itemInHand
         if (item == null || item.type == Material.AIR) return
-        if (!PitManager.hasEnoughInternalItem(player, "chunk_of_vile_item", 1)) return
-        var maxLive = ItemUtil.getItemIntData(item, "maxLive")
-        var lives = ItemUtil.getItemIntData(item, "lives")
-        if (maxLive == lives) return
-        else {
-            lives++
+        val maxLive = ItemUtil.getItemIntData(item, "maxLive")
+        val live = ItemUtil.getItemIntData(item, "live")
+        if (maxLive == live || maxLive == 0) return
+        if (!PitManager.hasEnoughInternalItem(player, "chunk_of_vile_item", 1)) {
+            player.sendMessage(CC.translate(getNoEnoughCoalsMessage))
+            return
+        } else {
+            player.itemInHand = fixMythicItems(item)
             PitManager.takeInterNalItem(player, "chunk_of_vile_item", 1)
+            player.sendMessage(CC.translate(getSuccessfulFixItemInHand))
+            player.updateInventory()
         }
+    }
+
+    private fun fixMythicItems(item: ItemStack): ItemStack {
+        val pitItem = ThePit.getInstance().itemFactory.getItemFromStack(item)
+        val live = ItemUtil.getItemIntData(item, "live")
+        return ItemBuilder(pitItem.toItemStack()).changeNbt("live", live + 1).build()
     }
 
     private fun giveExp(player: Player) {
@@ -113,7 +125,7 @@ class FreeCE : Runnable {
         if (isVIP(player)) {
             amount = Random.nextInt(3) + 1
         }
-        if (equippedInterstellarHelmet(player)) amount += 1
+        if (amount != 0 && equippedInterstellarHelmet(player)) amount += 1
         for (i in 0 until amount) {
             player.inventory.addItem(pitItem.afkFragment)
         }
@@ -210,6 +222,10 @@ class FreeCE : Runnable {
         private val getCoinMessage: String = Main.instance.config.getString("FreeCoinAndExperience.GetCoin-Message")
         private val getItemMessage: String = Main.instance.config.getString("FreeCoinAndExperience.GetItem-Message")
         private val getKillsMessage: String = Main.instance.config.getString("FreeCoinAndExperience.GetKills-Message")
+        private val getNoEnoughCoalsMessage: String =
+            Main.instance.config.getString("FreeCoinAndExperience.NoEnoughCoals-Message")
+        private val getSuccessfulFixItemInHand: String =
+            Main.instance.config.getString("FreeCoinAndExperience.SuccessfulFixItemInHand-Message")
 //        private val experience = Main.instance.config.getInt("FreeCoinAndExperience.Experience")
 //        private val coin = Main.instance.config.getInt("FreeCoinAndExperience.Coin")
     }

@@ -139,6 +139,7 @@ class EnchantmentManager {
                 //"please_stop"
                 //"poet"
                 //"miners_enchant"
+                //"soul_of_frozen_clarity"
             )
         )
     }

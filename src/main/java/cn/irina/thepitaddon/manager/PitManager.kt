@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.manager
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import net.mizukilab.pit.util.item.ItemUtil
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -19,8 +20,7 @@ object PitManager {
 
     @JvmStatic
     fun hasInternalName(item: ItemStack, internalName: String): Boolean {
-        val pitItem = pitInstance.itemFactory.getItemFromStack(item)
-        return pitItem != null && pitItem.internalName.equals(internalName)
+        return item != null && ItemUtil.getInternalName(item).equals(internalName)
     }
 
     @Throws(NullPointerException::class)
@@ -67,9 +67,8 @@ object PitManager {
 
     fun getInternalItemAmount(player: Player, internalName: String): Int {
         var amount = 0
-        val inventory = player.inventory
-        for (slot in 0 until inventory.size) {
-            val item = inventory.getItem(slot) ?: continue
+        for (item in player.inventory) {
+            if (item == null || item.type == Material.AIR) continue
             if (!hasInternalName(item, internalName)) continue
             amount += item.amount
         }

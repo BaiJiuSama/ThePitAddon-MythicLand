@@ -94,6 +94,43 @@ class FixListeners : Listener {
     }
 
     @EventHandler
+    fun onPlayerWalkInAfkWorld(event: PlayerMoveEvent) {
+        val player = event.player
+        if (!player.world.name.equals("afk")) return
+        if (!equippedShadowBoots(player)) return
+        val location = player.location.add(0.0, 0.5, 0.0)
+        player.world.players.forEach { targetPlayer ->
+            sendRedstoneParticle(targetPlayer, location, 128f, 0f, 128f)
+        }
+    }
+
+    private fun sendRedstoneParticle(sender: Player, location: org.bukkit.Location, r: Float, g: Float, b: Float) {
+        val packet = net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles(
+            net.minecraft.server.v1_8_R3.EnumParticle.REDSTONE,
+            true,
+            location.x.toFloat(),
+            location.y.toFloat(),
+            location.z.toFloat(),
+            r / 255,
+            g / 255,
+            b / 255,
+            1.0f,
+            0
+        )
+        (sender as CraftPlayer).handle.playerConnection.sendPacket(packet)
+    }
+
+    private fun equippedShadowBoots(player: Player): Boolean {
+        if (player.inventory.boots == null || player.inventory.boots.type == org.bukkit.Material.AIR) return false
+        val boots = player.inventory.boots
+        return isShadowBoots(boots)
+    }
+
+    private fun isShadowBoots(boots: org.bukkit.inventory.ItemStack): Boolean {
+        return net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots).equals("shadow_boots")
+    }
+
+    @EventHandler
     fun onArrowHit(event: ProjectileHitEvent) {
         val arrow = event.entity
         if (arrow is Arrow && arrow.shooter is Player) {

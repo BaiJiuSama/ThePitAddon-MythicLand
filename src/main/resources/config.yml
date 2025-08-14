@@ -42,3 +42,5 @@ FreeCoinAndExperience:
   GetCoin-Message: "&6&l挂机奖励！ &7你获得了 &6%coin%硬币."
   GetItem-Message: "&f&l挂机奖励！ &7你获得了 &f%count%x &b灵泉&f碎片."
   GetKills-Message: "&c&l挂机奖励！ &7你获得了 &f%kills% &7击杀数."
+  NoEnoughCoals-Message: "&c&l修复失败！ &7你没有足够的暗聚块来修复你手中的神话物品."
+  SuccessfulFixItemInHand-Message: "&a&l修复成功！ &7成功修复您手中的神话物品."
