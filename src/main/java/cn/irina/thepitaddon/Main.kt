@@ -150,11 +150,10 @@ class Main : JavaPlugin() {
         send("&aPowered by Irina, ShanguanLinG, MIYU")
 
         if (config.getBoolean("FreeCoinAndExperience.Enable")) {
-            scheduler.scheduleWithFixedDelay(FreeCE(), 0L, 5L, TimeUnit.MINUTES)
+            Bukkit.getScheduler().runTaskTimer(this, FreeCE(), 0L, 5 * 20L * 60L)
         } else {
-            send("&c未启用 免费经验与硬币")
+            send("&c未启用 挂机池")
         }
-
         scheduler.scheduleWithFixedDelay(Announcer(), 0L, 5L, TimeUnit.MINUTES)
         scheduler.scheduleWithFixedDelay(RefreshReward(), 0L, 1L, TimeUnit.MINUTES)
     }

@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.runnable
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.PitItem
+import cn.irina.thepitaddon.utils.Log.send
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.MessageType
 import net.mizukilab.pit.util.chat.RomanUtil
@@ -22,9 +23,9 @@ class FreeCE : Runnable {
             if (player.world.name.equals("afk")) {
                 val profile = PlayerProfile.getRawCache(player.uniqueId)
                 giveExp(player)
-                giveCoin(player, Random.nextInt(500000) + 500000)
-                giveKillCounts(player, 250)
-                giveAfkFragment(player, Random.nextInt(3) + 1)
+                giveCoin(player)
+                giveKillCounts(player)
+                giveAfkFragment(player)
                 if (profile.level >= 120
                     && !equippedShadowBoots(player)
                     && !isFullLevel(player, 100)
@@ -39,9 +40,9 @@ class FreeCE : Runnable {
     private fun giveExp(player: Player) {
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         val exp = profile.experience
-        val rewardExp = getRewardExp(profile.prestige)
-        if (isFullLevel(player, 100)
-            || (profile.level == 120 && equippedShadowBoots(player))
+        var rewardExp = getRewardExp(profile.prestige)
+        if (!isVIP(player)) rewardExp *= 0.6
+        if (isFullLevel(player, 100) || (profile.level == 120 && equippedShadowBoots(player))
         ) {
             player.sendMessage(CC.translate("&b&l经验值已满! &7您已满级, 无法继续升级!"))
             return
@@ -62,11 +63,12 @@ class FreeCE : Runnable {
         return player.hasPermission("pit.afk")
     }
 
-    private fun giveCoin(player: Player, coin: Int) {
+    private fun giveCoin(player: Player) {
         if (!equippedChainMailGoldArmor(player)) return
+        val coin = Random.nextInt(500000) + 500000
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         profile.coins += coin
-        player.sendMessage(CC.translate(getCoinMessage).replace("%coin%", coin.toString()))
+        if (coin > 0) player.sendMessage(CC.translate(getCoinMessage).replace("%coin%", coin.toString()))
     }
 
     private fun isFullLevel(
@@ -77,20 +79,28 @@ class FreeCE : Runnable {
         return profile.prestige >= prestige && profile.level >= 120
     }
 
-    private fun giveKillCounts(player: Player, kills: Int) {
+    private fun giveKillCounts(player: Player) {
         val playerProfile = PlayerProfile.getRawCache(player.uniqueId) ?: return
+        var kills = 0
+        if (isVIP(player)) kills = 250
+        else if (meetRequirements(player)) kills = 100
         playerProfile.kills += kills
-        player.sendMessage(CC.translate(getKillsMessage).replace("%kills%", kills.toString()))
+        if (kills > 0) player.sendMessage(CC.translate(getKillsMessage).replace("%kills%", kills.toString()))
     }
 
-    private fun giveAfkFragment(player: Player, count: Int) {
-        var amount = count
+    private fun giveAfkFragment(player: Player) {
+        var amount = 0
         val pitItem = PitItem()
+        if (isVIP(player)) {
+            amount = Random.nextInt(3) + 1
+        } else if (meetRequirements(player)) {
+            amount = Random.nextInt(2)
+        }
         if (equippedInterstellarHelmet(player)) amount += 1
-        for (i in 0 until count) {
+        for (i in 0 until amount) {
             player.inventory.addItem(pitItem.afkFragment)
         }
-        player.sendMessage(CC.translate(getItemMessage).replace("%count%", count.toString()))
+        if (amount > 0) player.sendMessage(CC.translate(getItemMessage).replace("%count%", amount.toString()))
     }
 
     private fun getRewardExp(prestige: Int): Double {
