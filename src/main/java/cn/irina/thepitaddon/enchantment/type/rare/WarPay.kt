@@ -3,7 +3,6 @@ package cn.irina.thepitaddon.enchantment.type.rare
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
-import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerKilledEntity
 import net.mizukilab.pit.util.cooldown.Cooldown
@@ -16,7 +15,7 @@ import org.bukkit.entity.Player
  */
 
 @ArmorOnly
-class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
+class WarPay : AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "战酬"
     }
@@ -48,6 +47,6 @@ class WarPay: AbstractEnchantment(), IPlayerKilledEntity {
         coin: AtomicDouble,
         exp: AtomicDouble,
     ) {
-        coin.getAndAdd(0.3 + (level * 0.2))
+        coin.set(coin.get() * (1.3 + 0.2 * level))
     }
 }

@@ -151,7 +151,7 @@ class FreeCE : Runnable {
     }
 
     private fun isShadowBoots(boots: ItemStack): Boolean {
-        return ItemUtil.getInternalName(boots).equals("shadow_boots")
+        return "shadow_boots" == ItemUtil.getInternalName(boots)
     }
 
     private fun equippedShadowBoots(player: Player): Boolean {
@@ -161,7 +161,7 @@ class FreeCE : Runnable {
     }
 
     private fun isChainMailGoldArmor(chestPlate: ItemStack): Boolean {
-        return ItemUtil.getInternalName(chestPlate).equals("chain-mail_gold_armor")
+        return "chain-mail_gold_armor" == ItemUtil.getInternalName(chestPlate)
     }
 
     private fun equippedChainMailGoldArmor(player: Player): Boolean {
@@ -171,7 +171,7 @@ class FreeCE : Runnable {
     }
 
     private fun isInterstellarHelmet(helmet: ItemStack): Boolean {
-        return ItemUtil.getInternalName(helmet).equals("interstellar_helmet")
+        return "interstellar_helmet" == ItemUtil.getInternalName(helmet)
     }
 
     private fun equippedInterstellarHelmet(player: Player): Boolean {

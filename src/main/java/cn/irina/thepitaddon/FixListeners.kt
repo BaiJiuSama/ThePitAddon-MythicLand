@@ -127,7 +127,7 @@ class FixListeners : Listener {
     }
 
     private fun isShadowBoots(boots: org.bukkit.inventory.ItemStack): Boolean {
-        return net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots).equals("shadow_boots")
+        return "shadow_boots" == net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots)
     }
 
     @EventHandler

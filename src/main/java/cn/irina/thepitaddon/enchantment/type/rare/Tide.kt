@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
 @WeaponOnly
 @ArmorOnly
 
-class Tide: AbstractEnchantment(), IPlayerKilledEntity {
+class Tide : AbstractEnchantment(), IPlayerKilledEntity {
     override fun getEnchantName(): String {
         return "潮汐"
     }
@@ -50,6 +50,6 @@ class Tide: AbstractEnchantment(), IPlayerKilledEntity {
         coin: AtomicDouble,
         exp: AtomicDouble,
     ) {
-        exp.getAndAdd(0.3 + (level * 0.2))
+        exp.set(exp.get() * (1.3 + 0.2 * level))
     }
 }
