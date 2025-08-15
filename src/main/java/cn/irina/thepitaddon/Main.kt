@@ -231,6 +231,7 @@ class Main : JavaPlugin() {
                 PlayerSuicide(),
                 ShowDevelopmentCommand(),
                 FixWipe(),
+                WorldTp(),
                 PlayerProving(),
                 OpenMenu(),
 //                FreeCE()

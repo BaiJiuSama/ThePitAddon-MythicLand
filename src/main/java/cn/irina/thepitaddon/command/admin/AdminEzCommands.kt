@@ -4,11 +4,16 @@ import cn.charlotte.pit.data.PlayerProfile
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
+import dev.rollczi.litecommands.annotations.context.Sender
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.mizukilab.pit.getPitProfile
 import net.mizukilab.pit.util.chat.CC
+import org.bukkit.Bukkit
+import org.bukkit.World
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+
 
 @Command(name = "heal")
 @Permission("pit.admin")
@@ -47,6 +52,24 @@ class FixWipe {
             profile.wipedData.isKnow = true
             player.sendMessage(CC.translate("&aSuccess."))
         }
+    }
+}
+
+@Command(name = "worldTp")
+@Permission("pit.admin")
+class WorldTp {
+    @Execute
+    fun onCommand(
+        @Context sender: CommandSender,
+        @Arg player: Player,
+        @Arg worldName: String
+    ) {
+        val targetWorld: World? = Bukkit.getWorld(worldName)
+        if (targetWorld == null) {
+            player.sendMessage(CC.translate("&c目标世界不存在!"))
+            return
+        }
+        player.teleport(targetWorld.spawnLocation)
     }
 }
 
