@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.command.player
 
 import cn.irina.thepitaddon.Main
+import cn.irina.thepitaddon.manager.PitManager
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -14,13 +15,17 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /*
- * @Author Irina, ShanguanLinG
- * @Date 2025/6/19
+ * @Author ShanguanLinG
+ * @Date 2025/8/15
  */
 
 @Command(name = "unGem")
 class UnGem {
     val prefix = Main.instance.PREFIX
+    private var reverseGemInternalName = "reverse_totally_legit_gem"
+    private val reverseGlobalGemInternalName = "reverse_global_attention_gem"
+    private val reverseUniversalGemInternalName = "reverse_gem"
+
 
     @Execute
     fun onCommand(
@@ -30,29 +35,55 @@ class UnGem {
     ) {
         val item = player.inventory.itemInHand
         if (item == null || item.type == Material.AIR) {
-            sender.sendMessage(CC.translate("$prefix &c请手持物品!"))
+            sender.sendMessage(CC.translate("$prefix&c请手持物品!"))
             return
         }
         if ("Gem" == gemTypeName) {
             if (!isBoostedByGem(item)) {
-                sender.sendMessage(CC.translate("$prefix &c这件物品上并没有使用过 &a遵纪守法的宝石!"))
+                sender.sendMessage(CC.translate("$prefix&c这件物品上并没有使用过 &a遵纪守法的宝石!"))
+                return
+            }
+            if (!PitManager.hasEnoughInternalItem(player, reverseGemInternalName, 1)) {
+                sender.sendMessage(CC.translate("$prefix&c你没有足够的 &5逆向宝石"))
                 return
             }
             val newItem = ItemBuilder(item).changeNbt("boostedByGem", 0).build()
             player.inventory.itemInHand = newItem
+            PitManager.takeInterNalItem(player, reverseGemInternalName, 1)
             player.updateInventory()
-            player.sendMessage(CC.translate("$prefix &a成功移除了 &a遵纪守法的宝石 &7点缀."))
+            player.sendMessage(CC.translate("$prefix&a成功移除了 &a遵纪守法的宝石 &7点缀."))
             return
         }
         if ("GlobalGem" == gemTypeName) {
             if (!isBoostedByGlobalGem(item)) {
-                sender.sendMessage(CC.translate("$prefix &c这件物品上并没有使用过 &b举世瞩目的宝石!"))
+                sender.sendMessage(CC.translate("$prefix&c这件物品上并没有使用过 &b举世瞩目的宝石!"))
+                return
+            }
+            if (!PitManager.hasEnoughInternalItem(player, reverseGlobalGemInternalName, 1)) {
+                sender.sendMessage(CC.translate("$prefix&c你没有足够的 &5逆向宝石"))
                 return
             }
             val newItem = ItemBuilder(item).changeNbt("boostedByGlobalGem", 0).build()
             player.inventory.itemInHand = newItem
+            PitManager.takeInterNalItem(player, reverseGlobalGemInternalName, 1)
             player.updateInventory()
-            player.sendMessage(CC.translate("$prefix &a成功移除了 &b举世瞩目的宝石 &7点缀."))
+            player.sendMessage(CC.translate("$prefix&a成功移除了 &b举世瞩目的宝石 &7点缀."))
+            return
+        }
+        if ("All" == gemTypeName) {
+            if (!isBoostedByGem(item) && !isBoostedByGlobalGem(item)) {
+                sender.sendMessage(CC.translate("$prefix&c这件物品上并没有使用过任何宝石! "))
+                return
+            }
+            if (!PitManager.hasEnoughInternalItem(player, reverseUniversalGemInternalName, 1)) {
+                sender.sendMessage(CC.translate("$prefix&c你没有足够的 &5逆向宝石"))
+                return
+            }
+            val newItem = ItemBuilder(item).changeNbt("boostedByGem", 0).changeNbt("boostedByGlobalGem", 0).build()
+            player.inventory.itemInHand = newItem
+            PitManager.takeInterNalItem(player, reverseUniversalGemInternalName, 1)
+            player.updateInventory()
+            player.sendMessage(CC.translate("$prefix&a成功移除了所有宝石点缀."))
             return
         }
     }
