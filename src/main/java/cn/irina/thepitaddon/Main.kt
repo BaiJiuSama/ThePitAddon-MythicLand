@@ -211,6 +211,7 @@ class Main : JavaPlugin() {
                 AdminChangeGameMode(),
                 CommandEnchant(),
                 unEnchant(),
+                UnGem(),
                 AdminCrashClient(),
                 AdminHealSelf(),
                 AdminClearBounty(),
