@@ -75,6 +75,18 @@ object PitManager {
         return amount
     }
 
+    fun isAmulet(item: ItemStack): Boolean {
+        return getInternalName(item).startsWith("amulet_")
+    }
+
+    fun isAmulet(item: ItemStack, amuletName: String): Boolean {
+        return getInternalName(item) == "amulet_$amuletName"
+    }
+
+    fun hasInternalItem(player: Player, internalName: String): Boolean {
+        return getInternalItemAmount(player, internalName) > 0
+    }
+
     fun hasEnoughInternalItem(player: Player, internalName: String, count: Int): Boolean {
         return getInternalItemAmount(player, internalName) >= count
     }

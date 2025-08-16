@@ -2,6 +2,7 @@ package cn.irina.thepitaddon
 
 import cn.charlotte.pit.data.PlayerProfile
 import cn.charlotte.pit.event.PitStreakKillChangeEvent
+import cn.irina.thepitaddon.manager.PitManager
 import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -97,7 +98,7 @@ class FixListeners : Listener {
     fun onPlayerWalkInAfkWorld(event: PlayerMoveEvent) {
         val player = event.player
         if (!player.world.name.equals("afk")) return
-        if (!equippedShadowBoots(player)) return
+        if (!hasShadowBootsInInventory(player)) return
         val location = player.location.add(0.0, 0.5, 0.0)
         player.world.players.forEach { targetPlayer ->
             sendRedstoneParticle(targetPlayer, location, 128f, 0f, 128f)
@@ -120,14 +121,18 @@ class FixListeners : Listener {
         (sender as CraftPlayer).handle.playerConnection.sendPacket(packet)
     }
 
+    private fun isShadowBoots(boots: org.bukkit.inventory.ItemStack): Boolean {
+        return "shadow_boots" == net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots)
+    }
+
     private fun equippedShadowBoots(player: Player): Boolean {
         if (player.inventory.boots == null || player.inventory.boots.type == org.bukkit.Material.AIR) return false
         val boots = player.inventory.boots
         return isShadowBoots(boots)
     }
 
-    private fun isShadowBoots(boots: org.bukkit.inventory.ItemStack): Boolean {
-        return "shadow_boots" == net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots)
+    private fun hasShadowBootsInInventory(player: Player): Boolean {
+        return PitManager.hasInternalItem(player, "shadow_boots")
     }
 
     @EventHandler
