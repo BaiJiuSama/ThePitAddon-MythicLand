@@ -20,12 +20,11 @@ object PitManager {
 
     @JvmStatic
     fun hasInternalName(item: ItemStack, internalName: String): Boolean {
-        return item != null && internalName == ItemUtil.getInternalName(item)
+        return internalName == getInternalName(item)
     }
 
-    @Throws(NullPointerException::class)
     fun getInternalName(item: ItemStack): String {
-        return ItemUtil.getInternalName(item)
+        return ItemUtil.getInternalName(item) ?: ""
     }
 
     fun hasPitEnchant(item: ItemStack, enchantName: String): Boolean {
@@ -36,7 +35,7 @@ object PitManager {
         return pitApi.getItemEnchantLevel(item, enchantName)
     }
 
-    fun takeInterNalItem(player: Player, internalName: String, count: Int) {
+    fun takeInternalItem(player: Player, internalName: String, count: Int) {
         var remaining = count
         val inventory = player.inventory
         for (slot in 0 until inventory.size) {
