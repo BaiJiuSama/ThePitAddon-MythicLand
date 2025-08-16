@@ -20,7 +20,7 @@ object PitManager {
 
     @JvmStatic
     fun hasInternalName(item: ItemStack, internalName: String): Boolean {
-        return item != null && ItemUtil.getInternalName(item).equals(internalName)
+        return item != null && internalName == ItemUtil.getInternalName(item)
     }
 
     @Throws(NullPointerException::class)

@@ -98,11 +98,15 @@ class FixListeners : Listener {
     fun onPlayerWalkInAfkWorld(event: PlayerMoveEvent) {
         val player = event.player
         if (!player.world.name.equals("afk")) return
-        if (!hasShadowBootsInInventory(player)) return
+        if (!hasAmuletInInventory(player, "amulet_shadow")) return
         val location = player.location.add(0.0, 0.5, 0.0)
         player.world.players.forEach { targetPlayer ->
             sendRedstoneParticle(targetPlayer, location, 128f, 0f, 128f)
         }
+    }
+
+    private fun hasAmuletInInventory(player: Player, internalName: String): Boolean {
+        return PitManager.hasInternalItem(player, internalName)
     }
 
     private fun sendRedstoneParticle(sender: Player, location: org.bukkit.Location, r: Float, g: Float, b: Float) {
