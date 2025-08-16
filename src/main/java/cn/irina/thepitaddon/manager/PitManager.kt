@@ -20,7 +20,7 @@ object PitManager {
 
     @JvmStatic
     fun hasInternalName(item: ItemStack, internalName: String): Boolean {
-        return item != null && ItemUtil.getInternalName(item).equals(internalName)
+        return item != null && internalName == ItemUtil.getInternalName(item)
     }
 
     @Throws(NullPointerException::class)
@@ -73,6 +73,18 @@ object PitManager {
             amount += item.amount
         }
         return amount
+    }
+
+    fun isAmulet(item: ItemStack): Boolean {
+        return getInternalName(item).startsWith("amulet_")
+    }
+
+    fun isAmulet(item: ItemStack, amuletName: String): Boolean {
+        return getInternalName(item) == "amulet_$amuletName"
+    }
+
+    fun hasInternalItem(player: Player, internalName: String): Boolean {
+        return getInternalItemAmount(player, internalName) > 0
     }
 
     fun hasEnoughInternalItem(player: Player, internalName: String, count: Int): Boolean {

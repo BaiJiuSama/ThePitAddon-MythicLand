@@ -30,7 +30,7 @@ class FreeCE : Runnable {
                 giveAfkFragment(player)
                 fixMythicItemsInHandWithCoal(player)
                 if (profile.level >= 120
-                    && !equippedShadowBoots(player)
+                    && !hasAmuletInInventory(player, "amulet_shadow")
                     && !isFullLevel(player, 100)
                 ) {
                     autoPrestige(player)
@@ -69,7 +69,9 @@ class FreeCE : Runnable {
         val exp = profile.experience
         var rewardExp = getRewardExp(profile.prestige)
         if (!isVIP(player)) rewardExp *= 0.6
-        if (isFullLevel(player, 100) || (profile.level == 120 && equippedShadowBoots(player))
+        if (isFullLevel(player, 100)
+            || (profile.level == 120
+                    && hasAmuletInInventory(player, "amulet_shadow"))
         ) {
             player.sendMessage(CC.translate("&b&l经验值已满! &7您已满级, 无法继续升级!"))
             return
@@ -81,8 +83,8 @@ class FreeCE : Runnable {
 
     private fun meetRequirements(player: Player): Boolean {
         val profile = PlayerProfile.getRawCache(player.uniqueId)
-        var prestige = profile.prestige
-        var kills = profile.kills
+        val prestige = profile.prestige
+        val kills = profile.kills
         return prestige >= 30 && kills >= 20000
     }
 
@@ -91,7 +93,7 @@ class FreeCE : Runnable {
     }
 
     private fun giveCoin(player: Player) {
-        if (!equippedChainMailGoldArmor(player)) return
+        if (!hasAmuletInInventory(player, "amulet_gold")) return
         val coin = Random.nextInt(500000) + 500000
         val profile = PlayerProfile.getRawCache(player.uniqueId)
         profile.coins += coin
@@ -121,11 +123,11 @@ class FreeCE : Runnable {
     private fun giveAfkFragment(player: Player) {
         var amount = Random.nextInt(2)
         val pitItem = PitItem()
-        if (!meetRequirements(player)) return
+        if (!meetRequirements(player)) amount = 0
         if (isVIP(player)) {
             amount = Random.nextInt(3) + 1
         }
-        if (amount != 0 && equippedInterstellarHelmet(player)) amount += 1
+        if (amount != 0 && hasAmuletInInventory(player, "amulet_traveller")) amount += 1
         for (i in 0 until amount) {
             player.inventory.addItem(pitItem.afkFragment)
         }
@@ -150,6 +152,10 @@ class FreeCE : Runnable {
         return needExp * booster + 10000
     }
 
+    private fun hasAmuletInInventory(player: Player, internalName: String): Boolean {
+        return PitManager.hasInternalItem(player, internalName)
+    }
+
     private fun isShadowBoots(boots: ItemStack): Boolean {
         return "shadow_boots" == ItemUtil.getInternalName(boots)
     }
@@ -158,6 +164,10 @@ class FreeCE : Runnable {
         if (player.inventory.boots == null || player.inventory.boots.type == Material.AIR) return false
         val boots = player.inventory.boots
         return isShadowBoots(boots)
+    }
+
+    private fun hasShadowBootsInInventory(player: Player): Boolean {
+        return PitManager.hasInternalItem(player, "shadow_boots")
     }
 
     private fun isChainMailGoldArmor(chestPlate: ItemStack): Boolean {
@@ -170,6 +180,10 @@ class FreeCE : Runnable {
         return isChainMailGoldArmor(chestPlate)
     }
 
+    private fun hasChainMailGoldArmorInInventory(player: Player): Boolean {
+        return PitManager.hasInternalItem(player, "chain-mail_gold_armor")
+    }
+
     private fun isInterstellarHelmet(helmet: ItemStack): Boolean {
         return "interstellar_helmet" == ItemUtil.getInternalName(helmet)
     }
@@ -180,9 +194,13 @@ class FreeCE : Runnable {
         return isInterstellarHelmet(helmet)
     }
 
+    private fun hasInterstellarHelmetInInventory(player: Player): Boolean {
+        return PitManager.hasInternalItem(player, "interstellar_helmet")
+    }
+
     private fun autoPrestige(player: Player) {
         val profile = PlayerProfile.getRawCache(player.uniqueId)
-        if (equippedChainMailGoldArmor(player)) {
+        if (hasAmuletInInventory(player, "amulet_gold")) {
             profile.coins /= 2
         } else {
             profile.coins = 0.0
