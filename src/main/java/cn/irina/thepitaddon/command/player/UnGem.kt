@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack
 @Command(name = "unGem")
 class UnGem {
     val prefix = Main.instance.PREFIX
-    private var reverseGemInternalName = "reverse_totally_legit_gem"
+    private val reverseGemInternalName = "reverse_totally_legit_gem"
     private val reverseGlobalGemInternalName = "reverse_global_attention_gem"
     private val reverseUniversalGemInternalName = "reverse_gem"
 

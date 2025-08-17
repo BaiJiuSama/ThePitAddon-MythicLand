@@ -59,8 +59,8 @@ public class Winter extends AbstractEnchantment implements IAttackEntity, Listen
     public String getUsefulnessLore(int enchantLevel) {
         return "&7对带有 &c缓慢 &7效果的玩家造成的伤害 &c+" + (enchantLevel * 4 + 4) + "%/s" +
                 "&7攻击目标时将对其施加: /s" +
-                "   &f▶ &b霜寒 &f(00:0" + (enchantLevel + 1) + ") /s" +
-                "   &f▶ &8脆弱 &f(00:0" + ((enchantLevel * 2) + 2) + ") /s" +
+                "  &f▶ &b霜寒 &f(00:0" + (enchantLevel + 1) + ") /s" +
+                "  &f▶ &8脆弱 &f(00:0" + ((enchantLevel * 2) + 2) + ") /s" +
                 "&7效果 &b霜寒&7: 移速大幅降低, 对他人造成的伤害 &9-20% /s" +
                 "&7效果 &8脆弱&7: 受到的暴击伤害 &c+20% /s" +
                 (enchantLevel >= 3 ? "&7同时, 攻击目标时将清除自身的 &c缓慢 &7效果 /s" + "&8每秒只可触发一次" : "&8每秒只可触发一次/s") +

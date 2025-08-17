@@ -49,10 +49,10 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7当自身在空中时, 每被攻击 &f3 &7次, 触发以下效果: /s" +
-                " &f▶ &7恢复 &c2.0❤ 生命值 /s" +
-                " &f▶ &7获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(可叠加, 最多&64❤&7) /s" +
-                " &f▶ &7获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
-                if (enchantLevel > 1) " &f▶ &7受到的伤害&9 -${enchantLevel * 4}% &7(持续12秒, 不可叠加) /s" else ""
+                "  &f▶ &7恢复 &c2.0❤ 生命值 /s" +
+                "  &f▶ &7获得 &6${0.5 + (enchantLevel * 0.5)}❤ 生命吸收 &7(可叠加, 最多&64❤&7) /s" +
+                "  &f▶ &7获得 &b速度 ${RomanUtil.convert(enchantLevel)} &f(00:08) /s" +
+                if (enchantLevel > 1) "  &f▶ &7受到的伤害&9 -${enchantLevel * 4}% &7(持续12秒, 不可叠加) /s" else ""
     }
 
     override fun handlePlayerDamaged(

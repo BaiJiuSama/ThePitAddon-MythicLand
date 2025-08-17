@@ -16,6 +16,9 @@ import org.bukkit.metadata.FixedMetadataValue
 
 @ArmorOnly
 class Regularity : AbstractEnchantment(), Listener {
+
+    private val pitAPI = ThePit.getApi()
+
     override fun getEnchantName(): String {
         return "狂暴连击"
     }
@@ -64,7 +67,10 @@ class Regularity : AbstractEnchantment(), Listener {
 
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
+        if (event.entity !is Player) return
+        var player = (event.entity as Player).player
         if (attacker !is Player) return
+        if (pitAPI.getItemEnchantLevel(player.inventory.leggings, "think_of_the_people") > 0) return
 
         val victim = event.entity
         if (victim !is Player) return

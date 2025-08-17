@@ -45,8 +45,8 @@ class Determination : AbstractEnchantment(),  IPlayerDamaged, IActionDisplayEnch
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7受击时, 若自身血量低于最大生命值的 &c${10 + (enchantLevel * 10)}%❤ &7, 则获得效果: /s" +
-                "   &f▶ &3抗性提升 ${RomanUtil.convert(enchantLevel)} &7(00:04) /s" +
-                "   &f▶ &b速度 I &7(${formatTotalSeconds(if (enchantLevel >= 3) 6 else 4)}) /s" +
+                "  &f▶ &3抗性提升 ${RomanUtil.convert(enchantLevel)} &7(00:04) /s" +
+                "  &f▶ &b速度 I &7(${formatTotalSeconds(if (enchantLevel >= 3) 6 else 4)}) /s" +
                 "&7同时, 恢复自身血量 &c${(enchantLevel + 1).toDouble()}❤ /s" +
                 "&7此附魔每 &f10 &7秒触发一次"
     }
