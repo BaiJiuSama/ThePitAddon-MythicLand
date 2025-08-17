@@ -52,7 +52,7 @@ class FreeCE : Runnable {
             return
         } else {
             player.itemInHand = fixMythicItems(item)
-            PitManager.takeInterNalItem(player, "chunk_of_vile_item", 1)
+            PitManager.takeInternalItem(player, "chunk_of_vile_item", 1)
             player.sendMessage(CC.translate(getSuccessfulFixItemInHand))
             player.updateInventory()
         }
