@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.data.PlayerProfile
+import cn.irina.thepitaddon.enchantment.type.rare.BackStab.Companion.teleportBehind
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant
@@ -12,15 +13,14 @@ import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.atan2
 import kotlin.math.max
 
 @ArmorOnly
 class Phantom : AbstractEnchantment(), IAttackEntity, IPlayerDamaged, IActionDisplayEnchant {
-
-    private val cooldown = HashMap<UUID, Cooldown>()
+    private val cooldown = ConcurrentHashMap<UUID, Cooldown>()
 
     override fun getEnchantName(): String {
         return "幻"
@@ -57,34 +57,16 @@ class Phantom : AbstractEnchantment(), IAttackEntity, IPlayerDamaged, IActionDis
         cancel: AtomicBoolean
     ) {
         if (target !is Player) return
-        if ("bot" == target.name) return
+        if (target.hasMetadata("NPC")) return
+
         val hit = PlayerProfile.getRawCache(attacker.uniqueId).meleeHit
         if (hit % 2 != 0) return
-        if (!cooldown.getOrDefault(attacker.uniqueId, Cooldown(0L)).hasExpired()) return
+
+        val cd = cooldown[attacker.uniqueId] ?: Cooldown(0L)
+        if (!cd.hasExpired()) return
+
         teleportBehind(attacker, target)
         cooldown[attacker.uniqueId] = Cooldown(10L, TimeUnit.SECONDS)
-    }
-
-    fun teleportBehind(player: Player, target: Player) {
-        val targetLocation = target.location
-        val targetDirection = targetLocation.direction.normalize()
-
-        targetDirection.setY(0)
-        targetDirection.normalize()
-
-        val behindLocation = targetLocation.clone().subtract(targetDirection.multiply(2.0f))
-
-        player.teleport(behindLocation)
-
-        val playerLocation = player.location
-        val deltaX = targetLocation.x - playerLocation.x
-        val deltaZ = targetLocation.z - playerLocation.z
-
-        val yaw = (atan2(deltaZ, deltaX) * (180 / Math.PI)).toFloat() - 90
-
-        playerLocation.yaw = yaw
-        playerLocation.pitch = 0f
-        player.teleport(playerLocation)
     }
 
     override fun getText(enchantLevel: Int, player: Player): String {
@@ -100,11 +82,11 @@ class Phantom : AbstractEnchantment(), IAttackEntity, IPlayerDamaged, IActionDis
         atomicDouble1: AtomicDouble,
         cancel: AtomicBoolean
     ) {
-        if (victim.isBlocking && entity is Player) {
-            val currentCooldown = cooldown[victim.uniqueId]
-            if (currentCooldown == null || currentCooldown.hasExpired()) return
-            val newRemaining = max(0L, currentCooldown.remaining - 4000L)
-            cooldown[victim.uniqueId] = Cooldown(newRemaining)
-        }
+        if (!victim.isBlocking || entity !is Player) return
+        val currentCooldown = cooldown[victim.uniqueId]
+        if (currentCooldown == null || currentCooldown.hasExpired()) return
+
+        val newRemaining = max(0L, currentCooldown.remaining - 4000L)
+        cooldown[victim.uniqueId] = Cooldown(newRemaining)
     }
 }
