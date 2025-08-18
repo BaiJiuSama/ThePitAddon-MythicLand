@@ -131,7 +131,7 @@ class EnchantmentManager {
                 //"frost"
                 "outnumbered_by_the_enemy",
                 //"tear"
-                "vital_echo"
+                "vital_echo",
                 //"lonely_red_blood"
                 //"steal"
                 //"piercing_bow"
@@ -140,6 +140,9 @@ class EnchantmentManager {
                 //"poet"
                 //"miners_enchant"
                 //"soul_of_frozen_clarity"
+                //"think_of_the_people"
+                //"bounty_hunter_hunter"
+                "rush_E_dj"
             )
         )
     }

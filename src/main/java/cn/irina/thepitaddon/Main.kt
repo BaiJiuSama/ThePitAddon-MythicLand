@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon
 
 import cn.charlotte.pit.ThePit
+import cn.charlotte.pit.events.trigger.type.IEpicEvent
 import cn.irina.thepitaddon.command.admin.*
 import cn.irina.thepitaddon.command.player.*
 import cn.irina.thepitaddon.command.player.buyItems.BuyEgg
@@ -137,6 +138,7 @@ class Main : JavaPlugin() {
     }
 
     private fun setUp() {
+        clearEpicEvents()
         loadEnchantmentManager()
         registerCommands()
         loadListener()
@@ -203,6 +205,22 @@ class Main : JavaPlugin() {
         return receiveManager!!
     }
 
+    private fun clearEpicEvents() {
+        try {
+            val eventFactoryClass = Class.forName("cn.charlotte.pit.events.EventFactory")
+            val thePitInstance = ThePit.getInstance()
+            val eventFactoryField = ThePit::class.java.getDeclaredField("eventFactory")
+            eventFactoryField.isAccessible = true
+            val eventFactoryInstance = eventFactoryField.get(thePitInstance)
+            val epicEventsField = eventFactoryClass.getDeclaredField("epicEvents")
+            epicEventsField.isAccessible = true
+            val emptyList = java.util.Collections.emptyList<IEpicEvent>()
+            epicEventsField.set(eventFactoryInstance, emptyList)
+            send("&a事件清空成功!")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     private var liteCommands: LiteCommands<CommandSender>? = null
     private fun registerCommands() {
@@ -249,7 +267,8 @@ class Main : JavaPlugin() {
             "RainbowTylenol.nbs",
             "GirlsBandCry.nbs",
             "Megalovania.nbs",
-            "NeverGonnaGiveYouUp.nbs"
+            "NeverGonnaGiveYouUp.nbs",
+//            "RushE.nbs"
         )
 
         for (filePath in musicResources) {
