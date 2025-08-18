@@ -113,9 +113,8 @@ class FreeCE : Runnable {
         var kills = 0
         if (isVIP(player)) {
             kills = 250
-        } else if (meetRequirements(player)) {
-            kills = 100
         }
+        if (kills <= 0) return
         playerProfile.kills += kills
         if (kills > 0) player.sendMessage(CC.translate(getKillsMessage).replace("%kills%", kills.toString()))
     }
@@ -154,48 +153,6 @@ class FreeCE : Runnable {
 
     private fun hasAmuletInInventory(player: Player, internalName: String): Boolean {
         return PitManager.hasInternalItem(player, internalName)
-    }
-
-    private fun isShadowBoots(boots: ItemStack): Boolean {
-        return "shadow_boots" == ItemUtil.getInternalName(boots)
-    }
-
-    private fun equippedShadowBoots(player: Player): Boolean {
-        if (player.inventory.boots == null || player.inventory.boots.type == Material.AIR) return false
-        val boots = player.inventory.boots
-        return isShadowBoots(boots)
-    }
-
-    private fun hasShadowBootsInInventory(player: Player): Boolean {
-        return PitManager.hasInternalItem(player, "shadow_boots")
-    }
-
-    private fun isChainMailGoldArmor(chestPlate: ItemStack): Boolean {
-        return "chain-mail_gold_armor" == ItemUtil.getInternalName(chestPlate)
-    }
-
-    private fun equippedChainMailGoldArmor(player: Player): Boolean {
-        if (player.inventory.chestplate == null || player.inventory.chestplate.type == Material.AIR) return false
-        val chestPlate = player.inventory.chestplate
-        return isChainMailGoldArmor(chestPlate)
-    }
-
-    private fun hasChainMailGoldArmorInInventory(player: Player): Boolean {
-        return PitManager.hasInternalItem(player, "chain-mail_gold_armor")
-    }
-
-    private fun isInterstellarHelmet(helmet: ItemStack): Boolean {
-        return "interstellar_helmet" == ItemUtil.getInternalName(helmet)
-    }
-
-    private fun equippedInterstellarHelmet(player: Player): Boolean {
-        if (player.inventory.helmet == null || player.inventory.helmet.type == Material.AIR) return false
-        val helmet = player.inventory.helmet
-        return isInterstellarHelmet(helmet)
-    }
-
-    private fun hasInterstellarHelmetInInventory(player: Player): Boolean {
-        return PitManager.hasInternalItem(player, "interstellar_helmet")
     }
 
     private fun autoPrestige(player: Player) {
