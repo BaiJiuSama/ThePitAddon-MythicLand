@@ -250,6 +250,7 @@ class Main : JavaPlugin() {
                 ShowDevelopmentCommand(),
                 FixWipe(),
                 WorldTp(),
+                Broadcast(),
                 PlayerProving(),
                 OpenMenu(),
 //                FreeCE()

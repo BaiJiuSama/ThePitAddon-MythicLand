@@ -4,7 +4,6 @@ import cn.charlotte.pit.data.PlayerProfile
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
-import dev.rollczi.litecommands.annotations.context.Sender
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import net.mizukilab.pit.getPitProfile
@@ -70,6 +69,18 @@ class WorldTp {
             return
         }
         player.teleport(targetWorld.spawnLocation)
+    }
+}
+
+@Command(name = "broadcast")
+@Permission("pit.admin")
+class Broadcast {
+    @Execute
+    fun onCommand(
+        @Context sender: CommandSender,
+        @Arg message: String
+    ) {
+        Bukkit.broadcastMessage(CC.translate(message))
     }
 }
 
