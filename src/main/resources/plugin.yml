@@ -1,5 +1,5 @@
 name: ThePitAddon
-version: 0.0.1
+version: 0.0.4
 author: Irina, MindsMaster_, ShanguanLinG
 main: cn.irina.thepitaddon.Main
 load: STARTUP
