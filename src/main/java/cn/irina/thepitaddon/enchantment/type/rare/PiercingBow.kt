@@ -109,7 +109,7 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
                     true
                 )
             )
-        } else if (existingSpeed.amplifier < enchantLevel - 2) {
+        } else if (existingSpeed.amplifier <= enchantLevel - 2) {
             shooter.removePotionEffect(PotionEffectType.SPEED)
             shooter.addPotionEffect(
                 PotionEffect(
