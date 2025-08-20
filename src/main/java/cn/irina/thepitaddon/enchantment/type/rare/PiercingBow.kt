@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 @BowOnly
 class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionDisplayEnchant {
     private val maxChargeCooldown: HashMap<UUID, Cooldown> = HashMap()
-    private val speedBoostCooldown: HashMap<UUID, Cooldown> = HashMap()
     private val hitCount: HashMap<UUID, Int> = HashMap()
 
     override fun getEnchantName(): String {
@@ -61,7 +60,7 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         var stringBuilder = StringBuilder("&7射箭时无需蓄力即可让箭矢以最大蓄力状态射出,/s")
         if (enchantLevel > 1)
             stringBuilder.append(
-                "&7每 &e1 &7次箭矢射出并命中为自身添加 &b速度 ${RomanUtil.convert(if (enchantLevel > 1) enchantLevel - 1 else 1)} &f(${
+                "&7同时为自身添加 &b速度 ${RomanUtil.convert(if (enchantLevel > 1) enchantLevel - 1 else 1)} &f(${
                     TimeUtil.millisToTimer(
                         (enchantLevel + 1) * 1000L + 2000L
                     )
@@ -99,6 +98,29 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
             val bow = itemStack.item as ItemBow
             bow.a(itemStack, ePlayer.world, ePlayer, 0)
         }
+        val existingSpeed = shooter.activePotionEffects.find { it.type == PotionEffectType.SPEED }
+        val enchantLevel = this.getItemEnchantLevel(itemInHand)
+        if (existingSpeed == null) {
+            shooter.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    20 * (enchantLevel + 1) + 20 * 2,
+                    enchantLevel - 2,
+                    true
+                )
+            )
+        } else if (existingSpeed.amplifier < enchantLevel - 2) {
+            shooter.removePotionEffect(PotionEffectType.SPEED)
+            shooter.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    20 * (enchantLevel + 1) + 20 * 2,
+                    enchantLevel - 2,
+                    true
+                )
+            )
+        }
+        return
     }
 
     override fun handleShootEntity(
@@ -113,30 +135,6 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         val playerId = attacker.uniqueId
         val currentHitCount = hitCount.getOrDefault(playerId, 0) + 1
         hitCount[playerId] = currentHitCount
-        val existingSpeed = attacker.activePotionEffects.find { it.type == PotionEffectType.SPEED }
-        if (currentHitCount == 1) {
-            if (existingSpeed == null) {
-                attacker.addPotionEffect(
-                    PotionEffect(
-                        PotionEffectType.SPEED,
-                        20 * (enchantLevel + 1) + 20 * 2,
-                        enchantLevel - 2,
-                        true
-                    )
-                )
-            } else if (existingSpeed.amplifier <= enchantLevel - 2) {
-                attacker.removePotionEffect(PotionEffectType.SPEED)
-                attacker.addPotionEffect(
-                    PotionEffect(
-                        PotionEffectType.SPEED,
-                        20 * (enchantLevel + 1) + 20 * 2,
-                        enchantLevel - 2,
-                        true
-                    )
-                )
-            }
-            return
-        }
         if (currentHitCount == 2) {
             attacker.removePotionEffect(PotionEffectType.SPEED)
             attacker.addPotionEffect(
