@@ -19,7 +19,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.*
@@ -59,13 +58,23 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
 
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7射箭时无需蓄力即可让箭矢以最大蓄力状态射出,/s" +
-                "&7每 &e2 &7次箭矢射出并命中为自身添加 &b速度 ${RomanUtil.convert(enchantLevel + 1)} &f(${
+        var stringBuilder = StringBuilder("&7射箭时无需蓄力即可让箭矢以最大蓄力状态射出,/s")
+        if (enchantLevel > 1)
+            stringBuilder.append(
+                "&7每 &e1 &7次箭矢射出并命中为自身添加 &b速度 ${RomanUtil.convert(if (enchantLevel > 1) enchantLevel - 1 else 1)} &f(${
                     TimeUtil.millisToTimer(
                         (enchantLevel + 1) * 1000L + 2000L
                     )
-                })/s" +
-                "/s\"&7&o我就是闪电侠\""
+                })/s"
+            )
+        stringBuilder.append(
+            "&7每 &e2 &7次箭矢射出并命中为自身添加 &b速度 ${RomanUtil.convert(enchantLevel + 1)} &f(${
+                TimeUtil.millisToTimer(
+                    (enchantLevel + 1) * 1000L + 2000L
+                )
+            })/s"
+        ).append("/s\"&7&o我就是闪电侠\"")
+        return stringBuilder.toString()
     }
 
     @EventHandler
@@ -104,6 +113,30 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         val playerId = attacker.uniqueId
         val currentHitCount = hitCount.getOrDefault(playerId, 0) + 1
         hitCount[playerId] = currentHitCount
+        val existingSpeed = attacker.activePotionEffects.find { it.type == PotionEffectType.SPEED }
+        if (currentHitCount == 1) {
+            if (existingSpeed == null) {
+                attacker.addPotionEffect(
+                    PotionEffect(
+                        PotionEffectType.SPEED,
+                        20 * (enchantLevel + 1) + 20 * 2,
+                        enchantLevel - 2,
+                        true
+                    )
+                )
+            } else if (existingSpeed.amplifier <= enchantLevel - 2) {
+                attacker.removePotionEffect(PotionEffectType.SPEED)
+                attacker.addPotionEffect(
+                    PotionEffect(
+                        PotionEffectType.SPEED,
+                        20 * (enchantLevel + 1) + 20 * 2,
+                        enchantLevel - 2,
+                        true
+                    )
+                )
+            }
+            return
+        }
         if (currentHitCount == 2) {
             attacker.removePotionEffect(PotionEffectType.SPEED)
             attacker.addPotionEffect(
@@ -120,32 +153,6 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         }
     }
 
-    private fun addAndBoostEffect(itemInHand: ItemStack, shooter: Player) {
-        val enchantLevel = this.getItemEnchantLevel(itemInHand)
-        val existingSpeed = shooter.activePotionEffects.find { it.type == PotionEffectType.SPEED }
-        if (existingSpeed == null) return
-        var potionEffectTime = existingSpeed.duration
-        var potionEffectLevel = existingSpeed.amplifier
-
-        potionEffectTime += enchantLevel * 20 + 20
-        if (potionEffectTime > enchantLevel * 20 * 4) {
-            potionEffectTime = enchantLevel * 20 * 4
-        }
-        potionEffectLevel += 1
-        if (potionEffectLevel > enchantLevel) {
-            potionEffectLevel = enchantLevel
-        }
-        shooter.removePotionEffect(PotionEffectType.SPEED)
-        shooter.addPotionEffect(
-            PotionEffect(
-                PotionEffectType.SPEED,
-                potionEffectTime,
-                potionEffectLevel,
-                false,
-                true
-            )
-        )
-    }
 
     override fun getText(level: Int, player: Player): String {
         return "&e&l" + hitCount.getOrDefault(
