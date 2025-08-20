@@ -26,7 +26,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
+import org.bukkit.event.player.PlayerChangedWorldEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 
 class PlayerListener : Listener {
@@ -384,6 +388,22 @@ class PlayerListener : Listener {
             player.playSound(player.location, Sound.VILLAGER_NO, 1.0f, 1.0f)
             event.isCancelled = true
         }
+    }
+
+    @EventHandler
+    fun onWorldChange(event: PlayerChangedWorldEvent) {
+        val player = event.player
+        val worldName = player.world.name
+        if (worldName.equals("afk", ignoreCase = true)) {
+            player.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, Int.MAX_VALUE, 4, false, false))
+        }
+    }
+
+    @EventHandler
+    fun inSpawn(event: PlayerMoveEvent) {
+        var player = event.player
+        val profile = PlayerProfile.getRawCache(player.uniqueId) ?: return
+        if (!profile.isInArena) player.removePotionEffect(PotionEffectType.REGENERATION)
     }
 
     private fun getItemNBT(item: ItemStack?): String {

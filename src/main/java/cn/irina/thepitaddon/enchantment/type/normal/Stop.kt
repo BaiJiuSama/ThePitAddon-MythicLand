@@ -41,13 +41,12 @@ class Stop : AbstractEnchantment(), IPlayerShootEntity {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        var cd = 3 - enchantLevel
-        if (cd < 0) cd = 0
+        var cd = 4 - enchantLevel
         val duration = enchantLevel * 2 + 2
         val s = StringBuilder("&7弓箭命中敌人后对敌人施加 &c缓慢 I &f(00:0${duration}) /s")
         if (enchantLevel >= 2) {
             s.append("&7同时, 降低敌人的一级 &b速度 &7效果")
-            if (cd > 0) s.append(" (${cd}s冷却)")
+            s.append(" (${cd}s冷却)")
             s.append(".")
         }
         return s.toString()
@@ -68,8 +67,7 @@ class Stop : AbstractEnchantment(), IPlayerShootEntity {
                 PotionEffectType.SLOW
             )
         target.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (enchantLevel * 2 + 2) * 20, 0))
-        var cd = 3 - enchantLevel
-        if (cd < 0) cd = 0
+        var cd = 4 - enchantLevel
         val cooldown = reduceSpeedBuffCooldown[attacker.uniqueId]
         if (enchantLevel >= 3) {
             reduceSpeedBuff(target)

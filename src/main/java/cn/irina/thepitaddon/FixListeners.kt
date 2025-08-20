@@ -125,20 +125,6 @@ class FixListeners : Listener {
         (sender as CraftPlayer).handle.playerConnection.sendPacket(packet)
     }
 
-    private fun isShadowBoots(boots: org.bukkit.inventory.ItemStack): Boolean {
-        return "shadow_boots" == net.mizukilab.pit.util.item.ItemUtil.getInternalName(boots)
-    }
-
-    private fun equippedShadowBoots(player: Player): Boolean {
-        if (player.inventory.boots == null || player.inventory.boots.type == org.bukkit.Material.AIR) return false
-        val boots = player.inventory.boots
-        return isShadowBoots(boots)
-    }
-
-    private fun hasShadowBootsInInventory(player: Player): Boolean {
-        return PitManager.hasInternalItem(player, "shadow_boots")
-    }
-
     @EventHandler
     fun onArrowHit(event: ProjectileHitEvent) {
         val arrow = event.entity

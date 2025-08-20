@@ -10,6 +10,7 @@ import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
+import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
@@ -34,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionDisplayEnchant {
     private val maxChargeCooldown: HashMap<UUID, Cooldown> = HashMap()
     private val speedBoostCooldown: HashMap<UUID, Cooldown> = HashMap()
+    private val hitCount: HashMap<UUID, Int> = HashMap()
 
     override fun getEnchantName(): String {
         return "穿云弓"
@@ -58,26 +60,12 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
         return "&7射箭时无需蓄力即可让箭矢以最大蓄力状态射出,/s" +
-                "&7同时, 为自身提升一级速度并延长效果 &e${enchantLevel + 1} &7秒 (2秒冷却) /s" +
-                "&7(上限为${enchantLevel * 4} &7秒, 等级最高为${RomanUtil.convert(enchantLevel + 1)}级) /s" +
-                "&7此附魔每秒只能触发一次, 触发效果提升时必须拥有速度效果/s" +
-                "/s" +
-                "  \"&7&o我就是闪电侠\""
-    }
-
-    override fun handleShootEntity(
-        enchantLevel: Int,
-        shooter: Player,
-        target: Entity?,
-        v: Double,
-        atomicDouble: AtomicDouble?,
-        atomicDouble1: AtomicDouble?,
-        atomicBoolean: AtomicBoolean?
-    ) {
-        val existingSpeed = shooter.activePotionEffects.find { it.type == PotionEffectType.SPEED }
-        if (existingSpeed == null) {
-            return
-        }
+                "&7每 &e2 &7次箭矢射出并命中为自身添加 &b速度 ${RomanUtil.convert(enchantLevel + 1)} &f(${
+                    TimeUtil.millisToTimer(
+                        (enchantLevel + 1) * 1000L + 2000L
+                    )
+                })/s" +
+                "/s\"&7&o我就是闪电侠\""
     }
 
     @EventHandler
@@ -91,9 +79,6 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         if (level == -1) {
             return
         }
-//        if (shooter.isSneaking) {
-//            return
-//        }
         if (itemInHand.type != Material.BOW) {
             return
         }
@@ -105,10 +90,33 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
             val bow = itemStack.item as ItemBow
             bow.a(itemStack, ePlayer.world, ePlayer, 0)
         }
+    }
 
-        if (speedBoostCooldown.getOrDefault(shooter.uniqueId, Cooldown(0L)).hasExpired()) {
-            speedBoostCooldown[shooter.uniqueId] = Cooldown(2, TimeUnit.SECONDS)
-            addAndBoostEffect(itemInHand, shooter)
+    override fun handleShootEntity(
+        enchantLevel: Int,
+        attacker: Player,
+        target: Entity,
+        damage: Double,
+        finalDamage: AtomicDouble?,
+        boostDamage: AtomicDouble?,
+        cancel: AtomicBoolean?
+    ) {
+        val playerId = attacker.uniqueId
+        val currentHitCount = hitCount.getOrDefault(playerId, 0) + 1
+        hitCount[playerId] = currentHitCount
+        if (currentHitCount == 2) {
+            attacker.removePotionEffect(PotionEffectType.SPEED)
+            attacker.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    20 * (enchantLevel + 1) + 20 * 2,
+                    enchantLevel,
+                    true
+                )
+            )
+            hitCount[playerId] = 0
+        } else if (currentHitCount > 2) {
+            hitCount[playerId] = 0
         }
     }
 
@@ -140,12 +148,9 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
     }
 
     override fun getText(level: Int, player: Player): String {
-        if (!PlayerUtil.isVenom(player)) return getCooldownActionText(
-            speedBoostCooldown.getOrDefault(
-                player.uniqueId,
-                Cooldown(0L)
-            )
-        )
-        return "&c&l✘"
+        return "&e&l" + hitCount.getOrDefault(
+            player.uniqueId,
+            0
+        ) + "/" + 2
     }
 }

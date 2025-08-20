@@ -142,7 +142,8 @@ class EnchantmentManager {
                 //"soul_of_frozen_clarity"
                 //"think_of_the_people"
                 //"bounty_hunter_hunter"
-                "rush_E_dj"
+                //"shattered_astral_crossbow"
+                //"piercing_bow"
             )
         )
     }

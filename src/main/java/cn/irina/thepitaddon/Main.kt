@@ -268,7 +268,7 @@ class Main : JavaPlugin() {
             "RainbowTylenol.nbs",
             "GirlsBandCry.nbs",
             "Megalovania.nbs",
-            "NeverGonnaGiveYouUp.nbs"
+            "NeverGonnaGiveYouUp.nbs",
         )
 
         for (filePath in musicResources) {
