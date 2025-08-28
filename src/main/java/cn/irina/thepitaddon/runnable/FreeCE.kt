@@ -120,15 +120,20 @@ class FreeCE : Runnable {
     }
 
     private fun giveAfkFragment(player: Player) {
-        var amount = Random.nextInt(2)
-        val pitItem = PitItem()
-        if (!meetRequirements(player)) amount = 0
+        var chance = 0
+        var amount = 1
+        val playerProfile = PlayerProfile.getRawCache(player.uniqueId) ?: return
+        if (meetRequirements(player)) chance = playerProfile.kills / 2000
+        if (chance > 50) chance = 50
         if (isVIP(player)) {
+            chance = 100
             amount = Random.nextInt(3) + 1
         }
-        if (amount != 0 && hasAmuletInInventory(player, "amulet_traveller")) amount += 1
+        if (hasAmuletInInventory(player, "amulet_traveller")) amount += 1
+        if (Random.nextInt(100) > chance) return
+        val afkFragment = PitItem().afkFragment
         for (i in 0 until amount) {
-            player.inventory.addItem(pitItem.afkFragment)
+            player.inventory.addItem(afkFragment)
         }
         if (amount > 0) player.sendMessage(CC.translate(getItemMessage).replace("%count%", amount.toString()))
     }
@@ -170,8 +175,6 @@ class FreeCE : Runnable {
         if (data != null) {
             profile.experience = LevelUtil.getLevelTotalExperience(profile.getPrestige(), 50)
         }
-        //PlayerUtil.clearPlayer(player);
-        //InventoryUtil.supplyItems(player);
         var award = 10
         if (profile.getPrestige() > 4) {
             award += 10
