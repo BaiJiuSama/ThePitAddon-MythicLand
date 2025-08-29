@@ -357,6 +357,7 @@ class PlayerListener : Listener {
             }
         }
 
+        if (!killer.isOnline) return
         player.sendMessage(
             CC.translate(
                 "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
