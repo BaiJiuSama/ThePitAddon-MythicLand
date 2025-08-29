@@ -69,8 +69,9 @@ class TemporalRipple: AbstractEnchantment(), IPlayerDamaged, Listener {
         myself.sendMessage(CC.translate("&b&l时间涟漪! &7效果触发!"))
 
         Bukkit.getScheduler().runTaskLater(instance, {
-            myself.noDamageTicks -= boostTick
-            myself.sendMessage(CC.translate("&b&l时间涟漪! &7效果结束..."))
+            val me = if (!myself.isOnline) Bukkit.getOfflinePlayer(myself.uniqueId).player else myself
+            me.noDamageTicks -= boostTick
+            me.sendMessage(CC.translate("&b&l时间涟漪! &7效果结束..."))
         }, 3 * 20L)
     }
 
