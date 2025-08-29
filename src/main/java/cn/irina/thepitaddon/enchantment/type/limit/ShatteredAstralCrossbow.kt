@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.enchantment.type.limit
 import cn.charlotte.pit.ThePit
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.cooldown.Cooldown
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @Date 2025/8/20 03:52
  */
 
+@BowOnly
 class ShatteredAstralCrossbow: AbstractEnchantment(), IPlayerShootEntity, Listener {
     override fun getEnchantName(): String {
         return "殒星残弩"

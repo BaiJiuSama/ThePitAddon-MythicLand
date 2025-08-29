@@ -37,6 +37,8 @@ class GetLastestKiller: Listener {
     @EventHandler
     fun onDeath(evt: PlayerDeathEvent) {
         val player = evt.entity
+        if (player.hasMetadata("NPC")) return
+
         val killer = player.killer
         val killerName = PlayerProfile.getRawCache(killer.uniqueId).formattedNameWithRoman
 
