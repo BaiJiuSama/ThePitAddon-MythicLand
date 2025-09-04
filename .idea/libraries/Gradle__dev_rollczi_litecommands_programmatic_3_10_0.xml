@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: dev.rollczi:litecommands-programmatic:3.10.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="dev.rollczi" artifactId="litecommands-programmatic" version="3.10.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-programmatic/3.10.0/4baefd2d91bf4c5bbd8679cad57892aa4f1fe083/litecommands-programmatic-3.10.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-programmatic/3.10.0/36574f315a493bad4dd21a6aba56436a7961601b/litecommands-programmatic-3.10.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-programmatic/3.10.0/38312c95537c620312c5f66a97effd5768335fae/litecommands-programmatic-3.10.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

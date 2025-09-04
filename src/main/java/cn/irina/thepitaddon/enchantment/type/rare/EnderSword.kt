@@ -50,8 +50,8 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.getAction() != Action.RIGHT_CLICK_AIR) return
-        val player = event.getPlayer()
+        if (event.action != Action.RIGHT_CLICK_AIR) return
+        val player = event.player
 
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
 
@@ -64,7 +64,7 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
         val level = ThePit.getApi().getItemEnchantLevel(player.itemInHand, this.nbtName)
         Companion.cooldown.put(player.uniqueId, Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS))
-        enchantLevel.put(player.uniqueId, level)
+        enchantLevel[player.uniqueId] = level
 
         player.launchProjectile(EnderPearl::class.java).shooter = player
 
@@ -77,7 +77,7 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
     @EventHandler
     fun onTeleport(event: PlayerTeleportEvent) {
-        val player = event.getPlayer()
+        val player = event.player
         if (player == null || enchantLevel.getOrDefault(
                 player.uniqueId,
                 -1
