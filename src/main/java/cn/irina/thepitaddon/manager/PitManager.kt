@@ -6,6 +6,8 @@ import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 /**
  * @Author ShanguanLinG
@@ -23,18 +25,23 @@ object PitManager {
         return internalName == getInternalName(item)
     }
 
+    @JvmStatic
     fun getInternalName(item: ItemStack): String {
         return ItemUtil.getInternalName(item) ?: ""
     }
 
+    @JvmStatic
     fun hasPitEnchant(item: ItemStack, enchantName: String): Boolean {
         return getPitEnchantLevel(item, enchantName) > 0
     }
 
+    @JvmStatic
     fun getPitEnchantLevel(item: ItemStack, enchantName: String): Int {
         return pitApi.getItemEnchantLevel(item, enchantName)
     }
 
+
+    @JvmStatic
     fun takeInternalItem(player: Player, internalName: String, count: Int) {
         var remaining = count
         val inventory = player.inventory
@@ -54,6 +61,7 @@ object PitManager {
         player.updateInventory()
     }
 
+    @JvmStatic
     @Throws(NullPointerException::class)
     fun getInternalItemFromInventory(player: Player, internalName: String): ItemStack? {
         for (slot in 0 until player.inventory.size) {
@@ -64,6 +72,7 @@ object PitManager {
         return null
     }
 
+    @JvmStatic
     fun getInternalItemAmount(player: Player, internalName: String): Int {
         var amount = 0
         for (item in player.inventory) {
@@ -74,18 +83,48 @@ object PitManager {
         return amount
     }
 
+    @JvmStatic
+    fun givePlayerSpeedBuff(player: Player, duration: Int, level: Int) {
+        val existingSpeed = player.activePotionEffects.find { it.type == PotionEffectType.SPEED }
+        if (existingSpeed == null) {
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    duration,
+                    level,
+                    true
+                )
+            )
+        } else {
+            if (existingSpeed.amplifier > level) return
+            player.removePotionEffect(PotionEffectType.SPEED)
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    duration,
+                    level,
+                    true
+                )
+            )
+        }
+    }
+
+    @JvmStatic
     fun isAmulet(item: ItemStack): Boolean {
         return getInternalName(item).startsWith("amulet_")
     }
 
+    @JvmStatic
     fun isAmulet(item: ItemStack, amuletName: String): Boolean {
         return getInternalName(item) == "amulet_$amuletName"
     }
 
+    @JvmStatic
     fun hasInternalItem(player: Player, internalName: String): Boolean {
         return getInternalItemAmount(player, internalName) > 0
     }
 
+    @JvmStatic
     fun hasEnoughInternalItem(player: Player, internalName: String, count: Int): Boolean {
         return getInternalItemAmount(player, internalName) >= count
     }
