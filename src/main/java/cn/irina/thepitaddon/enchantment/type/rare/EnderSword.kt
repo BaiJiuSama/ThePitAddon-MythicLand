@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.manager.PitManager
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
@@ -15,14 +16,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
-
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 @WeaponOnly
-class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
+class EnderSword : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     override fun getEnchantName(): String {
         return "末影剑"
     }
@@ -83,18 +81,13 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
                 -1
             )!! <= 0 || event.cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL
         ) return
-
-        if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
-
-        player.addPotionEffect(
-            PotionEffect(
-                PotionEffectType.SPEED,
+        enchantLevel[player.uniqueId]?.let {
+            PitManager.givePlayerSpeedBuff(
+                player,
                 4 * 20,
-                enchantLevel.get(player.uniqueId)!!,
-                false,
-                true
+                it
             )
-        )
+        }
     }
 
     companion object {

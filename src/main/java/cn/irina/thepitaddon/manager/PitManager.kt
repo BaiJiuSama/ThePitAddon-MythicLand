@@ -97,6 +97,7 @@ object PitManager {
             )
         } else {
             if (existingSpeed.amplifier > level) return
+            if (existingSpeed.amplifier >= level && existingSpeed.duration > duration) return
             player.removePotionEffect(PotionEffectType.SPEED)
             player.addPotionEffect(
                 PotionEffect(

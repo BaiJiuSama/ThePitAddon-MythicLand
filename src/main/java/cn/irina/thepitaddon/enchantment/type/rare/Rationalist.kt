@@ -22,7 +22,7 @@ import kotlin.collections.HashMap
 @ArmorOnly
 class Rationalist : AbstractEnchantment(), IPlayerDamaged {
 
-//    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
+    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
 
     override fun getEnchantName(): String {
         return "理性主义者"
@@ -65,13 +65,13 @@ class Rationalist : AbstractEnchantment(), IPlayerDamaged {
         if (!hasGambleEnchant) {
             return
         }
-//        if (!cooldown.getOrDefault(victim.uniqueId, Cooldown(0L)).hasExpired()) return
+        if (!cooldown.getOrDefault(victim.uniqueId, Cooldown(0L)).hasExpired()) return
         if (victim.hasPotionEffect(PotionEffectType.REGENERATION)) victim.removePotionEffect(PotionEffectType.REGENERATION)
         victim.addPotionEffect(PotionEffect(PotionEffectType.REGENERATION, 20, 1 + enchantLevel, false, true))
         val craftPlayer = victim as CraftPlayer
         val absorptionHearts = craftPlayer.handle.absorptionHearts
         if (absorptionHearts >= FixListeners.LimitAbsorptionHearts) return
         craftPlayer.handle.absorptionHearts += 2 * (0.4 + (0.4 * enchantLevel)).toFloat()
-//        cooldown[victim.uniqueId] = Cooldown(500, TimeUnit.MILLISECONDS)
+        cooldown[victim.uniqueId] = Cooldown(500, TimeUnit.MILLISECONDS)
     }
 }
