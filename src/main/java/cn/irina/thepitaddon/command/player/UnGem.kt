@@ -81,7 +81,7 @@ class UnGem {
                 itObj.changeNbt("boostedByGem", 0).changeNbt("boostedByGlobalGem", 0).build()
                 takeInternalGem(player, reverseUniversalGemInternalName)
 
-                player.sendMessage(CC.translate("$prefix&a成功移除了所有宝石点缀."))
+                player.sendMessage(CC.translate("$prefix&a成功移除了所有宝石点缀. 请将神话物品放入附魔台刷新!"))
             }
         }
 
