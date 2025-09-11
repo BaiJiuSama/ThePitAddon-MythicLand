@@ -1,21 +1,26 @@
 package cn.irina.thepitaddon.enchantment.type.recode.rare
 
 import cn.charlotte.pit.ThePit
+import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.util.PlayerUtil
+import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
+import java.util.concurrent.atomic.AtomicBoolean
 
 @ArmorOnly
-class Regularity : AbstractEnchantment(), Listener {
+class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
 
     private val pitAPI = ThePit.getApi()
 
@@ -64,7 +69,6 @@ class Regularity : AbstractEnchantment(), Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
         if (event.entity !is Player) return
@@ -82,9 +86,7 @@ class Regularity : AbstractEnchantment(), Listener {
         val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
         if (level < 1) return
 
-
-        if (event.finalDamage < a(level)
-        ) {
+        if (event.finalDamage < a(level)) {
             val metadata = victim.getMetadata("regularity_cooldown")
             metadata.firstOrNull()?.asLong()?.let {
                 if (System.currentTimeMillis() < it) {
@@ -95,7 +97,6 @@ class Regularity : AbstractEnchantment(), Listener {
             if (!victim.isDead) {
                 val boost = b(level) * 0.01
                 Bukkit.getScheduler().runTaskLater(ThePit.getInstance(), {
-
                     victim.noDamageTicks = 0
                     victim.damage(event.damage * boost, attacker)
                     victim.setMetadata(
@@ -104,6 +105,25 @@ class Regularity : AbstractEnchantment(), Listener {
                     )
                 }, 5L)
             }
+        }
+    }
+
+    override fun handleAttackEntity(
+        enchantLevel: Int,
+        player: Player,
+        entity: Entity,
+        v: Double,
+        atomicDouble: AtomicDouble,
+        boostDamage: AtomicDouble,
+        atomicBoolean: AtomicBoolean
+    ) {
+        if (entity !is Player) return
+        if (!entity.hasMetadata("regularity_cooldown")) return
+        val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
+        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
+            if (pitAPI.getItemEnchantLevel(player.inventory.itemInHand, "billionaire") <= 0) return
+//            player.sendMessage(CC.translate("&7" + (cooldownEnd - System.currentTimeMillis())))
+            boostDamage.getAndSet(0.1)
         }
     }
 }
