@@ -7,7 +7,6 @@ import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.util.PlayerUtil
-import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
 import org.bukkit.entity.Entity
@@ -18,6 +17,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.concurrent.atomic.AtomicBoolean
+
+/*
+ * @Author ShanguanLinG
+ * @Date 2025/9/12 13:13
+ */
 
 @ArmorOnly
 class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
@@ -45,18 +49,15 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当近战伤害低于&c${a(enchantLevel)}❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
-            b(
-                enchantLevel
-            )
-        }%&7."
+        return "&7当近战伤害低于&c${a(enchantLevel)}❤&7时, &7将会自动再次攻击两次./s" +
+                "&7第二, 三次攻击的伤害将&c依次衰减${100 - b(enchantLevel)}%&7, 且不会被更高的伤害所覆盖."
     }
 
     fun a(enchantLevel: Int): Double {
         return when (enchantLevel) {
-            1 -> 0.7
-            2 -> 1.7
-            else -> 1.9
+            1 -> 1.0
+            2 -> 1.5
+            else -> 2.0
         }
     }
 
@@ -72,7 +73,7 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
         if (event.entity !is Player) return
-        var player = (event.entity as Player).player
+        val player = (event.entity as Player).player
         if (attacker !is Player) return
         if (pitAPI.getItemEnchantLevel(player.inventory.leggings, "think_of_the_people") > 0) return
 
@@ -121,8 +122,7 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
         if (!entity.hasMetadata("regularity_cooldown")) return
         val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
         if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
-            if (pitAPI.getItemEnchantLevel(player.inventory.itemInHand, "billionaire") <= 0) return
-            boostDamage.getAndSet(0.1)
+            boostDamage.getAndSet(0.01)
         }
     }
 }
