@@ -122,7 +122,6 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
         val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
         if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
             if (pitAPI.getItemEnchantLevel(player.inventory.itemInHand, "billionaire") <= 0) return
-//            player.sendMessage(CC.translate("&7" + (cooldownEnd - System.currentTimeMillis())))
             boostDamage.getAndSet(0.1)
         }
     }
