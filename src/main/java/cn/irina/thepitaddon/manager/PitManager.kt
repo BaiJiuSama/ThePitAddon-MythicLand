@@ -4,6 +4,7 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -40,6 +41,16 @@ object PitManager {
         return pitApi.getItemEnchantLevel(item, enchantName)
     }
 
+    @JvmStatic
+    fun getAbsorptionHearts(player: Player): Float {
+        val craftPlayer = player as CraftPlayer
+        return craftPlayer.handle.absorptionHearts
+    }
+
+    fun hasAbsolutionHearts(player: Player): Boolean {
+        val absorptionHearts = getAbsorptionHearts(player)
+        return absorptionHearts > 0
+    }
 
     @JvmStatic
     fun takeInternalItem(player: Player, internalName: String, count: Int) {
@@ -59,17 +70,6 @@ object PitManager {
             remaining -= takeAmount
         }
         player.updateInventory()
-    }
-
-    @JvmStatic
-    @Throws(NullPointerException::class)
-    fun getInternalItemFromInventory(player: Player, internalName: String): ItemStack? {
-        for (slot in 0 until player.inventory.size) {
-            val item = player.inventory.getItem(slot) ?: continue
-            if (!hasInternalName(item, internalName)) continue
-            return item
-        }
-        return null
     }
 
     @JvmStatic

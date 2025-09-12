@@ -1,6 +1,7 @@
 package cn.irina.thepitaddon.enchantment.type.recode.rare
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.manager.PitManager
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
@@ -120,6 +121,7 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
     ) {
         if (entity !is Player) return
         if (!entity.hasMetadata("regularity_cooldown")) return
+        if (PitManager.hasAbsolutionHearts(entity)) return
         val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
         if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
             boostDamage.getAndSet(0.01)
