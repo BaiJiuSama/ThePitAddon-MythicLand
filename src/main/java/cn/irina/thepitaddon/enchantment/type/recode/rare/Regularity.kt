@@ -55,9 +55,9 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
 
     fun a(enchantLevel: Int): Double {
         return when (enchantLevel) {
-            1 -> 1.0
-            2 -> 1.5
-            else -> 2.0
+            1 -> 0.7
+            2 -> 1.7
+            else -> 1.9
         }
     }
 

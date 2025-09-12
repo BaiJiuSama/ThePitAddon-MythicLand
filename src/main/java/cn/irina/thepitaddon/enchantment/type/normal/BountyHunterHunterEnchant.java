@@ -46,7 +46,7 @@ public class BountyHunterHunterEnchant extends AbstractEnchantment implements IA
 
     @Override
     public String getUsefulnessLore(int enchantLevel) {
-        return "&7自身有悬赏时造成的伤害 &c+" + (5 + 10 * enchantLevel) + "%";
+        return "&7自身有悬赏时造成的伤害 &c+" + (10 + 5 * enchantLevel) + "%";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BountyHunterHunterEnchant extends AbstractEnchantment implements IA
     public void handleAttackEntity(int enchantLevel, Player attacker, Entity target, double damage, AtomicDouble finalDamage, AtomicDouble boostDamage, AtomicBoolean cancel) {
         int bounty = PlayerProfile.getPlayerProfileByUuid(attacker.getUniqueId()).getBounty();
         if (bounty > 0) {
-            boostDamage.set(boostDamage.get() + (enchantLevel * 0.1 + 0.05));
+            boostDamage.set(boostDamage.get() + (0.1 + enchantLevel * 0.05));
         }
     }
 }
