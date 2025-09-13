@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="ThePitUltimate-core-dev" level="project" />
+    <orderEntry type="library" name="KnockbackManager-1.9.6" level="project" />
   </component>
 </module>

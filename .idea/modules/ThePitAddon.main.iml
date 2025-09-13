@@ -113,5 +113,6 @@
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.16.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.mongodb:bson-record-codec:5.0.0" level="project" />
     <orderEntry type="library" name="ThePitUltimate-core-dev" level="project" />
+    <orderEntry type="library" name="KnockbackManager-1.9.6" level="project" />
   </component>
 </module>

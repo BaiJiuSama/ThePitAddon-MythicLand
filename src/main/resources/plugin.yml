@@ -3,6 +3,8 @@ version: 0.0.4
 author: Irina, MindsMaster_, ShanguanLinG
 main: cn.irina.thepitaddon.Main
 load: STARTUP
+softdepend:
+  - KnockbackManager
 depend:
   - ThePitUltimate
   - LuckPerms
