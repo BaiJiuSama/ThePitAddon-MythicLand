@@ -74,7 +74,7 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
         if (event.entity !is Player) return
-        val player = (event.entity as Player).player
+        var player = (event.entity as Player).player
         if (attacker !is Player) return
         if (pitAPI.getItemEnchantLevel(player.inventory.leggings, "think_of_the_people") > 0) return
 
@@ -88,7 +88,8 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
         val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
         if (level < 1) return
 
-        if (event.finalDamage < a(level)) {
+        if (event.finalDamage < a(level)
+        ) {
             val metadata = victim.getMetadata("regularity_cooldown")
             metadata.firstOrNull()?.asLong()?.let {
                 if (System.currentTimeMillis() < it) {

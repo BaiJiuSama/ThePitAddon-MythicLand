@@ -1,11 +1,11 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
+import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.manager.PitManager
 import cn.irina.thepitaddon.manager.PitManager.hasPitEnchant
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.getPitProfile
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -45,7 +45,7 @@ class Heavy : AbstractEnchantment(), Listener {
 
     @EventHandler
     fun onExit(event: PlayerQuitEvent) {
-        val profile = event.player.getPitProfile()
+        val profile = PlayerProfile.getRawCache(event.player.uniqueId)
         profile.extraMaxHealth.remove("heavy")
     }
 
@@ -54,7 +54,7 @@ class Heavy : AbstractEnchantment(), Listener {
         val player = event.player
         val leggings = player.inventory.leggings
         if (leggings != null && hasPitEnchant(leggings, "heavy")) {
-            val profile = player.getPitProfile()
+            val profile = PlayerProfile.getRawCache(event.player.uniqueId)
             val item = player.inventory.leggings
             if (!hasPitEnchant(item, "heavy")) return
             profile.extraMaxHealth["heavy"] = (
@@ -65,7 +65,7 @@ class Heavy : AbstractEnchantment(), Listener {
             player.maxHealth = profile.maxHealth
             return
         }
-        val profile = player.getPitProfile()
+        val profile = PlayerProfile.getRawCache(event.player.uniqueId)
         if (!profile.extraMaxHealth.containsKey("heavy")) return
         profile.extraMaxHealth.remove("heavy")
         player.maxHealth = profile.maxHealth

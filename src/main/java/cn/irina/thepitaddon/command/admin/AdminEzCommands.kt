@@ -36,6 +36,16 @@ class AdminClearBounty {
     }
 }
 
+@Command(name = "setHitDelay")
+@Permission("pit.admin")
+class SetHitDelay {
+    @Execute
+    fun onCommand(@Context player: Player, @Arg delay: Int) {
+        player.noDamageTicks = delay
+        player.sendMessage(CC.translate("&aSUCCESS."))
+    }
+}
+
 @Command(name = "fixWipe")
 @Permission("pit.admin")
 class FixWipe {

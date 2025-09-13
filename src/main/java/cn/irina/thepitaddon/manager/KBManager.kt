@@ -10,9 +10,15 @@ import org.bukkit.inventory.ItemStack
 
 class KBManager : Listener {
 
+    /*
+    * @Author ShanguanLinG
+    * @Date 2025/9/13 23:52
+    */
+
+
     private val kbAPI = Main.instance.kbmAPI
 
-    private fun hasRegEnchant(leggings: ItemStack): Boolean? {
+    private fun hasRegEnchant(leggings: ItemStack): Boolean {
         val hasRegEnchant = leggings.let {
             PitManager.hasPitEnchant(
                 it,
@@ -22,38 +28,50 @@ class KBManager : Listener {
         return hasRegEnchant
     }
 
-    private fun hasGrimReaperEnchant(leggings: ItemStack): Boolean? {
-        val hasGrimReaperEnchant = leggings.let {
+    private fun hasGrimReaperEnchant(leggings: ItemStack): Boolean {
+        return leggings?.let {
             PitManager.hasPitEnchant(
                 it,
                 "grim_reaper_enchant"
             )
-        }
-        return hasGrimReaperEnchant
+        } ?: false
     }
 
+    @Throws(NullPointerException::class)
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
+        val damager = event.damager as Player
         val other: Player = event.entity as Player
-        kbAPI?.setFilter(other, true)
-        other.sendMessage(CC.translate("&csetFilter true."))
-        val kbFileName = kbAPI?.getKBFile(other)
-        other.sendMessage(CC.translate("$other kbFileName: $kbFileName"))
-        val leggings: ItemStack = other.inventory.leggings
-        when {
-            hasRegEnchant(leggings) == true -> {
-                kbAPI?.setKBFile(other, "regularity")
-                other.sendMessage(CC.translate("&csetKBFile regularity."))
+        kbAPI?.let { api ->
+            val kbFileName = api.getKBFile(other)
+            other.sendMessage(CC.translate("$other kbFileName: $kbFileName"))
+            val inventory = damager.inventory
+            val leggings = inventory.leggings
+            if (inventory == null || leggings == null) {
+                api.setKBFile(other, "default")
+                other.sendMessage(CC.translate("&csetKBFile default."))
+                return
             }
+            when {
+                hasRegEnchant(leggings) -> {
+                    api.setKBFile(other, "regularity")
+                    other.sendMessage(CC.translate("&csetKBFile regularity."))
+                    return
+                }
 
-            hasGrimReaperEnchant(leggings) == true -> {
-                kbAPI?.setKBFile(other, "grim_reaper_enchant")
-                other.sendMessage(CC.translate("&csetKBFile grim_reaper_enchant."))
-            }
+                hasGrimReaperEnchant(leggings) -> {
+                    api.setKBFile(other, "grim_reaper_enchant")
+                    other.sendMessage(CC.translate("&csetKBFile grim_reaper_enchant."))
+                    return
+                }
 
-            else -> {
-                kbAPI?.setKBFile(other, "default")
+                else -> {
+                    api.setKBFile(other, "default")
+                    other.sendMessage(CC.translate("&csetKBFile default."))
+                    return
+                }
             }
         }
+
     }
 }

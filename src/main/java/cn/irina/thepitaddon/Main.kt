@@ -64,7 +64,8 @@ class Main : JavaPlugin() {
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
     val pointsAPI: PlayerPointsAPI = PlayerPoints.getInstance().api
-    val kbmAPI: KnockbackManagerAPI? = KnockbackManager.getAPI()
+    var kbmAPI: KnockbackManagerAPI? = null
+        private set
 
     private fun modifyRarityPrefix() {
         try {
@@ -141,6 +142,7 @@ class Main : JavaPlugin() {
     }
 
     private fun setUp() {
+        kbmAPI = KnockbackManager.getInstance().api
         clearEpicEvents()
         loadEnchantmentManager()
         registerCommands()
