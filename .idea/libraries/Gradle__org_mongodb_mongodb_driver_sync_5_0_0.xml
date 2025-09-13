@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: org.mongodb:mongodb-driver-sync:5.0.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.mongodb" artifactId="mongodb-driver-sync" version="5.0.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.mongodb/mongodb-driver-sync/5.0.0/bbc9871e387a3b1952357b28ee88aba60a700ccc/mongodb-driver-sync-5.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.mongodb/mongodb-driver-sync/5.0.0/1ad4432ac87a7efa8b4a297a5a6356736037f7dd/mongodb-driver-sync-5.0.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/org.mongodb/mongodb-driver-sync/5.0.0/6b0843959ef90e94cb3f8b904fa980e6e6f437d7/mongodb-driver-sync-5.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

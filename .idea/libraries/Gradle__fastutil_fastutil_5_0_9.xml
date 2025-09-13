@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: fastutil:fastutil:5.0.9" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="fastutil" artifactId="fastutil" version="5.0.9" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/fastutil/fastutil/5.0.9/85c9e3295a387a4cc73e9a6fc4a4649e6e66d050/fastutil-5.0.9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/fastutil/fastutil/5.0.9/a4328ff41adf6059635be70b52c34f1cd42e7938/fastutil-5.0.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

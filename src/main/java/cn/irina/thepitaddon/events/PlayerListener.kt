@@ -340,32 +340,32 @@ class PlayerListener : Listener {
             .replace("#v", victimName)
             .replace("#k", killerName)
 
-        Bukkit.broadcastMessage(CC.translate(message))
-
-        val legging = CC.translate(" &f[&b护腿&f] ")
-        val weapon = CC.translate(" &f[&b武器&f] ")
-
-        val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
-        val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
-
-        val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
-
         Bukkit.getScheduler().runTask(Main.instance) {
+            Bukkit.broadcastMessage(CC.translate(message))
+
+            val legging = CC.translate(" &f[&b护腿&f] ")
+            val weapon = CC.translate(" &f[&b武器&f] ")
+
+            val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
+            val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
+
+            val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+
             Bukkit.getOnlinePlayers().forEach { p ->
                 if (!p.hasPermission("irina.deathCheck")) return@forEach
                 p.spigot().sendMessage(*msg)
             }
-        }
 
-        if (!killer.isOnline) return
-        player.sendMessage(
-            CC.translate(
-                "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
-                    "%.1f",
-                    killer.health * 0.5
-                ) + "❤"
+            if (!killer.isOnline) return@runTask
+            player.sendMessage(
+                CC.translate(
+                    "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
+                        "%.1f",
+                        killer.health * 0.5
+                    ) + "❤"
+                )
             )
-        )
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

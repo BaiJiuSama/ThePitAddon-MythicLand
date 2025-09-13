@@ -2,10 +2,14 @@ package cn.irina.thepitaddon.manager
 
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
+import dev.rollczi.litecommands.annotations.context.Context
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 /**
  * @Author ShanguanLinG
@@ -23,18 +27,33 @@ object PitManager {
         return internalName == getInternalName(item)
     }
 
+    @JvmStatic
     fun getInternalName(item: ItemStack): String {
         return ItemUtil.getInternalName(item) ?: ""
     }
 
+    @JvmStatic
     fun hasPitEnchant(item: ItemStack, enchantName: String): Boolean {
         return getPitEnchantLevel(item, enchantName) > 0
     }
 
+    @JvmStatic
     fun getPitEnchantLevel(item: ItemStack, enchantName: String): Int {
         return pitApi.getItemEnchantLevel(item, enchantName)
     }
 
+    @JvmStatic
+    fun getAbsorptionHearts(player: Player): Float {
+        val craftPlayer = player as CraftPlayer
+        return craftPlayer.handle.absorptionHearts
+    }
+
+    fun hasAbsolutionHearts(player: Player): Boolean {
+        val absorptionHearts = getAbsorptionHearts(player)
+        return absorptionHearts > 0
+    }
+
+    @JvmStatic
     fun takeInternalItem(player: Player, internalName: String, count: Int) {
         var remaining = count
         val inventory = player.inventory
@@ -51,19 +70,10 @@ object PitManager {
             }
             remaining -= takeAmount
         }
-        player.updateInventory()
+        flushPlayerItem(player)
     }
 
-    @Throws(NullPointerException::class)
-    fun getInternalItemFromInventory(player: Player, internalName: String): ItemStack? {
-        for (slot in 0 until player.inventory.size) {
-            val item = player.inventory.getItem(slot) ?: continue
-            if (!hasInternalName(item, internalName)) continue
-            return item
-        }
-        return null
-    }
-
+    @JvmStatic
     fun getInternalItemAmount(player: Player, internalName: String): Int {
         var amount = 0
         for (item in player.inventory) {
@@ -74,18 +84,65 @@ object PitManager {
         return amount
     }
 
+    @JvmStatic
+    fun givePlayerSpeedBuff(player: Player, duration: Int, level: Int) {
+        val existingSpeed = player.activePotionEffects.find { it.type == PotionEffectType.SPEED }
+        if (existingSpeed == null) {
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    duration,
+                    level,
+                    true
+                )
+            )
+        } else {
+            if (existingSpeed.amplifier > level) return
+            if (existingSpeed.amplifier >= level && existingSpeed.duration > duration) return
+            player.removePotionEffect(PotionEffectType.SPEED)
+            player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.SPEED,
+                    duration,
+                    level,
+                    true
+                )
+            )
+        }
+    }
+
+    fun flushPlayerItem(@Context player: Player) {
+        try {
+            val inventory = player.inventory
+            inventory.forEachIndexed { index, itemStack ->
+                val mmItem = ThePit.getInstance().itemFactory.getItemFromStack(itemStack)
+                if (mmItem != null) {
+                    inventory.remove(index)
+                    inventory.setItem(index, mmItem.toItemStack())
+                }
+            }
+            player.sendMessage("成功刷新.")
+        } catch (ignored: Exception) {
+            player.sendMessage("Error")
+        }
+    }
+
+    @JvmStatic
     fun isAmulet(item: ItemStack): Boolean {
         return getInternalName(item).startsWith("amulet_")
     }
 
+    @JvmStatic
     fun isAmulet(item: ItemStack, amuletName: String): Boolean {
         return getInternalName(item) == "amulet_$amuletName"
     }
 
+    @JvmStatic
     fun hasInternalItem(player: Player, internalName: String): Boolean {
         return getInternalItemAmount(player, internalName) > 0
     }
 
+    @JvmStatic
     fun hasEnoughInternalItem(player: Player, internalName: String, count: Int): Boolean {
         return getInternalItemAmount(player, internalName) >= count
     }

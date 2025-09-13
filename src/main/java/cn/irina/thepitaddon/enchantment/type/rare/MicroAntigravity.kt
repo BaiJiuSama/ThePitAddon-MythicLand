@@ -2,6 +2,7 @@ package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
+import cn.irina.thepitaddon.manager.PitManager
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
@@ -14,8 +15,6 @@ import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -81,18 +80,15 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
         if (hitCounts[playerUUID] == 3) {
             val ap = PlayerProfile.getRawCache(entity.uniqueId)
             player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
-
             keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
-
             PlayerUtil.heal(player, 4.0)
-
-            if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
-            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 7 * 20, enchantLevel - 1, false, true))
-
+            PitManager.givePlayerSpeedBuff(
+                player,
+                8 * 20,
+                enchantLevel - 1
+            )
             if (keepBoost[player.uniqueId] == null || keepBoost[player.uniqueId]!!.hasExpired()) return
-
             reduceDamage.getAndAdd(enchantLevel * -0.04)
-
             val craftPlayer = player as CraftPlayer
             val hemorrhageEnchantLevel = ThePit.getApi().getItemEnchantLevel(entity.itemInHand, "Hemorrhage")
             if (hemorrhageEnchantLevel <= 0) {

@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.recode.normal
 
+import cn.irina.thepitaddon.manager.PitManager
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.event.PlayerOnly
@@ -65,15 +66,7 @@ class Electrolytes : AbstractEnchantment(), IPlayerKilledEntity {
             myself.removePotionEffect(p.type)
             val maxDuration = (enchantLevel + 2) * 6 * 20
             val finalDuration = if (duration >= maxDuration) maxDuration else duration
-            myself.addPotionEffect(
-                PotionEffect(
-                    PotionEffectType.SPEED,
-                    finalDuration,
-                    p.amplifier,
-                    false,
-                    true
-                )
-            )
+            PitManager.givePlayerSpeedBuff(myself, finalDuration, p.amplifier)
         }
     }
 }

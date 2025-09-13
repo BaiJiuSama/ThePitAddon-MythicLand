@@ -131,7 +131,7 @@ class EnchantmentManager {
                 //"frost"
                 "outnumbered_by_the_enemy",
                 //"tear"
-                "vital_echo",
+                //"vital_echo",
                 //"lonely_red_blood"
                 //"steal"
                 //"piercing_bow"

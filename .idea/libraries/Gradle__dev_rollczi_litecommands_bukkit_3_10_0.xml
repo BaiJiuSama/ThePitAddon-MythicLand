@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: dev.rollczi:litecommands-bukkit:3.10.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="dev.rollczi" artifactId="litecommands-bukkit" version="3.10.0" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-bukkit/3.10.0/ce5550ff80d3496b5ed1d8164fbfaa81f8ad2e37/litecommands-bukkit-3.10.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-bukkit/3.10.0/eb191fa9e377ee9ca1298cf497e7ab159ac042c6/litecommands-bukkit-3.10.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../../../../../../Program Files/gradle-9.0.0-milestone-8-docs/caches/modules-2/files-2.1/dev.rollczi/litecommands-bukkit/3.10.0/16d3e87078566ca8b097a88c71cfc65ca745d2b5/litecommands-bukkit-3.10.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

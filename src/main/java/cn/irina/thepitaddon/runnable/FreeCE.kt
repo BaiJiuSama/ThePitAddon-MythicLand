@@ -54,7 +54,7 @@ class FreeCE : Runnable {
             player.itemInHand = fixMythicItems(item)
             PitManager.takeInternalItem(player, "chunk_of_vile_item", 1)
             player.sendMessage(CC.translate(getSuccessfulFixItemInHand))
-            player.updateInventory()
+            PitManager.flushPlayerItem(player)
         }
     }
 
@@ -140,14 +140,22 @@ class FreeCE : Runnable {
 
     private fun getRewardExp(prestige: Int): Double {
         var booster = 0.24              // 50->79
-        if (prestige <= 12) {           // 50->99
-            booster = 0.48
-        } else if (prestige <= 20) {    // 50->92
-            booster = 0.40
-        } else if (prestige <= 30) {    // 50->88
-            booster = 0.36
-        } else if (prestige <= 40) {    // 50->85
-            booster = 0.32
+        when {
+            prestige <= 12 -> {           // 50->99
+                booster = 0.48
+            }
+
+            prestige <= 20 -> {    // 50->92
+                booster = 0.40
+            }
+
+            prestige <= 30 -> {    // 50->88
+                booster = 0.36
+            }
+
+            prestige <= 40 -> {    // 50->85
+                booster = 0.32
+            }
         }
         var needExp = 0.0
         for (level in 1..120) {

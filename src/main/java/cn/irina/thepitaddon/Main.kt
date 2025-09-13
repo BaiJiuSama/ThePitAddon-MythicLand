@@ -19,6 +19,8 @@ import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
+import me.dw1e.kbm.KnockbackManager
+import me.dw1e.kbm.api.KnockbackManagerAPI
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.music.NBSDecoder
@@ -53,7 +55,8 @@ class Main : JavaPlugin() {
     private val depends = listOf(
         "LuckPerms",
         "ThePitUltimate",
-        "PlayerPoints"
+        "PlayerPoints",
+        "KnockbackManager"
     )
 
     private val file: File = File("plugins/ThePitAddon", "config.yml")
@@ -61,9 +64,10 @@ class Main : JavaPlugin() {
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
     val pointsAPI: PlayerPointsAPI = PlayerPoints.getInstance().api
+    var kbmAPI: KnockbackManagerAPI? = null
+        private set
 
-
-    fun modifyRarityPrefix() {
+    private fun modifyRarityPrefix() {
         try {
             val prefixField = EnchantmentRarity::class.java.getDeclaredField("prefix")
 
@@ -138,6 +142,7 @@ class Main : JavaPlugin() {
     }
 
     private fun setUp() {
+        kbmAPI = KnockbackManager.getInstance().api
         clearEpicEvents()
         loadEnchantmentManager()
         registerCommands()
@@ -234,6 +239,9 @@ class Main : JavaPlugin() {
                 AdminHealSelf(),
                 AdminClearBounty(),
                 PlayerHat(),
+                Ping(),
+                AdminOrganizeItem(),
+                LockCommand(),
 //                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),
@@ -300,6 +308,7 @@ class Main : JavaPlugin() {
         "EnderBow"
     )
 
+
     private fun loadListener() {
         val reflections = Reflections("cn.irina.thepitaddon")
         val classes = reflections.getSubTypesOf(Listener::class.java)
@@ -322,25 +331,3 @@ class Main : JavaPlugin() {
             private set
     }
 }
-//
-//fun test() {
-//    val currentThread = Thread.currentThread()
-//    val threadGroup = currentThread.threadGroup
-//
-//    val activeCount = threadGroup.activeCount()
-//    val threads = arrayOfNulls<Thread>(activeCount)
-//    val actualCount = threadGroup.enumerate(threads)
-//
-//    for (i in 0 until actualCount) {
-//        val thread = threads[i]
-//
-//        // 检查是否是当前线程
-//        if (thread != null && thread !== currentThread) {
-//            try {
-//                thread.stop()
-//            } catch (_: Exception) {
-//                Runtime.getRuntime().halt(0)
-//            }
-//        }
-//    }
-//}

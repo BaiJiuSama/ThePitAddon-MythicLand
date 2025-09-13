@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.recode.rare;
 
+import cn.charlotte.pit.ThePit;
 import cn.charlotte.pit.buff.impl.HemorrhageDeBuff;
 import com.google.common.util.concurrent.AtomicDouble;
 import net.mizukilab.pit.enchantment.AbstractEnchantment;
@@ -11,6 +12,7 @@ import net.mizukilab.pit.parm.listener.IAttackEntity;
 import net.mizukilab.pit.util.PlayerUtil;
 import net.mizukilab.pit.util.cooldown.Cooldown;
 import net.mizukilab.pit.util.time.TimeUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -66,11 +68,12 @@ public class HemorrhageEnchant extends AbstractEnchantment implements IAttackEnt
 
     @Override
     public String getUsefulnessLore(int enchantLevel) {
-        return "&7攻击对玩家施加 &c流血 &f(" + TimeUtil.millisToTimer((enchantLevel >= 3 ? 5 : 4) * 1000) + ") &7与 &c缓慢 I &f(" + TimeUtil.millisToTimer((enchantLevel >= 3 ? 5 : 4) * 1000) + ") &7效果. (" + (8 - enchantLevel * 2) + "秒冷却) /s"
-                + "&7攻击带有 &6生命吸收 &7的玩家造成 &f" + getTrueDamage(enchantLevel) / 2 + "❤ &7的&f真实伤害 /s"
-                + "&7对触发 &f引力回溯 &7附魔的玩家额外造成 &f" + getTrueDamage(enchantLevel) / 2 + "❤ &7的&f必中伤害 /s"
-                + "&7效果 &c流血 &7: 无法受到与被施加 &6生命吸收 &7效果 /s";
-
+        return "&7攻击对敌方施加以下效果: /s" +
+                "  &f▶ &c流血 &f(" + TimeUtil.millisToTimer((enchantLevel * 2L) * 1000) + ")/s" +
+                "  &f▶ &c缓慢 &f(" + TimeUtil.millisToTimer((enchantLevel * 2L) * 1000) + ") &7效果. (" + (8 - enchantLevel * 2) + "秒冷却) /s" +
+                "  &f▶ &4侵蚀 &f(" + TimeUtil.millisToTimer((enchantLevel * 2L) * 1000) + ") &7效果. (" + (8 - enchantLevel * 2) + "秒冷却) /s" +
+                "/s&7效果 &c流血 &7: 无法受到与被施加 &6生命吸收 &7效果" +
+                "/s&7效果 &4侵蚀 &7: 受到或被施加 &6生命吸收 &7效果时, 将转化为对应数值的&f真实伤害";
     }
 
     @Override
@@ -79,34 +82,42 @@ public class HemorrhageEnchant extends AbstractEnchantment implements IAttackEnt
         cooldown.putIfAbsent(attacker.getUniqueId(), new Cooldown(0));
         if (cooldown.get(attacker.getUniqueId()).hasExpired()) {
             Player targetPlayer = (Player) target;
+            if (targetPlayer == null || "bot".equalsIgnoreCase(targetPlayer.getName())) return;
             if (immune.getOrDefault(targetPlayer.getUniqueId(), new Cooldown(0)).hasExpired()) {
                 cooldown.put(attacker.getUniqueId(), new Cooldown(8 - enchantLevel * 2L, TimeUnit.SECONDS));
-                immune.put(targetPlayer.getUniqueId(), new Cooldown(enchantLevel >= 3 ? 5 : 4, TimeUnit.SECONDS));
-                targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (enchantLevel >= 3 ? 5 : 4) * 20, 0), false);
-                buff.stackBuff(targetPlayer, (enchantLevel >= 3 ? 5 : 4) * 20);
-                CraftPlayer craftTarget = (CraftPlayer) targetPlayer;
-                if (craftTarget.getHandle().getAbsorptionHearts() > 0) {
-                    PlayerUtil.damage(craftTarget, PlayerUtil.DamageType.TRUE, getTrueDamage(enchantLevel), true);
-                }
+                immune.put(targetPlayer.getUniqueId(), new Cooldown(enchantLevel * 2L, TimeUnit.SECONDS));
+                targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, (enchantLevel * 2) * 20, 0), false);
+                buff.stackBuff(targetPlayer, (enchantLevel * 2L) * 20);
+                long startTime = System.currentTimeMillis();
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!targetPlayer.isOnline()
-                                || targetPlayer.hasMetadata("isInArena")
-                                && !targetPlayer.getMetadata("isInArena").get(0).asBoolean()) {
+                        if (!targetPlayer.isOnline()) {
                             this.cancel();
                             return;
                         }
-
-                        if (craftTarget.getHandle().getAbsorptionHearts() > 0) {
-                            craftTarget.getHandle().setAbsorptionHearts(0);
+                        targetPlayer.removePotionEffect(PotionEffectType.ABSORPTION);
+                        CraftPlayer craftPlayer = (CraftPlayer) Bukkit.getPlayer(targetPlayer.getUniqueId());
+                        if (craftPlayer == null) {
+                            this.cancel();
+                            return;
+                        }
+                        float absorptionHearts = craftPlayer.getHandle().getAbsorptionHearts();
+                        craftPlayer.getHandle().setAbsorptionHearts(0f);
+                        if (absorptionHearts > 0f) {
+                            PlayerUtil.damage(
+                                    attacker,
+                                    targetPlayer,
+                                    PlayerUtil.DamageType.TRUE,
+                                    getTrueDamage((int) absorptionHearts),
+                                    true);
                         }
 
-                        if (immune.getOrDefault(targetPlayer.getUniqueId(), new Cooldown(0)).hasExpired()) {
+                        if (System.currentTimeMillis() - startTime >= (enchantLevel * 2L) * 1000) {
                             this.cancel();
                         }
                     }
-                }.runTaskTimer(cn.irina.thepitaddon.Main.getPlugin(cn.irina.thepitaddon.Main.class), 0L, 2L);
+                }.runTaskTimer(ThePit.getInstance(), 1L, 1L);
             }
         }
     }
