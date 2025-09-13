@@ -1,11 +1,13 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
 import cn.charlotte.pit.ThePit
+import cn.irina.thepitaddon.Main
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.WeaponOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.PlayerUtil
+import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.entity.EnderPearl
@@ -48,6 +50,11 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
                 "&7当末影珍珠落地时, 自身获得 &b速度 " + RomanUtil.convert(enchantLevel + 1) + " &7(00:04)"
     }
 
+    private val enchantLevel = HashMap<UUID, Int>()
+    private val cooldown = HashMap<UUID, Cooldown>()
+
+    private val pitApi = ThePit.getApi()
+    private val prefix = Main.instance.PREFIX
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR) return
@@ -55,50 +62,36 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
         if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
 
-        if (ThePit.getApi().getItemEnchantLevel(player.itemInHand, this.nbtName) <= 0 || PlayerUtil.isVenom(
-                player
-            )
-        ) return
+        if (ThePit.getApi().getItemEnchantLevel(player.itemInHand, this.nbtName) <= 0) return
 
-        if (!Companion.cooldown.getOrDefault(player.uniqueId, Cooldown(0))!!.hasExpired()) return
+        val cd = cooldown[player.uniqueId] ?: Cooldown(0)
+        if (!cd.hasExpired()) return
 
-        val level = ThePit.getApi().getItemEnchantLevel(player.itemInHand, this.nbtName)
-        Companion.cooldown.put(player.uniqueId, Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS))
-        enchantLevel.put(player.uniqueId, level)
+        val level = pitApi.getItemEnchantLevel(player.itemInHand, this.nbtName)
+        val damage = ((0.5 + (level * 0.5)) * 2) + 0.5
+        if (player.health <= damage) {
+            player.sendMessage(CC.translate("$prefix&c你的血量不足以使用末影剑!"))
+            return
+        }
+        cooldown[player.uniqueId] = Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS)
+        enchantLevel[player.uniqueId] = level
 
         player.launchProjectile(EnderPearl::class.java).shooter = player
-
-        PlayerUtil.damage(player, PlayerUtil.DamageType.TRUE, (0.5 + (level * 0.5)) * 2, false)
+        PlayerUtil.damage(player, PlayerUtil.DamageType.TRUE, damage, false)
     }
 
-    override fun getText(i: Int, player: Player): String? {
-        return getCooldownActionText(Companion.cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
+    override fun getText(i: Int, player: Player): String {
+        return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
     }
 
     @EventHandler
     fun onTeleport(event: PlayerTeleportEvent) {
         val player = event.getPlayer()
-        if (player == null || enchantLevel.getOrDefault(
-                player.uniqueId,
-                -1
-            )!! <= 0 || event.cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL
-        ) return
+        val level = enchantLevel[player.uniqueId] ?: -1
+        if (player == null || level <= 0 || event.cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return
 
         if (player.hasPotionEffect(PotionEffectType.SPEED)) player.removePotionEffect(PotionEffectType.SPEED)
 
-        player.addPotionEffect(
-            PotionEffect(
-                PotionEffectType.SPEED,
-                4 * 20,
-                enchantLevel.get(player.uniqueId)!!,
-                false,
-                true
-            )
-        )
-    }
-
-    companion object {
-        private val enchantLevel = HashMap<UUID?, Int?>()
-        private val cooldown = HashMap<UUID?, Cooldown?>()
+        player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 4 * 20, level, false, true))
     }
 }
