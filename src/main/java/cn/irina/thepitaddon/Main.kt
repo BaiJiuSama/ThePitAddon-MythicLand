@@ -236,6 +236,7 @@ class Main : JavaPlugin() {
                 PlayerHat(),
                 Ping(),
                 AdminOrganizeItem(),
+                LockCommand(),
 //                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),

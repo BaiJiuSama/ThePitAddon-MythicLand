@@ -7,7 +7,6 @@ import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.join.Join
 import dev.rollczi.litecommands.annotations.permission.Permission
-import net.mizukilab.pit.getPitProfile
 import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
 import org.bukkit.World
@@ -31,8 +30,8 @@ class AdminHealSelf {
 class AdminClearBounty {
     @Execute
     fun clearBounty(@Context player: Player) {
-        val pitProfile = player.getPitProfile()
-        pitProfile.bounty = 0
+        val profile = PlayerProfile.getRawCache(player.uniqueId)
+        profile.bounty = 0
         player.sendMessage(CC.translate("&aSUCCESS."))
     }
 }

@@ -45,7 +45,7 @@ class AdminOrganizeItem {
                     .changeNbt("tier", 1)
                     .uuid(defUUID)
                     .buildWithUnbreakable()
-                player.inventory.setItemInHand(pitItemToStack)
+                player.inventory.itemInHand = pitItemToStack
                 player.sendMessage(CC.translate("&a物品整理完成!"))
             }
         }
