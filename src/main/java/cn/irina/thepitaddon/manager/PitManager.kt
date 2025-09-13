@@ -2,6 +2,7 @@ package cn.irina.thepitaddon.manager
 
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
+import dev.rollczi.litecommands.annotations.context.Context
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
@@ -69,7 +70,7 @@ object PitManager {
             }
             remaining -= takeAmount
         }
-        player.updateInventory()
+        flushPlayerItem(player)
     }
 
     @JvmStatic
@@ -107,6 +108,22 @@ object PitManager {
                     true
                 )
             )
+        }
+    }
+
+    fun flushPlayerItem(@Context player: Player) {
+        try {
+            val inventory = player.inventory
+            inventory.forEachIndexed { index, itemStack ->
+                val mmItem = ThePit.getInstance().itemFactory.getItemFromStack(itemStack)
+                if (mmItem != null) {
+                    inventory.remove(index)
+                    inventory.setItem(index, mmItem.toItemStack())
+                }
+            }
+            player.sendMessage("成功刷新.")
+        } catch (ignored: Exception) {
+            player.sendMessage("Error")
         }
     }
 

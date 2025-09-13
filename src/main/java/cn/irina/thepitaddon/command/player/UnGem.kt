@@ -86,7 +86,7 @@ class UnGem {
         }
 
         player.inventory.itemInHand = itObj.build()
-        player.updateInventory()
+        PitManager.flushPlayerItem(player)
     }
 
     private fun takeInternalGem(player: Player, internalName: String) {
