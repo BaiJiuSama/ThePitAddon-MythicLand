@@ -1,23 +1,18 @@
 package cn.irina.thepitaddon.enchantment.type.recode.rare
 
 import cn.charlotte.pit.ThePit
-import cn.irina.thepitaddon.manager.PitManager
-import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
-import net.mizukilab.pit.parm.listener.IAttackEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
-import java.util.concurrent.atomic.AtomicBoolean
 
 /*
  * @Author ShanguanLinG
@@ -25,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 @ArmorOnly
-class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
+class Regularity : AbstractEnchantment(), Listener {
 
     private val pitAPI = ThePit.getApi()
 
@@ -111,21 +106,21 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
         }
     }
 
-    override fun handleAttackEntity(
-        enchantLevel: Int,
-        player: Player,
-        entity: Entity,
-        v: Double,
-        atomicDouble: AtomicDouble,
-        boostDamage: AtomicDouble,
-        atomicBoolean: AtomicBoolean
-    ) {
-        if (entity !is Player) return
-        if (!entity.hasMetadata("regularity_cooldown")) return
-        if (PitManager.hasAbsolutionHearts(entity)) return
-        val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
-        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
-            boostDamage.getAndSet(0.01)
-        }
-    }
+//    override fun handleAttackEntity(
+//        enchantLevel: Int,
+//        player: Player,
+//        entity: Entity,
+//        v: Double,
+//        atomicDouble: AtomicDouble,
+//        boostDamage: AtomicDouble,
+//        atomicBoolean: AtomicBoolean
+//    ) {
+//        if (entity !is Player) return
+//        if (!entity.hasMetadata("regularity_cooldown")) return
+//        if (PitManager.hasAbsolutionHearts(entity)) return
+//        val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
+//        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
+//            boostDamage.getAndSet(0.01)
+//        }
+//    }
 }

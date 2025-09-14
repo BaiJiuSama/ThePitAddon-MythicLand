@@ -40,11 +40,14 @@ class KBManager : Listener {
     @Throws(NullPointerException::class)
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
+        if (event.damager !is Player || event.entity !is Player) return
         val damager = event.damager as Player
         val other: Player = event.entity as Player
+        if (other == null || "bot" == other.name) return
         kbAPI?.let { api ->
-            val kbFileName = api.getKBFile(other)
-            other.sendMessage(CC.translate("$other kbFileName: $kbFileName"))
+            val kbFile = api.getKBFile(other)
+            if (kbFile == null) api.setKBFile(other, "default")
+            other.sendMessage(CC.translate("$other kbFileName: $kbFile"))
             val inventory = damager.inventory
             val leggings = inventory.leggings
             if (inventory == null || leggings == null) {
