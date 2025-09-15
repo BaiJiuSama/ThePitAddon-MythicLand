@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 @Command(name = "whenDidIDie")
-class GetLastestKiller: Listener {
+class GetLastestKiller : Listener {
     private val prefix = Main.instance.PREFIX
     private val killerData = ConcurrentHashMap<UUID, KillerData>()
 
@@ -38,10 +38,8 @@ class GetLastestKiller: Listener {
     fun onDeath(evt: PlayerDeathEvent) {
         val player = evt.entity
         if (player.hasMetadata("NPC")) return
-
-        val killer = player.killer
+        val killer = player.killer ?: return
         val killerName = PlayerProfile.getRawCache(killer.uniqueId).formattedNameWithRoman
-
         killerData[player.uniqueId] = KillerData(killerName, System.currentTimeMillis())
     }
 }
