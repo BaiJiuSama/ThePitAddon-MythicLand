@@ -40,8 +40,13 @@ class AdminClearBounty {
 @Permission("pit.admin")
 class SetHitDelay {
     @Execute
-    fun onCommand(@Context player: Player, @Arg delay: Int) {
+    fun onCommand(
+        @Context player: Player,
+        @Arg delay: Int,
+        @Arg maxDelay: Int
+    ) {
         player.noDamageTicks = delay
+        player.maximumNoDamageTicks = maxDelay
         player.sendMessage(CC.translate("&aSUCCESS."))
     }
 }

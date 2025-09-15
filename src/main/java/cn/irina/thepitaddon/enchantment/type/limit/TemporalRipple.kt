@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 @ArmorOnly
-class TemporalRipple: AbstractEnchantment(), IPlayerDamaged, Listener {
+class TemporalRipple: AbstractEnchantment(), IPlayerDamaged{
     override fun getEnchantName(): String {
         return "时间涟漪"
     }
@@ -58,32 +58,32 @@ class TemporalRipple: AbstractEnchantment(), IPlayerDamaged, Listener {
     override fun handlePlayerDamaged(level: Int, myself: Player, entity: Entity, p3: Double, p4: AtomicDouble, p5: AtomicDouble, p6: AtomicBoolean, ) {
         if (entity !is Player) return
         if (!myself.isBlocking) return
-
-        val cd = cdMap[myself.uniqueId] ?: Cooldown(0L)
-        if (!cd.hasExpired()) return
-        cdMap[myself.uniqueId] = Cooldown(10L, TimeUnit.SECONDS)
-
-        val boostTick = level * 5
-
-        myself.noDamageTicks += boostTick
-        myself.sendMessage(CC.translate("&b&l时间涟漪! &7效果触发!"))
-
-        Bukkit.getScheduler().runTaskLater(instance, {
-            val me = if (!myself.isOnline) Bukkit.getOfflinePlayer(myself.uniqueId).player else myself
-            me.noDamageTicks -= boostTick
-            me.sendMessage(CC.translate("&b&l时间涟漪! &7效果结束..."))
-        }, 3 * 20L)
+//
+//        val cd = cdMap[myself.uniqueId] ?: Cooldown(0L)
+//        if (!cd.hasExpired()) return
+//        cdMap[myself.uniqueId] = Cooldown(10L, TimeUnit.SECONDS)
+//
+//        val boostTick = level * 5
+//
+//        myself.noDamageTicks += boostTick
+//        myself.sendMessage(CC.translate("&b&l时间涟漪! &7效果触发!"))
+//
+//        Bukkit.getScheduler().runTaskLater(instance, {
+//            val me = if (!myself.isOnline) Bukkit.getOfflinePlayer(myself.uniqueId).player else myself
+//            me.noDamageTicks -= boostTick
+//            me.sendMessage(CC.translate("&b&l时间涟漪! &7效果结束..."))
+//        }, 3 * 20L)
     }
 
-    @EventHandler
-    fun onQuit(event: PlayerQuitEvent) { event.player.noDamageTicks = 10 }
-
-    @EventHandler
-    fun onDeath(event: PlayerDeathEvent) {
-        val player = event.entity
-        val uuid = player.uniqueId
-        if (cdMap[uuid] != null) cdMap.remove(uuid)
-
-        player.noDamageTicks = 10
-    }
+//    @EventHandler
+//    fun onQuit(event: PlayerQuitEvent) { event.player.noDamageTicks = 20 }
+//
+//    @EventHandler
+//    fun onDeath(event: PlayerDeathEvent) {
+//        val player = event.entity
+//        val uuid = player.uniqueId
+//        if (cdMap[uuid] != null) cdMap.remove(uuid)
+//
+//        player.noDamageTicks = 20
+//    }
 }

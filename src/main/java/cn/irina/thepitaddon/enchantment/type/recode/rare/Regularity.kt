@@ -14,11 +14,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
 
-/*
- * @Author ShanguanLinG
- * @Date 2025/9/12 13:13
- */
-
 @ArmorOnly
 class Regularity : AbstractEnchantment(), Listener {
 
@@ -45,8 +40,11 @@ class Regularity : AbstractEnchantment(), Listener {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当近战伤害低于&c${a(enchantLevel)}❤&7时, &7将会自动再次攻击两次./s" +
-                "&7第二, 三次攻击的伤害将&c依次衰减${100 - b(enchantLevel)}%&7, 且不会被更高的伤害所覆盖."
+        return "&7当近战伤害低于&c${a(enchantLevel)}❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
+            b(
+                enchantLevel
+            )
+        }%&7."
     }
 
     fun a(enchantLevel: Int): Double {
@@ -66,6 +64,7 @@ class Regularity : AbstractEnchantment(), Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
+
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
         if (event.entity !is Player) return
@@ -83,6 +82,7 @@ class Regularity : AbstractEnchantment(), Listener {
         val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
         if (level < 1) return
 
+
         if (event.finalDamage < a(level)
         ) {
             val metadata = victim.getMetadata("regularity_cooldown")
@@ -95,6 +95,7 @@ class Regularity : AbstractEnchantment(), Listener {
             if (!victim.isDead) {
                 val boost = b(level) * 0.01
                 Bukkit.getScheduler().runTaskLater(ThePit.getInstance(), {
+
                     victim.noDamageTicks = 0
                     victim.damage(event.damage * boost, attacker)
                     victim.setMetadata(
@@ -105,22 +106,4 @@ class Regularity : AbstractEnchantment(), Listener {
             }
         }
     }
-
-//    override fun handleAttackEntity(
-//        enchantLevel: Int,
-//        player: Player,
-//        entity: Entity,
-//        v: Double,
-//        atomicDouble: AtomicDouble,
-//        boostDamage: AtomicDouble,
-//        atomicBoolean: AtomicBoolean
-//    ) {
-//        if (entity !is Player) return
-//        if (!entity.hasMetadata("regularity_cooldown")) return
-//        if (PitManager.hasAbsolutionHearts(entity)) return
-//        val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
-//        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
-//            boostDamage.getAndSet(0.01)
-//        }
-//    }
 }

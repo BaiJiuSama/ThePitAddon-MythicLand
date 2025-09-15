@@ -23,7 +23,7 @@ class KBManager : Listener {
             PitManager.hasPitEnchant(
                 it,
                 "regularity"
-            )
+            ) ?: false
         }
         return hasRegEnchant
     }
@@ -47,30 +47,25 @@ class KBManager : Listener {
         kbAPI?.let { api ->
             val kbFile = api.getKBFile(other)
             if (kbFile == null) api.setKBFile(other, "default")
-            other.sendMessage(CC.translate("$other kbFileName: $kbFile"))
             val inventory = damager.inventory
             val leggings = inventory.leggings
             if (inventory == null || leggings == null) {
                 api.setKBFile(other, "default")
-                other.sendMessage(CC.translate("&csetKBFile default."))
                 return
             }
             when {
                 hasRegEnchant(leggings) -> {
                     api.setKBFile(other, "regularity")
-                    other.sendMessage(CC.translate("&csetKBFile regularity."))
                     return
                 }
 
                 hasGrimReaperEnchant(leggings) -> {
                     api.setKBFile(other, "grim_reaper_enchant")
-                    other.sendMessage(CC.translate("&csetKBFile grim_reaper_enchant."))
                     return
                 }
 
                 else -> {
                     api.setKBFile(other, "default")
-                    other.sendMessage(CC.translate("&csetKBFile default."))
                     return
                 }
             }

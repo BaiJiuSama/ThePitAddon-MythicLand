@@ -86,7 +86,7 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
     @EventHandler
     fun onTeleport(event: PlayerTeleportEvent) {
-        val player = event.getPlayer()
+        val player = event.player
         val level = enchantLevel[player.uniqueId] ?: -1
         if (player == null || level <= 0 || event.cause != PlayerTeleportEvent.TeleportCause.ENDER_PEARL) return
 
