@@ -242,6 +242,7 @@ class Main : JavaPlugin() {
                 Ping(),
                 AdminOrganizeItem(),
                 LockCommand(),
+                SetHitDelay(),
 //                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),

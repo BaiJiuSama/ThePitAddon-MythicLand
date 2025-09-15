@@ -78,8 +78,12 @@ public class TearEnchant extends AbstractEnchantment implements Listener, IPlaye
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player target = (Player)event.getEntity();
-        if (!(event.getDamager() instanceof Arrow) || !(event.getDamager() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Arrow) && !(event.getDamager() instanceof Player)) return; // 修复逻辑判断条件
         Player attacker = (Player)(event.getDamager() instanceof Arrow ? ((Arrow) event.getDamager()).getShooter() : event.getDamager());
+
+        if (ThePit.getApi() == null) return;
+        if (attacker.getInventory().getLeggings() == null) return;
+        
         int enchantLevel = ThePit.getApi().getItemEnchantLevel(attacker.getInventory().getLeggings(), this.getNbtName());
 
         if (PlayerUtil.isVenom(attacker) || PlayerUtil.isVenom(target)) return;

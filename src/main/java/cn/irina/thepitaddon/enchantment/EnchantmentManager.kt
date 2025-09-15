@@ -126,7 +126,7 @@ class EnchantmentManager {
                 //"electrolytes_enchant"
                 //"regularity",
                 //"like_french"
-                //"temporal_ripple"
+                "temporal_ripple",
                 "desperation",
                 "coin_glorious",
                 //"frost"
