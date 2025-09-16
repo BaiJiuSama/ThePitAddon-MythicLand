@@ -27,14 +27,20 @@ import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerChangedWorldEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
+import java.util.concurrent.ConcurrentHashMap
 
 
 class PlayerListener : Listener {
     val prefix = Main.instance.PREFIX
+
+    private val noDamageTicksTasks = ConcurrentHashMap<Player, BukkitTask>()
+    private val lastNoDamageTicks = ConcurrentHashMap<Player, Int>()
 
     private val list = listOf(
         "_IR1NA_",
@@ -310,7 +316,7 @@ class PlayerListener : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun handleDeath(event: PlayerDeathEvent) {
-        val player = event.entity
+        val player = event.entity ?: return
         if (player.hasMetadata("NPC")) return
 
         val killer = player.killer ?: return
@@ -318,13 +324,13 @@ class PlayerListener : Listener {
         val pp = PlayerProfile.getRawCache(player.uniqueId) ?: return
         val kp = PlayerProfile.getRawCache(killer.uniqueId) ?: return
 
-        val itemInHand = killer.inventory.itemInHand
-        val itemInLegging = killer.inventory.leggings
+        val itemInHand = killer.inventory?.itemInHand
+        val itemInLegging = killer.inventory?.leggings
 
         val victimName = pp.formattedNameWithRoman
         val killerName = kp.formattedNameWithRoman
 
-        val itemName = getItemDisplayName(itemInHand)
+        val itemName = itemInHand?.let { getItemDisplayName(it) }
 
         val mythicWeaponNbt = getItemNBT(itemInHand)
         val mythicLeggingNbt = getItemNBT(itemInLegging)
@@ -349,7 +355,8 @@ class PlayerListener : Listener {
             val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
             val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
 
-            val msg = ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+            val msg =
+                ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
 
             Bukkit.getOnlinePlayers().forEach { p ->
                 if (!p.hasPermission("irina.deathCheck")) return@forEach
@@ -418,6 +425,41 @@ class PlayerListener : Listener {
     private fun getItemDisplayName(item: ItemStack): String {
         val meta = item.itemMeta
         return if (meta != null && meta.hasDisplayName()) meta.displayName else item.type.name
+    }
+
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        startMonitoringNoDamageTicks(player)
+        player.sendMessage(CC.translate("&c你现在的 &fmaximumNoDamageTicks &c值为 &f${player.maximumNoDamageTicks}"))
+    }
+
+    private fun startMonitoringNoDamageTicks(player: Player) {
+        stopMonitoringNoDamageTicks(player)
+        lastNoDamageTicks[player] = player.maximumNoDamageTicks
+        val task = Bukkit.getScheduler().runTaskTimer(Main.instance, {
+            val currentNoDamageTicks = player.maximumNoDamageTicks
+            val previousNoDamageTicks = lastNoDamageTicks.getOrDefault(player, 0)
+            if (currentNoDamageTicks != previousNoDamageTicks) {
+                player.sendMessage(CC.translate("&c你的 &fmaximumNoDamageTicks &c值已从 &f$previousNoDamageTicks &c变更为 &f$currentNoDamageTicks"))
+                lastNoDamageTicks[player] = currentNoDamageTicks
+            }
+            if (player.maximumNoDamageTicks < 19) {
+                player.sendMessage(CC.translate("&c错误的 &fmaximumNoDamageTicks &c值: &f${player.maximumNoDamageTicks}"))
+                player.sendMessage(CC.translate("&c请牢记你此刻正在做的事情, 然后及时汇报给管理员!"))
+            }
+        }, 1L, 1L)
+        noDamageTicksTasks[player] = task
+    }
+
+    // 停止对指定玩家的noDamageTicks监测
+    private fun stopMonitoringNoDamageTicks(player: Player) {
+        // 取消监测任务
+        noDamageTicksTasks[player]?.cancel()
+        // 移除任务引用
+        noDamageTicksTasks.remove(player)
+        // 移除存储的上一次值
+        lastNoDamageTicks.remove(player)
     }
 //
 //    @EventHandler(priority = EventPriority.HIGHEST)

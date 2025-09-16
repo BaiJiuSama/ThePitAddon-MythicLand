@@ -41,7 +41,7 @@ class AdminClearBounty {
 class SetHitDelay {
     @Execute
     fun onCommand(
-        @Context player: Player,
+        @Arg player: Player,
         @Arg delay: Int,
         @Arg maxDelay: Int
     ) {
