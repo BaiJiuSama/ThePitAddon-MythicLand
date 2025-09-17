@@ -1,5 +1,6 @@
 package cn.irina.thepitaddon.enchantment.type.rare
 
+import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.manager.PitManager
 import com.google.common.util.concurrent.AtomicDouble
 import net.minecraft.server.v1_8_R3.ItemBow
@@ -9,17 +10,19 @@ import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
+import net.mizukilab.pit.util.Utils
+import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -31,8 +34,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @BowOnly
 class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionDisplayEnchant {
-    private val maxChargeCooldown: HashMap<UUID, Cooldown> = HashMap()
+    private val cooldown: HashMap<UUID, Cooldown> = HashMap()
     private val hitCount: HashMap<UUID, Int> = HashMap()
+    private val pitApi = ThePit.getApi()
 
     override fun getEnchantName(): String {
         return "穿云弓"
@@ -79,31 +83,33 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
     fun onInteract(event: EntityShootBowEvent) {
         if (event.entity !is Player) return
         if (event.force >= 1) return
-        val shooter = event.entity as Player
-        if (PlayerUtil.isVenom(shooter) || PlayerUtil.isEquippingSomber(shooter)) return
-        val itemInHand = shooter.itemInHand ?: return
-        val level = this.getItemEnchantLevel(itemInHand)
+        val player = event.entity as Player
+        if (PlayerUtil.isVenom(player) || PlayerUtil.isEquippingSomber(player)) return
+        val itemInHand = player.itemInHand ?: return
+        val level = pitApi.getItemEnchantLevel(player.itemInHand, this.nbtName)
         if (level == -1) {
             return
         }
-        if (itemInHand.type != Material.BOW) {
-            return
+        if (itemInHand.type != Material.BOW) return
+        if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) return
+        cooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
+        if (level > 1) {
+            PitManager.givePlayerSpeedBuff(
+                player,
+                20 * level * 2,
+                level - 2
+            )
         }
-        if (maxChargeCooldown.getOrDefault(shooter.uniqueId, Cooldown(0L)).hasExpired()) {
-            maxChargeCooldown[shooter.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
-            event.isCancelled = true
-            val ePlayer = (shooter as CraftPlayer).handle
-            val itemStack = CraftItemStack.asNMSCopy(itemInHand)
-            val bow = itemStack.item as ItemBow
-            bow.a(itemStack, ePlayer.world, ePlayer, 0)
-        }
-        if (getItemEnchantLevel(itemInHand) < 2) return
-        PitManager.givePlayerSpeedBuff(
-            shooter,
-            20 * (level + 1) + 20 * 2,
-            level - 2
-        )
-        return
+        event.isCancelled = true
+        val ePlayer = (player as CraftPlayer).handle
+        val itemStack = Utils.toNMStackQuick(itemInHand)
+        val bow = itemStack.item as ItemBow
+        bow.a(itemStack, ePlayer.world, ePlayer, 0)
+    }
+
+    @EventHandler
+    fun onQuit(e: PlayerQuitEvent) {
+        cooldown.remove(e.player.uniqueId)
     }
 
     override fun handleShootEntity(

@@ -46,7 +46,7 @@ class Heavy : AbstractEnchantment(), Listener {
     @EventHandler
     fun onExit(event: PlayerQuitEvent) {
         val profile = PlayerProfile.getRawCache(event.player.uniqueId)
-        profile.extraMaxHealth.remove("heavy")
+        profile?.extraMaxHealth?.remove("heavy")
     }
 
     @EventHandler
@@ -54,7 +54,7 @@ class Heavy : AbstractEnchantment(), Listener {
         val player = event.player
         val leggings = player.inventory.leggings
         if (leggings != null && hasPitEnchant(leggings, "heavy")) {
-            val profile = PlayerProfile.getRawCache(event.player.uniqueId)
+            val profile = PlayerProfile.getRawCache(event.player.uniqueId) ?: return
             val item = player.inventory.leggings
             if (!hasPitEnchant(item, "heavy")) return
             profile.extraMaxHealth["heavy"] = (
@@ -65,7 +65,8 @@ class Heavy : AbstractEnchantment(), Listener {
             player.maxHealth = profile.maxHealth
             return
         }
-        val profile = PlayerProfile.getRawCache(event.player.uniqueId)
+        val profile = PlayerProfile.getRawCache(event.player.uniqueId) ?: return
+
         if (!profile.extraMaxHealth.containsKey("heavy")) return
         profile.extraMaxHealth.remove("heavy")
         player.maxHealth = profile.maxHealth

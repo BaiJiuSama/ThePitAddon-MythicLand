@@ -39,9 +39,6 @@ import java.util.concurrent.ConcurrentHashMap
 class PlayerListener : Listener {
     val prefix = Main.instance.PREFIX
 
-    private val noDamageTicksTasks = ConcurrentHashMap<Player, BukkitTask>()
-    private val lastNoDamageTicks = ConcurrentHashMap<Player, Int>()
-
     private val list = listOf(
         "_IR1NA_",
         "SHANGUANLING",
@@ -427,40 +424,7 @@ class PlayerListener : Listener {
         return if (meta != null && meta.hasDisplayName()) meta.displayName else item.type.name
     }
 
-    @EventHandler
-    fun onPlayerJoin(event: PlayerJoinEvent) {
-        val player = event.player
-        startMonitoringNoDamageTicks(player)
-        player.sendMessage(CC.translate("&c你现在的 &fmaximumNoDamageTicks &c值为 &f${player.maximumNoDamageTicks}"))
-    }
 
-    private fun startMonitoringNoDamageTicks(player: Player) {
-        stopMonitoringNoDamageTicks(player)
-        lastNoDamageTicks[player] = player.maximumNoDamageTicks
-        val task = Bukkit.getScheduler().runTaskTimer(Main.instance, {
-            val currentNoDamageTicks = player.maximumNoDamageTicks
-            val previousNoDamageTicks = lastNoDamageTicks.getOrDefault(player, 0)
-            if (currentNoDamageTicks != previousNoDamageTicks) {
-                player.sendMessage(CC.translate("&c你的 &fmaximumNoDamageTicks &c值已从 &f$previousNoDamageTicks &c变更为 &f$currentNoDamageTicks"))
-                lastNoDamageTicks[player] = currentNoDamageTicks
-            }
-            if (player.maximumNoDamageTicks < 19) {
-                player.sendMessage(CC.translate("&c错误的 &fmaximumNoDamageTicks &c值: &f${player.maximumNoDamageTicks}"))
-                player.sendMessage(CC.translate("&c请牢记你此刻正在做的事情, 然后及时汇报给管理员!"))
-            }
-        }, 1L, 1L)
-        noDamageTicksTasks[player] = task
-    }
-
-    // 停止对指定玩家的noDamageTicks监测
-    private fun stopMonitoringNoDamageTicks(player: Player) {
-        // 取消监测任务
-        noDamageTicksTasks[player]?.cancel()
-        // 移除任务引用
-        noDamageTicksTasks.remove(player)
-        // 移除存储的上一次值
-        lastNoDamageTicks.remove(player)
-    }
 //
 //    @EventHandler(priority = EventPriority.HIGHEST)
 //    fun onDamage(event: EntityDamageByEntityEvent) {

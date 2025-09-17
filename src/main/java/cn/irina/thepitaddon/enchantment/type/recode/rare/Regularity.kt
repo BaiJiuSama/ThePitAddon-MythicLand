@@ -1,24 +1,26 @@
 package cn.irina.thepitaddon.enchantment.type.recode.rare
 
 import cn.charlotte.pit.ThePit
+import net.mizukilab.pit.data.operator.ProfileOperator
 import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
+import net.mizukilab.pit.parm.AutoRegister
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
-import org.bukkit.Bukkit
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.scheduler.BukkitRunnable
 
+
+@AutoRegister
 @ArmorOnly
 class Regularity : AbstractEnchantment(), Listener {
-
-    private val pitAPI = ThePit.getApi()
-
     override fun getEnchantName(): String {
         return "狂暴连击"
     }
@@ -40,69 +42,87 @@ class Regularity : AbstractEnchantment(), Listener {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当近战伤害低于&c${a(enchantLevel)}❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
-            b(
-                enchantLevel
-            )
-        }%&7."
+        return "&7当近战伤害低于&c${
+            when (enchantLevel) {
+                1 -> 1.1
+                2 -> 1.3
+                else -> 1.5
+            }
+        }❤ &7时/ s&7, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
+            when (enchantLevel) {
+                1 -> 45
+                2 -> 60
+                else -> 75
+            }
+        }%&7. &7(最多三次)"
     }
 
-    fun a(enchantLevel: Int): Double {
-        return when (enchantLevel) {
-            1 -> 0.7
-            2 -> 1.7
-            else -> 1.9
-        }
-    }
-
-    fun b(enchantLevel: Int): Int {
-        return when (enchantLevel) {
-            1 -> 40
-            2 -> 45
-            else -> 60
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-
+    @EventHandler(priority = EventPriority.HIGH)
     fun damage(event: EntityDamageByEntityEvent) {
         val attacker = event.damager
-        if (event.entity !is Player) return
-        var player = (event.entity as Player).player
         if (attacker !is Player) return
-        if (pitAPI.getItemEnchantLevel(player.inventory.leggings, "think_of_the_people") > 0) return
 
         val victim = event.entity
-        if (victim !is Player) return
+        if (victim !is LivingEntity) return
 
+        var level = -1
+        val operator = (ThePit.getInstance().profileOperator as ProfileOperator).getOperator(attacker)
+
+        if (operator != null) {
+            if (operator.profile().leggings != null) {
+                if (operator.isLoaded) {
+                    level = operator.profile().leggings.getEnchantmentLevel(this.nbtName)
+                }
+            }
+        }
+
+
+        if (level < 1) return
         if (PlayerUtil.shouldIgnoreEnchant(attacker, victim)) {
             return
         }
-
-        val level = ThePit.api.getItemEnchantLevel(attacker.inventory.leggings, "regularity")
-        if (level < 1) return
-
-
-        if (event.finalDamage < a(level)
+        if (event.finalDamage < when (level) {
+                1 -> 1.1
+                2 -> 1.3
+                else -> 1.5
+            }
         ) {
-            val metadata = victim.getMetadata("regularity_cooldown")
+            val metadata = victim.getMetadata("regularity")
             metadata.firstOrNull()?.asLong()?.let {
                 if (System.currentTimeMillis() < it) {
                     return
+                } else {
+                    victim.removeMetadata("regularity", ThePit.getInstance())
                 }
             }
 
             if (!victim.isDead) {
-                val boost = b(level) * 0.01
-                Bukkit.getScheduler().runTaskLater(ThePit.getInstance(), {
+                val boost = when (level) {
+                    1 -> 45
+                    2 -> 60
+                    else -> 75
+                } * 0.01
 
-                    victim.noDamageTicks = 0
-                    victim.damage(event.damage * boost, attacker)
-                    victim.setMetadata(
-                        "regularity_cooldown",
-                        FixedMetadataValue(ThePit.getInstance(), System.currentTimeMillis() + 1000L + 2)
-                    )
-                }, 5L)
+                val operator_vic = (ThePit.getInstance().profileOperator as ProfileOperator).getOperator(attacker)
+                object : BukkitRunnable() {
+                    override fun run() {
+                        if(operator_vic.profile() != null){
+                            if (!operator_vic.profile().isInArena) {
+                                return
+                            }
+                        }
+                        if(victim.isDead){
+                            return;
+                        }
+                        victim.noDamageTicks = 0;
+                        victim.damage(event.damage * boost, attacker)
+                        victim.lastDamage = 2000.0;
+                        victim.setMetadata(
+                            "regularity",
+                            FixedMetadataValue(ThePit.getInstance(), System.currentTimeMillis() + 700)
+                        )
+                    }
+                }.runTaskLater(ThePit.getInstance(), 5L)
             }
         }
     }

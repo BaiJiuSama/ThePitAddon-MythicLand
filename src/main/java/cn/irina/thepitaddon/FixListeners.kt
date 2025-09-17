@@ -133,6 +133,14 @@ class FixListeners : Listener {
         }
     }
 
+    @EventHandler
+    fun onPlayerUseRodInAfkWorld(event: PlayerInteractEvent) {
+        val player = event.player
+        if ("afk" != player.world.name) return
+        if (player.inventory.itemInHand.type != Material.FISHING_ROD) return
+        event.isCancelled = true
+    }
+
     companion object {
         @JvmField
         val LimitAbsorptionHearts: Float = Main.instance.config?.getInt("LimitAbsorptionHearts")?.toFloat() ?: 120F
