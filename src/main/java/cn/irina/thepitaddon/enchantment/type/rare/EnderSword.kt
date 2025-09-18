@@ -10,6 +10,7 @@ import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
+import net.mizukilab.pit.util.time.TimeUtil
 import org.bukkit.entity.EnderPearl
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -19,12 +20,11 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 @WeaponOnly
-class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
+class EnderSword : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     override fun getEnchantName(): String {
         return "末影剑"
     }
@@ -55,6 +55,7 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
 
     private val pitApi = ThePit.getApi()
     private val prefix = Main.instance.PREFIX
+
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR) return
@@ -81,7 +82,11 @@ class EnderSword : AbstractEnchantment(),  Listener, IActionDisplayEnchant {
     }
 
     override fun getText(i: Int, player: Player): String {
-        return getCooldownActionText(cooldown.getOrDefault(player.uniqueId, Cooldown(0L)))
+        return if (cooldown.getOrDefault(player.uniqueId, Cooldown(0))
+                .hasExpired()
+        ) "&a&l✔" else "&c&l" + TimeUtil.millisToRoundedTime(
+            cooldown[player.uniqueId]!!.remaining
+        ).replace(" ", "")
     }
 
     @EventHandler

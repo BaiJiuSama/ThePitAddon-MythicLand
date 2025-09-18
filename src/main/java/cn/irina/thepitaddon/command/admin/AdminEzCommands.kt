@@ -7,6 +7,7 @@ import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.join.Join
 import dev.rollczi.litecommands.annotations.permission.Permission
+import net.mizukilab.pit.util.SpecialUtil
 import net.mizukilab.pit.util.chat.CC
 import org.bukkit.Bukkit
 import org.bukkit.World
@@ -48,6 +49,19 @@ class SetHitDelay {
         player.noDamageTicks = delay
         player.maximumNoDamageTicks = maxDelay
         player.sendMessage(CC.translate("&aSUCCESS."))
+    }
+}
+
+@Command(name = "private")
+@Permission("pit.private")
+class Private {
+    @Execute
+    fun onCommand(@Context player: Player) {
+        if (SpecialUtil.isPrivate(player)) {
+            SpecialUtil.removePlayer(player)
+            return
+        }
+        SpecialUtil.addPlayer(player)
     }
 }
 

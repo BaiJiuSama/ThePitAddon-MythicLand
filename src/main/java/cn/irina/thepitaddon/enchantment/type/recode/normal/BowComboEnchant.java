@@ -80,11 +80,7 @@ public class BowComboEnchant extends AbstractEnchantment implements IPlayerShoot
             public void run() {
                 if (combo.getOrDefault(attacker.getUniqueId(), 0) >= (enchantLevel >= 2 ? 2 : 3)) {
                     combo.put(attacker.getUniqueId(), 0);
-                    PitManager.givePlayerSpeedBuff(
-                            attacker,
-                            20 * (enchantLevel + 1),
-                            enchantLevel
-                    );
+                    PitManager.givePlayerSpeedBuff(attacker, 20 * (enchantLevel + 2), enchantLevel);
                 }
             }
         }.runTaskLater(ThePit.getInstance(), 2L);

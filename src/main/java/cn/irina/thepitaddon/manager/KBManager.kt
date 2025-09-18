@@ -1,7 +1,7 @@
 package cn.irina.thepitaddon.manager
 
 import cn.irina.thepitaddon.Main
-import net.mizukilab.pit.util.chat.CC
+import org.bukkit.entity.NPC
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -40,13 +40,12 @@ class KBManager : Listener {
     @Throws(NullPointerException::class)
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
+        if (event.entity is NPC) return
         if (event.damager !is Player || event.entity !is Player) return
         val damager = event.damager as Player
         val other: Player = event.entity as Player
         if (other == null || "bot" == other.name) return
         kbAPI?.let { api ->
-            val kbFile = api.getKBFile(other)
-            if (kbFile == null) api.setKBFile(other, "default")
             val inventory = damager.inventory
             val leggings = inventory.leggings
             if (inventory == null || leggings == null) {

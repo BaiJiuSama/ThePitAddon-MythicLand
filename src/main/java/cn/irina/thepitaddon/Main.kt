@@ -243,6 +243,7 @@ class Main : JavaPlugin() {
                 AdminOrganizeItem(),
                 LockCommand(),
                 SetHitDelay(),
+                Private(),
 //                RandomRewardControl(),
 //                AdminPlayerAddValue(),
 //                AdminValue(),
