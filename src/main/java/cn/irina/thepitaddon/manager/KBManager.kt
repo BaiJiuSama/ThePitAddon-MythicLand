@@ -44,6 +44,7 @@ class KBManager : Listener {
         if (event.damager !is Player || event.entity !is Player) return
         val damager = event.damager as Player
         val other: Player = event.entity as Player
+        if (other.hasMetadata("NPC")) return
         if (other == null || "bot" == other.name) return
         kbAPI?.let { api ->
             val inventory = damager.inventory
