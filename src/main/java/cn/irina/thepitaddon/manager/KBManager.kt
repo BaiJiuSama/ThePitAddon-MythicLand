@@ -37,15 +37,13 @@ class KBManager : Listener {
         } ?: false
     }
 
-    @Throws(NullPointerException::class)
     @EventHandler
     fun onDamage(event: EntityDamageByEntityEvent) {
         if (event.entity is NPC) return
         if (event.damager !is Player || event.entity !is Player) return
         val damager = event.damager as Player
         val other: Player = event.entity as Player
-        if (other.hasMetadata("NPC")) return
-        if (other == null || "bot" == other.name) return
+        if (PitManager.isNPC(other)) return
         kbAPI?.let { api ->
             val inventory = damager.inventory
             val leggings = inventory.leggings

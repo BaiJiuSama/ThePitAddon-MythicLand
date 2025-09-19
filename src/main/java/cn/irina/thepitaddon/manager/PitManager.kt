@@ -3,6 +3,7 @@ package cn.irina.thepitaddon.manager
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import dev.rollczi.litecommands.annotations.context.Context
+import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.item.ItemUtil
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
@@ -51,6 +52,11 @@ object PitManager {
     fun hasAbsolutionHearts(player: Player): Boolean {
         val absorptionHearts = getAbsorptionHearts(player)
         return absorptionHearts > 0
+    }
+
+    @JvmStatic
+    fun isNPC(player: Player): Boolean {
+        return PlayerUtil.isNPC(player) || "bot" == player.name || player.hasMetadata("NPC")
     }
 
     @JvmStatic

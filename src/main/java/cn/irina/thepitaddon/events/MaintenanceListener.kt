@@ -4,6 +4,7 @@ import cn.charlotte.pit.ThePit
 import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.runnable.Maintenance.Companion.isInMaintenanceMode
 import net.mizukilab.pit.util.chat.CC
+import net.mizukilab.pit.util.cooldown.Cooldown
 import net.mizukilab.pit.util.random.RandomUtil.random
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -19,9 +20,15 @@ class MaintenanceListener : Listener {
         if (player.hasPermission("pit.admin")) return
         if (!profile.isInArena || "afk" == player.world.name) return
         if (!isInMaintenanceMode()) return
+        resetPlayerCombatTime(player)
         doRespawn(player)
         player.playSound(player.location, Sound.VILLAGER_NO, 1f, 1f)
         player.sendMessage(CC.translate("&c服务器维护中, 请稍后再试!"))
+    }
+
+    private fun resetPlayerCombatTime(player: Player) {
+        val profile = PlayerProfile.getRawCache(player.uniqueId) ?: return
+        profile.combatTimer = Cooldown(0)
     }
 
     private fun doRespawn(player: Player) {
