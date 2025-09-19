@@ -349,26 +349,32 @@ class PlayerListener : Listener {
             val legging = CC.translate(" &f[&b护腿&f] ")
             val weapon = CC.translate(" &f[&b武器&f] ")
 
-            val leggingHover = ChatComponentBuilder(legging).setCurrentHoverEvent(mythicLeggingHover).create()
-            val weaponHover = ChatComponentBuilder(weapon).setCurrentHoverEvent(mythicWeaponHover).create()
+            // 使用原生 TextComponent 替代 ChatComponentBuilder
+            val leggingComponent = TextComponent(legging)
+            leggingComponent.hoverEvent = mythicLeggingHover
+            
+            val weaponComponent = TextComponent(weapon)
+            weaponComponent.hoverEvent = mythicWeaponHover
 
-            val msg =
-                ChatComponentBuilder(CC.translate("&7击杀者装备: ")).append(leggingHover).append(weaponHover).create()
+            val msg = TextComponent(CC.translate("&7击杀者装备: "))
+            msg.addExtra(leggingComponent)
+            msg.addExtra(weaponComponent)
 
             Bukkit.getOnlinePlayers().forEach { p ->
                 if (!p.hasPermission("irina.deathCheck")) return@forEach
-                p.spigot().sendMessage(*msg)
+                p.spigot().sendMessage(msg)
             }
 
-            if (!killer.isOnline) return@runTask
-            player.sendMessage(
-                CC.translate(
-                    "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
-                        "%.1f",
-                        killer.health * 0.5
-                    ) + "❤"
+            if (killer.isOnline) {
+                player.sendMessage(
+                    CC.translate(
+                        "$prefix$killerName &7在你死亡前剩余的血量: &c" + String.format(
+                            "%.1f",
+                            killer.health * 0.5
+                        ) + "❤"
+                    )
                 )
-            )
+            }
         }
     }
 

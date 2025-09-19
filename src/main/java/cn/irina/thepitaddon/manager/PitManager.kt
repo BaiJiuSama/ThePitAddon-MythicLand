@@ -127,20 +127,9 @@ object PitManager {
                     inventory.setItem(index, mmItem.toItemStack())
                 }
             }
-            player.sendMessage("成功刷新.")
         } catch (ignored: Exception) {
             player.sendMessage("Error")
         }
-    }
-
-    @JvmStatic
-    fun isAmulet(item: ItemStack): Boolean {
-        return getInternalName(item).startsWith("amulet_")
-    }
-
-    @JvmStatic
-    fun isAmulet(item: ItemStack, amuletName: String): Boolean {
-        return getInternalName(item) == "amulet_$amuletName"
     }
 
     @JvmStatic

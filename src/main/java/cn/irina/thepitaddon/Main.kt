@@ -244,15 +244,9 @@ class Main : JavaPlugin() {
                 LockCommand(),
                 SetHitDelay(),
                 Private(),
-//                RandomRewardControl(),
-//                AdminPlayerAddValue(),
-//                AdminValue(),
-//                GodMode(),
-//                ChangeItemEnchant(),
                 ChangeUserMeta(),
                 BuyExDiamondItem(),
                 BuyEgg(),
-                //UnlockAllPerks(),
                 BuyPhysicalCoin(),
                 BuyIronHelmet(),
                 PlayerOpenTrash(),
@@ -263,7 +257,6 @@ class Main : JavaPlugin() {
                 Broadcast(),
                 PlayerProving(),
                 OpenMenu(),
-//                FreeCE()
             )
             .build()
     }
@@ -303,10 +296,10 @@ class Main : JavaPlugin() {
 
     private fun loadEnchantmentManager() {
         val enchantmentManager = EnchantmentManager()
-        enchantmentManager.registerEnchantment()
+        enchantmentManager.registerEnchantments()
     }
 
-    val dontLoads = listOf(
+    private val dontLoads = listOf(
         "EnderBow"
     )
 

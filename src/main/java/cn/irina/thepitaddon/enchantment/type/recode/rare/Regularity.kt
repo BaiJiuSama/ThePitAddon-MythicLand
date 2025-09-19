@@ -7,6 +7,7 @@ import net.mizukilab.pit.enchantment.AbstractEnchantment
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IAttackEntity
+import net.mizukilab.pit.parm.listener.IPlayerDamaged
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
@@ -16,7 +17,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.metadata.FixedMetadataValue
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 /*
@@ -25,8 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 @ArmorOnly
-class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
+class Regularity : AbstractEnchantment(), Listener, IAttackEntity, IPlayerDamaged {
 
+    private val comboLayers = HashMap<UUID, Int>()
     private val pitAPI = ThePit.getApi()
 
     override fun getEnchantName(): String {
@@ -50,8 +54,11 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
     }
 
     override fun getUsefulnessLore(enchantLevel: Int): String {
-        return "&7当近战伤害低于&c${a(enchantLevel)}❤&7时, &7将会自动再次攻击两次./s" +
-                "&7第二, 三次攻击的伤害将&c依次衰减${100 - b(enchantLevel)}%&7, 且不会被更高的伤害所覆盖."
+        return "&7当近战伤害低于&c${
+            a(enchantLevel)
+        }❤&7时, 将会自动再次攻击./s&7第二次攻击的伤害为第一次攻击的&c${
+            b(enchantLevel)
+        }%&7. &7(最多三次)/s" + "&7同时, 每攻击玩家 &e3 &7次时, 自身受到的伤害 &9-${c(enchantLevel)}% &7(可叠加, 最多三层)"
     }
 
     fun a(enchantLevel: Int): Double {
@@ -67,6 +74,14 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
             1 -> 40
             2 -> 45
             else -> 60
+        }
+    }
+
+    fun c(enchantLevel: Int): Int {
+        return when (enchantLevel) {
+            1 -> 2
+            2 -> 3
+            else -> 4
         }
     }
 
@@ -123,8 +138,33 @@ class Regularity : AbstractEnchantment(), Listener, IAttackEntity {
         if (!entity.hasMetadata("regularity_cooldown")) return
         if (PitManager.hasAbsolutionHearts(entity)) return
         val cooldownEnd = entity.getMetadata("regularity_cooldown")[0].asLong()
-        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的亿万时间为500-505之间
+        if (System.currentTimeMillis() < cooldownEnd - 600) { // 下一次理应正常触发的时间为500-505之间
             boostDamage.getAndSet(0.01)
         }
+        val attackerUUID = player.uniqueId
+        val layers = comboLayers.getOrDefault(attackerUUID, 0)
+        if (layers < 3) comboLayers[attackerUUID] = comboLayers.getOrDefault(attackerUUID, 0) + 1
+        if (layers <= 0) return
+    }
+
+    override fun handlePlayerDamaged(
+        enchantLevel: Int,
+        player: Player,
+        entity: Entity,
+        damage: Double,
+        boostDamage: AtomicDouble,
+        reduceDamage: AtomicDouble,
+        cancel: AtomicBoolean
+    ) {
+        if (entity !is Player) return
+        val attackerUUID = player.uniqueId
+        if (pitAPI.getItemEnchantLevel(entity.inventory.leggings, "think_of_the_people") > 0) return
+        val layers = comboLayers.getOrDefault(attackerUUID, 0)
+        reduceDamage.getAndAdd(layers * c(enchantLevel) * -0.01)
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent){
+        comboLayers.remove(event.player.uniqueId)
     }
 }
