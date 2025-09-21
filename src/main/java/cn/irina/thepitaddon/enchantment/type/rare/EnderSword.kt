@@ -64,13 +64,13 @@ class EnderSword : AbstractEnchantment(), Listener, IActionDisplayEnchant {
         if (!Companion.cooldown.getOrDefault(player.uniqueId, Cooldown(0))!!.hasExpired()) return
 
         val level = ThePit.getApi().getItemEnchantLevel(player.itemInHand, this.nbtName)
-        Companion.cooldown.put(player.uniqueId, Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS))
-        enchantLevel.put(player.uniqueId, level)
         val damage = (0.5 + (level * 0.5)) * 2
         if (damage > player.health) {
             player.sendMessage(CC.translate("&c你的血量不足以使用末影剑!"))
             return
         }
+        Companion.cooldown.put(player.uniqueId, Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS))
+        enchantLevel.put(player.uniqueId, level)
         player.launchProjectile(EnderPearl::class.java).shooter = player
         PlayerUtil.damage(player, PlayerUtil.DamageType.TRUE, damage, false)
     }
