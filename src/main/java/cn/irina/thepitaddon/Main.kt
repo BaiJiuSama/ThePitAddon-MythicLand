@@ -296,7 +296,7 @@ class Main : JavaPlugin() {
 
     private fun loadEnchantmentManager() {
         val enchantmentManager = EnchantmentManager()
-        enchantmentManager.registerEnchantments()
+        enchantmentManager.registerEnchantment()
     }
 
     private val dontLoads = listOf(
