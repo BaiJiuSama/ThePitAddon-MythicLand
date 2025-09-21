@@ -1,4 +1,4 @@
-package cn.irina.thepitaddon.enchantment.type.rare
+package cn.irina.thepitaddon.enchantment.type.limit
 
 import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.manager.PitManager
@@ -11,7 +11,6 @@ import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.Utils
-import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.chat.RomanUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import net.mizukilab.pit.util.time.TimeUtil
