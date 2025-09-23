@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * @Author: ShanguanLinG
- * @Date: 2025/7/29 00:53
+ * @Date: 2025/9/23 20:32
  */
 
 @BowOnly
@@ -78,7 +78,8 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
                 "&7激光命中敌人时, 将会产生一次爆炸并对周围敌人施加 &c虚弱 ${weaknessBuffLevel} &f($weaknessBuffDuration) &7与 &c缓慢 ${slownessBuffLevel} &f($slownessBuffDuration)/s" +
                 "&7同时, 若爆炸接触目标生命值低于 &c${enchantLevel * 0.5 + 0.5}❤ &7时, 将直接致死. /s" +
                 "&7若射箭时处于潜行状态则直接发射激光, 命中目标时, 将自身传送至爆炸处并获得 &b速度 ${speedBuffLevel} &f($speedDuration) &7(15秒冷却) /s" +
-                "&7此附魔每秒只能触发一次."
+                "&7此附魔每秒只能触发一次./s" + "/s  \"&7&o有的人说此地不宜久留" +
+                "/s      &7&o还有几个人愿在这守候\""
     }
 
     @EventHandler
@@ -98,7 +99,6 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
         val bow = itemStack.item as ItemBow
         Companion.cooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
         val ePlayer = (player as CraftPlayer).handle
-
         if ((event.entity as Player).isSneaking) {
             if (!Companion.blueLaserCooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) return
             val direction = player.location.direction.normalize()
@@ -133,6 +133,7 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
                 applyLaserEffects(player, entity, targetLoc, level)
                 execution(player, entity, targetLoc, level)
                 vampireWithPerk(player)
+                redLaserCooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
                 if (player.isSneaking) {
                     if (!Companion.blueLaserCooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) return
                     player.teleport(entity.location.clone())
@@ -206,20 +207,16 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
     }
 
     private fun applyLaserEffects(attacker: Player, target: Player, location: Location, level: Int) {
-        val maxDamage = 4.0
-        target.damage(maxDamage)
+        val damage = 1.0
+        target.damage(damage)
         location.world.playSound(location, Sound.EXPLODE, 1.0f, 1.0f)
         location.world.playEffect(location, Effect.EXPLOSION_HUGE, null)
         val nearbyPlayers = location.world.getNearbyEntities(location, 4.0, 4.0, 4.0)
         for (entity in nearbyPlayers) {
             if (entity !is Player || entity == target || entity == attacker || entity.isDead) continue
-            val distance = entity.location.distance(location)
-            if (distance <= maxDamage) {
-                val damage = ((maxDamage - distance) * 2).toFloat()
-                entity.damage(damage.toDouble())
-                setVector(entity, location)
-                applyEffect(entity, level)
-            }
+            entity.damage(damage)
+            setVector(entity, location)
+            applyEffect(entity, level)
         }
     }
 
