@@ -78,8 +78,7 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
                 "&7激光命中敌人时, 将会产生一次爆炸并对周围敌人施加 &c虚弱 ${weaknessBuffLevel} &f($weaknessBuffDuration) &7与 &c缓慢 ${slownessBuffLevel} &f($slownessBuffDuration)/s" +
                 "&7同时, 若爆炸接触目标生命值低于 &c${enchantLevel * 0.5 + 0.5}❤ &7时, 将直接致死. /s" +
                 "&7若射箭时处于潜行状态则直接发射激光, 命中目标时, 将自身传送至爆炸处并获得 &b速度 ${speedBuffLevel} &f($speedDuration) &7(15秒冷却) /s" +
-                "&7此附魔每秒只能触发一次./s" + "/s  \"&7&o有的人说此地不宜久留" +
-                "/s      &7&o还有几个人愿在这守候\""
+                "&7此附魔每秒只能触发一次./s" + "/s  \"&7&o穿越过去与未来我随意游走\""
     }
 
     @EventHandler

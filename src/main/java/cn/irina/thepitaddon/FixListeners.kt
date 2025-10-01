@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.scheduler.BukkitRunnable
 
+
 class FixListeners : Listener {
     private val blockTypes: MutableList<Material> = ArrayList()
 
@@ -80,6 +81,7 @@ class FixListeners : Listener {
         }
     }
 
+
     @EventHandler
     fun onPlayerMove(event: PlayerMoveEvent) {
         val player = event.player
@@ -109,7 +111,13 @@ class FixListeners : Listener {
         return PitManager.hasInternalItem(player, internalName)
     }
 
-    private fun sendRedstoneParticle(sender: Player, location: org.bukkit.Location, r: Float, g: Float, b: Float) {
+    private fun sendRedstoneParticle(
+        sender: Player,
+        location: org.bukkit.Location,
+        r: Float,
+        g: Float,
+        b: Float
+    ) {
         val packet = net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles(
             net.minecraft.server.v1_8_R3.EnumParticle.REDSTONE,
             true,

@@ -133,9 +133,9 @@ class Main : JavaPlugin() {
                     if (ThePit.getApi() == null) return
 
                     send("&fThePit Ultimate &a已加载完毕, 正在加载...")
-                    Bukkit.setWhitelist(false)
                     this.cancel()
                     setUp()
+                    Bukkit.setWhitelist(false)
                 }
             }.runTaskTimerAsynchronously(this, 0, 5 * 20L)
         }, 21L)
