@@ -14,6 +14,7 @@ import cn.irina.thepitaddon.menu.type.RandomReward
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
 import cn.irina.thepitaddon.runnable.RefreshReward
+import cn.irina.thepitaddon.utils.BannerUtil
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
 import cn.irina.thepitaddon.utils.Log.send
@@ -99,6 +100,8 @@ class Main : JavaPlugin() {
     override fun onEnable() {
         instance = this
         loadMusicResources()
+
+        BannerUtil.send()
 
         send("&e天坑斗斗终极版扩展 启动中...")
         send("&7作者: &fIrina &7| &fhttps://github.com/BaiJiuSama")
