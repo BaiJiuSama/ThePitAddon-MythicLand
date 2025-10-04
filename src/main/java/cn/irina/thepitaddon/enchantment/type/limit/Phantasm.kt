@@ -88,13 +88,14 @@ class Phantasm: AbstractEnchantment(), Listener, CoroutineScope {
 
             val speed = player.walkSpeed
             defaultSpeed[player.uniqueId] = speed
-            player.walkSpeed *= level * 0.1F
 
-            cancelTask[player.uniqueId] = Bukkit.getScheduler().runTaskLaterAsynchronously(instance, {
-                actives.remove(player.uniqueId)
-                player.walkSpeed = defaultSpeed[player.uniqueId] ?: 0.2F
-            }, level * 15L)
-
+            launch(Dispatchers.Main) {
+                player.walkSpeed *= level * 0.1F
+                cancelTask[player.uniqueId] = Bukkit.getScheduler().runTaskLaterAsynchronously(instance, {
+                    actives.remove(player.uniqueId)
+                    player.walkSpeed = defaultSpeed[player.uniqueId] ?: 0.2F
+                }, level * 15L)
+            }
         }
     }
 
@@ -118,7 +119,9 @@ class Phantasm: AbstractEnchantment(), Listener, CoroutineScope {
                 actives.remove(victim.uniqueId)
             }, level * 18L)
 
-            PlayerUtil.heal(victim, 6.0)
+            launch(Dispatchers.Main) {
+                PlayerUtil.heal(victim, 6.0)
+            }
         }
     }
 
@@ -128,8 +131,10 @@ class Phantasm: AbstractEnchantment(), Listener, CoroutineScope {
         launch {
             val damager = evt.damager as? Player ?: return@launch
             if (!actives.contains(damager.uniqueId)) return@launch
-            evt.isCancelled = true
-            damager.sendMessage(CC.translate("&8虚影 &7虚化状态下无法攻击!"))
+            launch(Dispatchers.Main) {
+                evt.isCancelled = true
+                damager.sendMessage(CC.translate("&8虚影 &7虚化状态下无法攻击!"))
+            }
         }
     }
 }
