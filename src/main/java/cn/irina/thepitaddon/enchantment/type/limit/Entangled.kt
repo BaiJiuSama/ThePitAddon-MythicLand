@@ -4,6 +4,7 @@ import cn.charlotte.pit.data.PlayerProfile
 import cn.irina.thepitaddon.Main
 import com.google.common.util.concurrent.AtomicDouble
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.BowOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerShootEntity
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 
 @BowOnly
-class Entangled: AbstractEnchantment(), IPlayerShootEntity {
+class Entangled: AbstractEnchantment(), IPlayerShootEntity, IActionDisplayEnchant {
     override fun getEnchantName(): String {
         return "缠"
     }
@@ -67,5 +68,9 @@ class Entangled: AbstractEnchantment(), IPlayerShootEntity {
         targetLoc.block.type = Material.WEB
 
         Bukkit.getScheduler().runTaskLater(instance, { targetLoc.block.type = oldBlock }, 20L * (i * 2))
+    }
+
+    override fun getText(p0: Int, p: Player): String {
+        return getCooldownActionText(cooldown[p.uniqueId] ?: Cooldown(0L))
     }
 }

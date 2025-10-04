@@ -4,6 +4,7 @@ import cn.charlotte.pit.ThePit
 import cn.irina.thepitaddon.Main
 import cn.irina.thepitaddon.data.PhantasmState
 import net.mizukilab.pit.enchantment.AbstractEnchantment
+import net.mizukilab.pit.enchantment.IActionDisplayEnchant
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.util.PlayerUtil
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit
  */
 
 @ArmorOnly
-class Phantasm : AbstractEnchantment(), Listener {
+class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
 
     override fun getEnchantName(): String = "虚影"
     override fun getRarity(): EnchantmentRarity = EnchantmentRarity.OP
@@ -149,4 +150,8 @@ class Phantasm : AbstractEnchantment(), Listener {
 
     private fun calculateDuration(level: Int): Long = level * PHANTASM_KEEP_TIME
     private fun calculatePerfectDuration(level: Int): Long = level * PERFECT_PHANTASM_KEEP_TIME
+
+    override fun getText(p0: Int, p: Player): String {
+        return getCooldownActionText(getState(p).cooldown)
+    }
 }
