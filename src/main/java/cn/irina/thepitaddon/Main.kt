@@ -9,11 +9,8 @@ import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
-import cn.irina.thepitaddon.manager.ReceiveManager
-import cn.irina.thepitaddon.menu.type.RandomReward
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
-import cn.irina.thepitaddon.runnable.RefreshReward
 import cn.irina.thepitaddon.utils.BannerUtil
 import cn.irina.thepitaddon.utils.DynamicInvoke
 import cn.irina.thepitaddon.utils.HideAccess
@@ -151,9 +148,6 @@ class Main : JavaPlugin() {
         registerCommands()
         loadListener()
         modifyRarityPrefix()
-        getReceiveManagerObject().loadReceivedData("Enchant")
-        getReceiveManagerObject().loadReceivedData("Item")
-        getReceiveManagerObject().loadReceivedData("Plate")
 
         if (config.getBoolean("DamageValidRange.Enable")) send("&e玩家伤害已被改动! 请注意!")
         send("&a天坑乱斗终极版扩展 已启动!")
@@ -165,7 +159,6 @@ class Main : JavaPlugin() {
             send("&c未启用 挂机池")
         }
         scheduler.scheduleWithFixedDelay(Announcer(), 0L, 5L, TimeUnit.MINUTES)
-        scheduler.scheduleWithFixedDelay(RefreshReward(), 0L, 1L, TimeUnit.MINUTES)
     }
 
     @HideAccess
@@ -199,18 +192,6 @@ class Main : JavaPlugin() {
                 send("&c无法删除 \"PlayerData\"")
             }
         }
-    }
-
-    var randomReward: RandomReward? = null
-    fun getRandomRewardObject(): RandomReward {
-        if (randomReward == null) randomReward = RandomReward()
-        return randomReward!!
-    }
-
-    var receiveManager: ReceiveManager? = null
-    fun getReceiveManagerObject(): ReceiveManager {
-        if (receiveManager == null) receiveManager = ReceiveManager
-        return receiveManager!!
     }
 
     private fun clearEpicEvents() {
