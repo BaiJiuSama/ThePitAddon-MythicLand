@@ -11,6 +11,7 @@ import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.chat.CC
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.Bukkit
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -40,17 +41,17 @@ class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     override fun getUsefulnessLore(i: Int): String {
         val duration = i * 0.75
         return "&7穿戴附有此附魔的 &e神话之甲 &7时 /s" +
-                "&7单击下蹲键将触发效果 &9虚化 (${duration}s) &8(9s冷却) /s" +
-                "&7效果 &9虚化&7: &f在 &e${duration}秒内无法被攻击, 在此期间移速增加 &b${i * 10}% /s" +
+                "&7单击下蹲键将触发效果 &8虚化 (${duration}s) &7(9s冷却) /s" +
+                "&7效果 &8虚化&7: &7在 &e${duration} &7秒内无法被攻击, 在此期间移速增加 &b${i * 10}% /s" +
                 "&7但同时, 自身也无法攻击目标"
     }
 
     companion object {
         const val COOLDOWN_SECONDS = 9L
         const val PHANTASM_KEEP_TIME = 15L
-        const val PERFECT_DODGE_WINDOW_MS = 100L
+        const val PERFECT_DODGE_WINDOW_MS = 600L
         const val PERFECT_PHANTASM_KEEP_TIME = 18L
-        const val PERFECT_PHANTASM_HEAL = 6.0
+        const val PERFECT_PHANTASM_HEAL = 8.0
     }
 
     private val instance = Main.instance
@@ -92,26 +93,24 @@ class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
         state.isActive = true
         activePlayers.add(player.uniqueId)
 
-        player.walkSpeed = state.defaultSpeed * (1 + level * 0.1F)
+        player.sendMessage(CC.translate("&8かむい!"))
+        player.walkSpeed = state.defaultSpeed * (1 + (level * 0.15F))
         scheduleDeactivation(player, state, calculateDuration(level))
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun onDefense(evt: EntityDamageByEntityEvent) {
-        if (evt.entity !is Player || evt.damager !is Player) return
-        if (evt.isCancelled) return
-
-        val victim = evt.entity as Player
+        val victim = evt.entity as? Player ?: return
 
         if (!activePlayers.contains(victim.uniqueId)) return
 
-        val state = state[victim.uniqueId] ?: return
+        val state = getState(victim)
         if (!state.isActive) return
 
         evt.isCancelled = true
 
         val currentTime = System.currentTimeMillis()
-        if (currentTime - state.startTime > PERFECT_DODGE_WINDOW_MS) return
+        if (currentTime - state.startTime > PERFECT_DODGE_WINDOW_MS || !state.isPerfect) return
 
         victim.sendMessage(CC.translate("&8虚影 &7完美虚化!"))
         state.isPerfect = true
@@ -122,14 +121,11 @@ class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
 
     @EventHandler(priority = EventPriority.LOW)
     fun onAttack(evt: EntityDamageByEntityEvent) {
-        if (evt.damager !is Player || evt.entity !is Player) return
-        if (evt.isCancelled) return
-
-        val damager = evt.damager as Player
+        val damager = if (evt.entity is Arrow) (evt.entity as Arrow).shooter as? Player ?: return else evt.damager as? Player ?: return
 
         if (!activePlayers.contains(damager.uniqueId)) return
 
-        val state = state[damager.uniqueId] ?: return
+        val state = getState(damager)
         if (!state.isActive) return
 
         evt.isCancelled = true
