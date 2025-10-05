@@ -49,6 +49,7 @@ class Main : JavaPlugin() {
 
     private val songs: MutableMap<String, Song> = HashMap()
     private val scheduler: ScheduledExecutorService = Executors.newScheduledThreadPool(3)
+    private var serverLoaded = false
 
     private val depends = listOf(
         "LuckPerms",
@@ -135,7 +136,9 @@ class Main : JavaPlugin() {
                     send("&fThePit Ultimate &a已加载完毕, 正在加载...")
                     this.cancel()
                     setUp()
-                    Bukkit.setWhitelist(false)
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(instance, {
+                        serverLoaded = true
+                    }, 5 * 20L)
                 }
             }.runTaskTimerAsynchronously(this, 0, 5 * 20L)
         }, 21L)
@@ -308,5 +311,9 @@ class Main : JavaPlugin() {
         @JvmStatic
         lateinit var instance: Main
             private set
+    }
+
+    fun isServerLoaded(): Boolean {
+        return serverLoaded
     }
 }
