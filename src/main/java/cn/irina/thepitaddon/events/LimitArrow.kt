@@ -9,39 +9,39 @@ import org.bukkit.event.player.PlayerInteractEvent
 
 class LimitArrow : Listener {
     @EventHandler
-    fun onPlayerShootsArrow(cnm: PlayerInteractEvent) {
-        val cnm1 = cnm.player
-        if (cnm1.hasPermission("pit.shoot") &&
-            cnm.action != null && cnm.action.name.contains("RIGHT_CLICK") &&
-            cnm1.itemInHand.type == Material.BOW
+    fun onPlayerShootsArrow(event: PlayerInteractEvent) {
+        val player = event.player
+        if (player.hasPermission("pit.shoot") &&
+            event.action != null && event.action.name.contains("RIGHT_CLICK") &&
+            player.itemInHand.type == Material.BOW
         ) {
-            cnm2(cnm1)
+            limitArrowCount(player)
         }
     }
 
-    private fun cnm2(cnm3: Player) {
-        val cnm4 = cnm3.inventory.contents
+    private fun limitArrowCount(player: Player) {
+        val currentArrowCount = player.inventory.contents
             .filter { it != null && it.type == Material.ARROW }
             .sumOf { it.amount }
 
-        if (cnm4 < 32) cnm5(cnm3, 32 - cnm4)
-        if (cnm4 > 32) cnm6(cnm3, cnm4 - 32)
+        if (currentArrowCount < 32) addArrows(player, 32 - currentArrowCount)
+        if (currentArrowCount > 32) removeArrows(player, currentArrowCount - 32)
     }
 
-    private fun cnm5(cnm7: Player, cnm8: Int) {
-        cnm7.inventory.addItem(cnm9(cnm8).build())
+    private fun addArrows(player: Player, amount: Int) {
+        player.inventory.addItem(createArrowItem(amount).build())
     }
 
-    private fun cnm6(cnm10: Player, cnm11: Int) {
-        cnm10.inventory.removeItem(cnm9(cnm11).build())
+    private fun removeArrows(player: Player, amount: Int) {
+        player.inventory.removeItem(createArrowItem(amount).build())
     }
 
-    private fun cnm9(cnm12: Int): ItemBuilder {
+    private fun createArrowItem(amount: Int): ItemBuilder {
         return ItemBuilder(Material.ARROW)
             .internalName("default_arrow")
             .defaultItem()
             .canDrop(false)
             .canSaveToEnderChest(false)
-            .amount(cnm12)
+            .amount(amount)
     }
 }
