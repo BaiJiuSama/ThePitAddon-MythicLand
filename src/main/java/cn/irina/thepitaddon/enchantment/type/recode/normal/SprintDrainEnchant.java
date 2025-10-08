@@ -62,8 +62,9 @@ public class SprintDrainEnchant extends AbstractEnchantment implements IPlayerSh
             AtomicDouble boostDamage,
             AtomicBoolean cancel
     ) {
-        PitManager.givePlayerSpeedBuff(
+        PitManager.givePlayerPotionEffect(
                 attacker,
+                PotionEffectType.SPEED,
                 20 * (enchantLevel * 2 + 1),
                 enchantLevel >= 3 ? 1 : 0
         );

@@ -38,12 +38,12 @@ class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     override fun getMaxEnchantLevel(): Int = 3
     override fun getNbtName(): String = "phantasm"
 
-    override fun getUsefulnessLore(i: Int): String {
-        val duration = i * 0.75
-        val speedBonus = (i * SPEED_MULTIPLIER_PER_LEVEL * 100).toInt()
+    override fun getUsefulnessLore(level: Int): String {
+        val durationSeconds = level * DURATION_PER_LEVEL_SECONDS
+        val speedBonus = (level * SPEED_MULTIPLIER_PER_LEVEL * 100).toInt()
         return "&7穿戴附有此附魔的 &e神话之甲 &7时 /s" +
-                "&7单击下蹲键将触发效果 &8虚化 (${duration}s) &7(9s冷却) /s" +
-                "&7效果 &8虚化&7: &7在 &e${duration} &7秒内无法被攻击, 在此期间移速增加 &b${speedBonus}% /s" +
+                "&7单击下蹲键将触发效果 &8虚化 (${durationSeconds}s) &7(${COOLDOWN_SECONDS}s冷却) /s" +
+                "&7效果 &8虚化&7: &7在 &e${durationSeconds} &7秒内无法被攻击, 在此期间移速增加 &b${speedBonus}% /s" +
                 "&7但同时, 自身也无法攻击目标"
     }
 
@@ -53,145 +53,176 @@ class Phantasm : AbstractEnchantment(), Listener, IActionDisplayEnchant {
     private val lastAccessTimeMap = ConcurrentHashMap<UUID, Long>()
 
     companion object {
-        const val COOLDOWN_SECONDS = 9L
-        const val PHANTASM_KEEP_TIME = 15L
-        const val PERFECT_DODGE_WINDOW_MS = 600L
-        const val PERFECT_PHANTASM_KEEP_TIME = 18L
-        const val PERFECT_PHANTASM_HEAL = 8.0
-        const val SPEED_MULTIPLIER_PER_LEVEL = 0.15F
-        const val CLEANUP_INTERVAL_TICKS = 20L * 60L * 20L
-        const val STATE_EXPIRE_TIME_MS = 30L * 60L * 1000L
+        // 核心配置
+        private const val COOLDOWN_SECONDS = 9L
+        private const val DURATION_PER_LEVEL_SECONDS = 0.75
+        private const val BASE_DURATION_TICKS = 15L
+        private const val SPEED_MULTIPLIER_PER_LEVEL = 0.15F
+
+        // 完美虚化配置
+        private const val PERFECT_DODGE_WINDOW_MS = 600L
+        private const val PERFECT_DURATION_MULTIPLIER = 1.2
+        private const val PERFECT_HEAL = 8.0
+
+        // 清理配置
+        private const val CLEANUP_INTERVAL_TICKS = 20L * 60L * 20L // 20分钟
+        private const val STATE_EXPIRE_TIME_MS = 30L * 60L * 1000L // 30分钟
+
+        // 消息常量
+        private const val MSG_ACTIVATE = "&8かむい!"
+        private const val MSG_PERFECT = "&8虚影 &7完美虚化!"
+        private const val MSG_CANNOT_ATTACK = "&8虚影 &7虚化状态下无法攻击!"
     }
 
     init {
         startCleanupTask()
     }
 
+    // ==================== 状态管理 ====================
+
     private fun getState(player: Player): PhantasmState {
         lastAccessTimeMap[player.uniqueId] = System.currentTimeMillis()
         return stateMap.getOrPut(player.uniqueId) { PhantasmState() }
     }
 
-    private fun scheduleDeactivation(player: Player, state: PhantasmState, keepTime: Long) {
+    private fun Player.scheduleDeactivation(state: PhantasmState, durationTicks: Long) {
         state.task?.cancel()
         state.task = Bukkit.getScheduler().runTaskLater(instance, {
-            state.isActive = false
-            state.isPerfect = false
-
-            if (player.isOnline) {
-                player.walkSpeed = state.defaultSpeed
-            }
-
-            state.task = null
-        }, keepTime)
+            deactivatePhantasm(state)
+        }, durationTicks)
     }
+
+    private fun Player.deactivatePhantasm(state: PhantasmState) {
+        state.isActive = false
+        state.isPerfect = false
+        if (isOnline) {
+            walkSpeed = state.defaultSpeed
+        }
+        state.task = null
+    }
+
+    // ==================== 事件处理 ====================
 
     @EventHandler
     fun onSneak(evt: PlayerToggleSneakEvent) {
-        val player = evt.player
-        if (!player.isSneaking) return
+        if (!evt.player.isSneaking) return
+        evt.player.tryActivatePhantasm()
+    }
 
-        val leggings = player.inventory.leggings ?: return
-        val level = pitApi.getItemEnchantLevel(leggings, nbtName)
+    private fun Player.tryActivatePhantasm() {
+        val level = inventory.leggings?.let { pitApi.getItemEnchantLevel(it, nbtName) } ?: 0
         if (level < 1) return
 
-        val state = getState(player)
+        val state = getState(this)
         if (!state.cooldown.hasExpired()) return
 
-        state.cooldown = Cooldown(COOLDOWN_SECONDS, TimeUnit.SECONDS)
-        state.level = level
-        state.startTime = System.currentTimeMillis()
-        state.isActive = true
+        // 激活虚影状态
+        state.apply {
+            cooldown = Cooldown(COOLDOWN_SECONDS, TimeUnit.SECONDS)
+            this.level = level
+            startTime = System.currentTimeMillis()
+            isActive = true
+        }
 
-        player.sendMessage(CC.translate("&8かむい!"))
-        player.walkSpeed = state.defaultSpeed * (1 + (level * SPEED_MULTIPLIER_PER_LEVEL))
-        scheduleDeactivation(player, state, calculateDuration(level))
+        sendMessage(CC.translate(MSG_ACTIVATE))
+        walkSpeed = state.defaultSpeed * (1 + level * SPEED_MULTIPLIER_PER_LEVEL)
+        scheduleDeactivation(state, calculateDuration(level))
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun onDefense(evt: EntityDamageByEntityEvent) {
         val victim = evt.entity as? Player ?: return
-
         val state = getState(victim)
         if (!state.isActive) return
 
         evt.isCancelled = true
 
-        val currentTime = System.currentTimeMillis()
-        val timeSinceActivation = currentTime - state.startTime
-
-        if (timeSinceActivation <= PERFECT_DODGE_WINDOW_MS && !state.isPerfect) {
-            victim.sendMessage(CC.translate("&8虚影 &7完美虚化!"))
-            state.isPerfect = true
-            PlayerUtil.heal(victim, PERFECT_PHANTASM_HEAL)
-            scheduleDeactivation(victim, state, calculatePerfectDuration(state.level))
+        // 检查是否触发完美虚化
+        if (state.shouldTriggerPerfectDodge()) {
+            victim.handlePerfectDodge(state)
         }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     fun onAttack(evt: EntityDamageByEntityEvent) {
-        val damager = if (evt.damager is Arrow) {
-            (evt.damager as Arrow).shooter as? Player ?: return
-        } else {
-            evt.damager as? Player ?: return
-        }
-
-        val state = getState(damager)
+        val attacker = evt.extractAttacker() ?: return
+        val state = getState(attacker)
         if (!state.isActive) return
 
         evt.isCancelled = true
-        damager.sendMessage(CC.translate("&8虚影 &7虚化状态下无法攻击!"))
+        attacker.sendMessage(CC.translate(MSG_CANNOT_ATTACK))
+    }
+
+    private fun PhantasmState.shouldTriggerPerfectDodge(): Boolean {
+        if (isPerfect) return false
+        val timeSinceActivation = System.currentTimeMillis() - startTime
+        return timeSinceActivation <= PERFECT_DODGE_WINDOW_MS
+    }
+
+    private fun Player.handlePerfectDodge(state: PhantasmState) {
+        sendMessage(CC.translate(MSG_PERFECT))
+        state.isPerfect = true
+        PlayerUtil.heal(this, PERFECT_HEAL)
+        scheduleDeactivation(state, calculateDuration(state.level, isPerfect = true))
+    }
+
+    private fun EntityDamageByEntityEvent.extractAttacker(): Player? = when (val dmg = damager) {
+        is Arrow -> dmg.shooter as? Player
+        is Player -> dmg
+        else -> null
     }
 
     @EventHandler
-    fun onQuit(evt: PlayerQuitEvent) {
-        cleanupPlayer(evt.player)
-    }
+    fun onQuit(evt: PlayerQuitEvent) = cleanupPlayer(evt.player)
 
     @EventHandler
-    fun onKick(evt: PlayerKickEvent) {
-        cleanupPlayer(evt.player)
-    }
+    fun onKick(evt: PlayerKickEvent) = cleanupPlayer(evt.player)
 
     @EventHandler
-    fun onDeath(evt: org.bukkit.event.entity.PlayerDeathEvent) {
-        cleanupPlayer(evt.entity)
-    }
+    fun onDeath(evt: org.bukkit.event.entity.PlayerDeathEvent) = cleanupPlayer(evt.entity)
+
+    // ==================== 工具方法 ====================
 
     private fun cleanupPlayer(player: Player) {
-        val playerState = stateMap.remove(player.uniqueId) ?: return
-        lastAccessTimeMap.remove(player.uniqueId)
-        playerState.cleanUp(player)
+        stateMap.remove(player.uniqueId)?.also { state ->
+            lastAccessTimeMap.remove(player.uniqueId)
+            state.cleanUp(player)
+        }
     }
 
-    private fun calculateDuration(level: Int): Long {
-        return level * PHANTASM_KEEP_TIME
-    }
-
-    private fun calculatePerfectDuration(level: Int): Long {
-        return level * PERFECT_PHANTASM_KEEP_TIME
+    private fun calculateDuration(level: Int, isPerfect: Boolean = false): Long {
+        val baseDuration = level * BASE_DURATION_TICKS
+        return if (isPerfect) {
+            (baseDuration * PERFECT_DURATION_MULTIPLIER).toLong()
+        } else {
+            baseDuration
+        }
     }
 
     private fun startCleanupTask() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(instance, {
-            val currentTime = System.currentTimeMillis()
-            val expiredPlayers = mutableListOf<UUID>()
-
-            lastAccessTimeMap.forEach { (uuid, lastTime) ->
-                if (currentTime - lastTime > STATE_EXPIRE_TIME_MS) {
-                    expiredPlayers.add(uuid)
-                }
-            }
-
-            expiredPlayers.forEach { uuid ->
-                stateMap.remove(uuid)?.cleanUp()
-                lastAccessTimeMap.remove(uuid)
-            }
-
-            if (expiredPlayers.isNotEmpty()) {
-                Bukkit.getLogger().info("[Phantasm] 清理了 ${expiredPlayers.size} 个过期的玩家状态")
-            }
+            performPeriodicCleanup()
         }, CLEANUP_INTERVAL_TICKS, CLEANUP_INTERVAL_TICKS)
+    }
+
+    private fun performPeriodicCleanup() {
+        val currentTime = System.currentTimeMillis()
+        val iterator = lastAccessTimeMap.entries.iterator()
+        var cleanupCount = 0
+
+        // 使用 iterator 一次遍历完成删除，避免 ConcurrentModificationException
+        while (iterator.hasNext()) {
+            val (uuid, lastTime) = iterator.next()
+            if (currentTime - lastTime > STATE_EXPIRE_TIME_MS) {
+                iterator.remove()
+                stateMap.remove(uuid)?.cleanUp()
+                cleanupCount++
+            }
+        }
+
+        if (cleanupCount > 0) {
+            Bukkit.getLogger().info("[Phantasm] 清理了 $cleanupCount 个过期的玩家状态")
+        }
     }
 
     override fun getText(p0: Int, p: Player): String {
