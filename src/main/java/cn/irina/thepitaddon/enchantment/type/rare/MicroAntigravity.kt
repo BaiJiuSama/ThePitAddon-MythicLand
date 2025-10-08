@@ -15,6 +15,7 @@ import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffectType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -82,8 +83,9 @@ class MicroAntigravity : AbstractEnchantment(), IPlayerDamaged {
             player.sendMessage(CC.translate("&b&l引力回溯! &7针对触发 " + ap.formattedNameWithRoman))
             keepBoost[playerUUID] = Cooldown(12L, TimeUnit.SECONDS)
             PlayerUtil.heal(player, 4.0)
-            PitManager.givePlayerSpeedBuff(
+            PitManager.givePlayerPotionEffect(
                 player,
+                PotionEffectType.SPEED,
                 8 * 20,
                 enchantLevel - 1
             )

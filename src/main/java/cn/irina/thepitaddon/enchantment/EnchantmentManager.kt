@@ -197,6 +197,7 @@ class EnchantmentManager {
         }
 
         ThePit.getInstance().enchantmentFactor.init(filteredEnchants)
+        ThePit.getInstance().enchTable.reload()
 //        for (removalEnchants in removalEnchants()) {
 //            ThePit.getInstance().enchantmentFactor.unregister(removalEnchants,null)
 //        }

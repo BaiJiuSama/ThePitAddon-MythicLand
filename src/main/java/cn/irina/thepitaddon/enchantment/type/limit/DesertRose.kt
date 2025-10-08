@@ -137,7 +137,7 @@ class DesertRose : AbstractEnchantment(), IPlayerShootEntity, Listener, IActionD
                     if (!Companion.blueLaserCooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) return
                     player.teleport(entity.location.clone())
                     blueLaserCooldown[player.uniqueId] = Cooldown(15, TimeUnit.SECONDS)
-                    PitManager.givePlayerSpeedBuff(player, level * 2 * 20 + 4 * 20, level)
+                    PitManager.givePlayerPotionEffect(player, PotionEffectType.SPEED,level * 2 * 20 + 4 * 20, level)
                     blueLaserCooldown[player.uniqueId] = Cooldown(15, TimeUnit.SECONDS)
                 }
                 return

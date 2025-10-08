@@ -56,7 +56,8 @@ class MinersEnchant : AbstractEnchantment(), IPlayerKilledEntity {
         experience: AtomicDouble
     ) {
         val profile = PlayerProfile.getPlayerProfileByUuid(myself.uniqueId)
-        if (profile.streakKills % 1000 != 0.0) return
+        val streakKills = profile.streakKills
+        if (streakKills.toInt() % 1000 != 0 || streakKills == 0.0) return
         val pitItem = PitItem()
         val chance = 0.01 * (enchantLevel + 2) * 10
         val playerId = myself.uniqueId

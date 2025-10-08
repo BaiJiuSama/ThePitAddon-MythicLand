@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class BowComboEnchant extends AbstractEnchantment implements IPlayerShoot
             public void run() {
                 if (combo.getOrDefault(attacker.getUniqueId(), 0) >= (enchantLevel >= 2 ? 2 : 3)) {
                     combo.put(attacker.getUniqueId(), 0);
-                    PitManager.givePlayerSpeedBuff(attacker, 20 * (enchantLevel + 2), enchantLevel);
+                    PitManager.givePlayerPotionEffect(attacker, PotionEffectType.SPEED, 20 * (enchantLevel + 2), enchantLevel);
                 }
             }
         }.runTaskLater(ThePit.getInstance(), 2L);

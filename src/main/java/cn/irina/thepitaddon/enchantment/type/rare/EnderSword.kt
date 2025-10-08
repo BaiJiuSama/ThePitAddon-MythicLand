@@ -73,7 +73,7 @@ class EnderSword : AbstractEnchantment(), Listener, IActionDisplayEnchant {
         Companion.cooldown.put(player.uniqueId, Cooldown((if (level >= 3) 20 else 30).toLong(), TimeUnit.SECONDS))
         enchantLevel.put(player.uniqueId, level)
         player.launchProjectile(EnderPearl::class.java).shooter = player
-        PlayerUtil.damage(player, PlayerUtil.DamageType.TRUE, damage, false)
+        PlayerUtil.damage(player, PlayerUtil.DamageType.TRUE, damage.toDouble(), false)
     }
 
     fun onPlayerQuit(event: PlayerQuitEvent) {

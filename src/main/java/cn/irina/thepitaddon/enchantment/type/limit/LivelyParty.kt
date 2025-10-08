@@ -49,13 +49,13 @@ class LivelyParty: AbstractEnchantment(), ITickTask, IActionDisplayEnchant {
                 .toList()
                 .size
 
-            targets[p.uniqueId] = radiusPlayers
+            targets[p.uniqueId] = radiusPlayers!!
         }
 
         val maxCount = i * MAX_TARGETS
         if (radiusPlayers == null || radiusPlayers == 0) return
 
-        val count = radiusPlayers.coerceAtMost(maxCount)
+        val count = radiusPlayers!!.coerceAtMost(maxCount)
         PlayerUtil.heal(p, count.toDouble())
     }
 

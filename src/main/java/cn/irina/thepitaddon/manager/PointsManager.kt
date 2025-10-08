@@ -10,21 +10,22 @@ import org.bukkit.entity.Player
  */
 
 object PointsManager {
-    val pointsAPI: PlayerPointsAPI = Main.instance.pointsAPI
+    val pointsAPI: PlayerPointsAPI?
+        get() = Main.instance.pointsAPI
 
     fun getPoints(player: Player): Int {
-        return pointsAPI.look(player.uniqueId)
+        return pointsAPI?.look(player.uniqueId) ?: 0
     }
 
     fun addPoints(player: Player, amount: Int) {
-        pointsAPI.give(player.uniqueId, amount)
+        pointsAPI?.give(player.uniqueId, amount)
     }
 
     fun takePoints(player: Player, amount: Int) {
-        pointsAPI.take(player.uniqueId, amount)
+        pointsAPI?.take(player.uniqueId, amount)
     }
 
     fun setPoints(player: Player, amount: Int) {
-        pointsAPI.set(player.uniqueId, amount)
+        pointsAPI?.set(player.uniqueId, amount)
     }
 }

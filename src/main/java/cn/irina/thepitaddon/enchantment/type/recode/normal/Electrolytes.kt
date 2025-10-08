@@ -67,7 +67,12 @@ class Electrolytes : AbstractEnchantment(), IPlayerKilledEntity {
             myself.removePotionEffect(p.type)
             val maxDuration = (enchantLevel + 2) * 6 * 20
             val finalDuration = if (duration >= maxDuration) maxDuration else duration
-            PitManager.givePlayerSpeedBuff(myself, finalDuration, p.amplifier)
+            PitManager.givePlayerPotionEffect(
+                myself,
+                PotionEffectType.SPEED,
+                finalDuration,
+                p.amplifier
+            )
         }
     }
 }

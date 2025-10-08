@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.potion.PotionEffectType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -93,8 +94,9 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         if (!cooldown.getOrDefault(player.uniqueId, Cooldown(0)).hasExpired()) return
         cooldown[player.uniqueId] = Cooldown(1, TimeUnit.SECONDS)
         if (level > 1) {
-            PitManager.givePlayerSpeedBuff(
+            PitManager.givePlayerPotionEffect(
                 player,
+                PotionEffectType.SPEED,
                 20 * level * 2,
                 level - 2
             )
@@ -124,8 +126,9 @@ class PiercingBow : AbstractEnchantment(), IPlayerShootEntity, Listener, IAction
         val currentHitCount = hitCount.getOrDefault(playerId, 0) + 1
         hitCount[playerId] = currentHitCount
         if (currentHitCount == 2) {
-            PitManager.givePlayerSpeedBuff(
+            PitManager.givePlayerPotionEffect(
                 attacker,
+                PotionEffectType.SPEED,
                 20 * (enchantLevel + 1) + 20 * 2,
                 enchantLevel
             )

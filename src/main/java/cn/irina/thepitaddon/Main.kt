@@ -64,9 +64,16 @@ class Main : JavaPlugin() {
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
     private val filterManager: FilterManager = FilterManager(instance)
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
-    val pointsAPI: PlayerPointsAPI = PlayerPoints.getInstance().api
+    val pointsAPI: PlayerPointsAPI?
+        get() {
+            val playerPoints = Bukkit.getPluginManager().getPlugin("PlayerPoints")
+            return if (playerPoints is PlayerPoints) playerPoints.api else null
+        }
     var kbmAPI: KnockbackManagerAPI? = null
         private set
+    fun getFilterManager(): FilterManager{
+        return filterManager
+    }
 
     private fun modifyRarityPrefix() {
         try {
@@ -107,6 +114,7 @@ class Main : JavaPlugin() {
         send("&7作者: &fIrina &7| &fhttps://github.com/BaiJiuSama")
 
         saveResource("config.yml", false)
+        saveResource("filter.yml", false)
 
         Bukkit.getScheduler().runTaskLater(this, {
             depends.forEach {
@@ -130,7 +138,6 @@ class Main : JavaPlugin() {
                         while (true) {
                             Thread.sleep(Long.MAX_VALUE)
                         }
-                        return
                     }
 
                     if (ThePit.getApi() == null) return
@@ -246,6 +253,7 @@ class Main : JavaPlugin() {
                 Broadcast(),
                 PlayerProving(),
                 OpenMenu(),
+                ReloadConfig(),
             )
             .build()
     }
