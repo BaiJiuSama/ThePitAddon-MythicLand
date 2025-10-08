@@ -1,7 +1,8 @@
 package cn.irina.thepitaddon.manager
 
 import cn.charlotte.pit.ThePit
-import cn.irina.thepitaddon.Main
+import cn.charlotte.pit.data.PlayerProfile
+import cn.charlotte.pit.data.sub.EnchantmentRecord
 import dev.rollczi.litecommands.annotations.context.Context
 import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.item.ItemUtil
@@ -19,9 +20,7 @@ import org.bukkit.potion.PotionEffectType
  */
 
 object PitManager {
-    private val pitInstance = ThePit.getInstance()
     private val pitApi = ThePit.api
-    val prefix = Main.instance.PREFIX
 
     @JvmStatic
     fun hasInternalName(item: ItemStack, internalName: String): Boolean {
@@ -90,25 +89,46 @@ object PitManager {
         return amount
     }
 
+
+    /**
+     * 智能判断玩家身上的Buff等级与时长
+     *
+     * 判断逻辑:
+     * 1. 玩家身上没有该效果 -> 直接给予效果
+     * 2. 玩家身上有该效果, 但等级低于被给予值 -> 清除原效果重新施加
+     * 3. 玩家身上有该效果, 但等级高于被给予值 -> 不做处理
+     * 4. 玩家身上有该效果, 但等级等于被给予值 -> 清除原效果重新施加
+     *
+     * @param player 玩家
+     * @param effectType 玩家要给予的Buff
+     * @param duration 玩家要给予的Buff的持续时间
+     * @param level 玩家要给予的Buff的等级
+     **/
+
+
     @JvmStatic
-    fun givePlayerSpeedBuff(player: Player, duration: Int, level: Int) {
-        val existingSpeed = player.activePotionEffects.find { it.type == PotionEffectType.SPEED }
-        if (existingSpeed == null) {
+    fun givePlayerPotionEffect(
+        player: Player,
+        effectType: PotionEffectType,
+        duration: Int, level: Int
+    ) {
+        val existingEffect = player.activePotionEffects.find { it.type == effectType }
+        if (existingEffect == null) {
             player.addPotionEffect(
                 PotionEffect(
-                    PotionEffectType.SPEED,
+                    effectType,
                     duration,
                     level,
                     true
                 )
             )
         } else {
-            if (existingSpeed.amplifier > level) return
-            if (existingSpeed.amplifier >= level && existingSpeed.duration > duration) return
-            player.removePotionEffect(PotionEffectType.SPEED)
+            if (existingEffect.amplifier > level) return
+            if (existingEffect.amplifier >= level && existingEffect.duration > duration) return
+            player.removePotionEffect(effectType)
             player.addPotionEffect(
                 PotionEffect(
-                    PotionEffectType.SPEED,
+                    effectType,
                     duration,
                     level,
                     true
@@ -133,6 +153,20 @@ object PitManager {
     }
 
     @JvmStatic
+    fun unScamArtist(player: Player, price: Int): Int {
+        // 我的世界反推。
+        // 计算经过商场欺诈术前应有的原始价格
+        val profile = PlayerProfile.getPlayerProfileByUuid(player.uniqueId)
+        val scamArtistData = profile.unlockedPerkMap["ScamArtist"]
+        return if (scamArtistData != null && scamArtistData.level > 0) {
+            val discountFactor = 1 - 0.05 * scamArtistData.level
+            (price / discountFactor).toInt() + 1
+        } else {
+            price
+        }
+    }
+
+    @JvmStatic
     fun hasInternalItem(player: Player, internalName: String): Boolean {
         return getInternalItemAmount(player, internalName) > 0
     }
@@ -140,5 +174,38 @@ object PitManager {
     @JvmStatic
     fun hasEnoughInternalItem(player: Player, internalName: String, count: Int): Boolean {
         return getInternalItemAmount(player, internalName) >= count
+    }
+
+    @JvmStatic
+    fun getItemUuid(itemStack: ItemStack): String? {
+        return ItemUtil.getUUID(itemStack)
+    }
+
+    // 获取物品的所有附魔记录
+    @JvmStatic
+    fun getEnchantrecords(itemStack: ItemStack): List<EnchantmentRecord> {
+        val item = ThePit.getInstance().itemFactory.getItemFromStack(itemStack) ?: return listOf()
+        return item.enchantmentRecords
+    }
+
+    // 获取物品的第一个附魔记录
+    @JvmStatic
+    fun getFirstEnchantRecord(itemStack: ItemStack): EnchantmentRecord? {
+        val item = ThePit.getInstance().itemFactory.getItemFromStack(itemStack) ?: return null
+        return item.enchantmentRecords.firstOrNull()
+    }
+
+    // 获取物品第一次附魔的时间
+    @JvmStatic
+    fun getFirstEnchantRecordTime(itemStack: ItemStack): Long? {
+        val item = ThePit.getInstance().itemFactory.getItemFromStack(itemStack) ?: return null
+        return item.enchantmentRecords.firstOrNull()?.timestamp
+    }
+
+    // 获取物品第一个附魔者
+    @JvmStatic
+    fun getFirstEnchantRecordEnchanter(itemStack: ItemStack): String? {
+        val item = ThePit.getInstance().itemFactory.getItemFromStack(itemStack) ?: return null
+        return item.enchantmentRecords.firstOrNull()?.enchanter
     }
 }

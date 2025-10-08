@@ -30,6 +30,8 @@ dependencies {
     implementation("fastutil:fastutil:5.0.9")
     compileOnly(fileTree(baseDir = "lib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.22.0")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.22.0")
 
 }
 

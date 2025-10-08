@@ -9,6 +9,7 @@ import cn.irina.thepitaddon.command.player.buyItems.BuyExDiamondItem
 import cn.irina.thepitaddon.command.player.buyItems.BuyIronHelmet
 import cn.irina.thepitaddon.command.player.buyItems.BuyPhysicalCoin
 import cn.irina.thepitaddon.enchantment.EnchantmentManager
+import cn.irina.thepitaddon.manager.FilterManager
 import cn.irina.thepitaddon.runnable.Announcer
 import cn.irina.thepitaddon.runnable.FreeCE
 import cn.irina.thepitaddon.utils.BannerUtil
@@ -60,6 +61,7 @@ class Main : JavaPlugin() {
     private val file: File = File("plugins/ThePitAddon", "config.yml")
     private val cfg: FileConfiguration = YamlConfiguration.loadConfiguration(file)
     private val PlayerDataPath: String = cfg.getString("PlayerDataPath") ?: ""
+    private val filterManager: FilterManager = FilterManager(instance)
     val PREFIX: String = CC.translate(instance.config.getString("Prefix") ?: "&8[&bI&fRINA&8] &f| ")
     val pointsAPI: PlayerPointsAPI = PlayerPoints.getInstance().api
     var kbmAPI: KnockbackManagerAPI? = null
