@@ -7,10 +7,10 @@ import net.mizukilab.pit.enchantment.param.event.PlayerOnly
 import net.mizukilab.pit.enchantment.param.item.ArmorOnly
 import net.mizukilab.pit.enchantment.rarity.EnchantmentRarity
 import net.mizukilab.pit.parm.listener.IPlayerKilledEntity
+import net.mizukilab.pit.util.PlayerUtil
 import net.mizukilab.pit.util.cooldown.Cooldown
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
 /*
@@ -54,6 +54,7 @@ class Electrolytes : AbstractEnchantment(), IPlayerKilledEntity {
         experience: AtomicDouble?
     ) {
         if (!myself.hasPotionEffect(PotionEffectType.SPEED)) return
+        if (PlayerUtil.isVenom(myself)) return
 
         for (p in myself.activePotionEffects) {
             if (p.type != PotionEffectType.SPEED) continue
