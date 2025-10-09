@@ -17,7 +17,7 @@ class ItemFilterListener : Listener {
     }
     
     @EventHandler
-    fun onPlayerRespawn(event: PlayerTeleportEvent) {
+    fun onPlayerSpawn(event: PlayerTeleportEvent) {
         Main.instance.server.scheduler.runTaskLater(Main.instance, {
             Main.instance.getFilterManager().applyFilters(event.player)
         }, 20L)
